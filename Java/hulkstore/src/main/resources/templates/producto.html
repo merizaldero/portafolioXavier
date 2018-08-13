@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title th:text="'Hulk Store - ' + ${beanSesion.producto.nombreProducto}"></title>
+<link th:href="@{/css/hulkstore.css}" rel="stylesheet" />
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/js/comun.js}"></script>
+<script th:src="@{/js/producto.js}"></script>
+</head>
+<body>
+	<div id="encabezado">
+		<a style="border:none" th:href="@{/hulkstore}"><img id="encabezadoMarvel" th:src="@{/img/marvel.png}"/></a>
+		<h2 th:text="'Hulk Store - ' + ${beanSesion.producto.nombreProducto}"></h2>
+		<a class="finalizarSesion" th:href="@{/logout}">Finalizar Sesion</a>
+		<img id="encabezadoDC" th:src="@{/img/dc.png}">
+	</div>
+	<div id="divMensaje"><span th:text="${mensaje}"></span><button>x</button></div>
+	<div id="contenido">
+		<div class="encabezadoTabla">Informaci&oacute;n de Producto</div>
+		<form id="frmProducto" name="frmProducto" method="POST"
+			th:action="@{/guardaritem}" th:object="${beanSesion.producto}" onsubmit="return validarFormulario(this);">
+			<input type="hidden" name="idProducto" th:value="*{idProducto}"/>
+			<div>
+				<span>Nombre Producto</span>
+				<input type="text" maxlength="32" name="nombreProducto" th:value="*{nombreProducto}"/>
+			</div>
+			<div>
+				<span>Cantidad Disponible:</span>
+				<input type="number" maxlength="5" name="cantidadDisponible" th:value="*{cantidadDisponible}" th:disabled="*{idProducto} != null"/>
+			</div>
+			<div>
+				<span>Activo</span>
+				<input type="checkbox" maxlength="32" name="activo" value="1" th:checked="*{activo}" />
+			</div>
+			<div>
+			<input class="boton" type="submit" value="Guardar">
+			<a class="boton" th:href="@{/hulkstore}">Cancelar</a>
+			</div>
+		</form>
+		<div id="tablaMovimientos">
+			<div class="encabezadoTabla">
+				<span class="columnaFecha">Fecha</span>
+				<span class="columnaConcepto">Concepto</span>
+				<span class="columnaCantidad">Cantidad</span>
+				<span class="columnaSaldo">Saldo</span>
+				<a class="boton" th:href="@{/nuevomovimiento}">Ingresar Movimiento</a>
+			</div>
+			<div class="detalleTabla" th:each="movimiento : ${movimientos}">
+				<span class="columnaFecha" th:text="${#dates.format( movimiento.fecha , 'dd-MM-yyyy HH:mm')}"></span>
+				<span class="columnaConcepto" th:text="${movimiento.concepto}"></span>
+				<span class="columnaCantidad" th:text="${movimiento.cantidad}"></span>
+				<span class="columnaSaldo" th:text="${movimiento.saldo}"></span>
+			</div>
+		</div>
+	</div>
+	<div id="pie">
+		<span> &copy; 2018 Xavier Merizalde </span> <span> - Powered by
+			Spring Boot - </span>
+	</div>
+</body>
+</html>

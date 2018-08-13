@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title th:text="'Hulk Store - ' + ${beanSesion.producto.nombreProducto}"></title>
+<link th:href="@{/css/hulkstore.css}" rel="stylesheet" />
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/js/comun.js}"></script>
+<script th:src="@{/js/movimiento.js}"></script>
+</head>
+<body>
+	<div id="encabezado">
+		<a style="border:none" th:href="@{/hulkstore}"><img id="encabezadoMarvel" th:src="@{/img/marvel.png}"/></a>
+		<h2 th:text="'Hulk Store - ' + ${beanSesion.producto.nombreProducto}"></h2>
+		<a class="finalizarSesion" th:href="@{/logout}">Finalizar Sesion</a>
+		<img id="encabezadoDC" th:src="@{/img/dc.png}">
+	</div>
+	<div id="divMensaje"><span th:text="${mensaje}"></span><button>x</button></div>
+	<div id="contenido">
+		<div class="encabezadoTabla">Informaci&oacute;n de Producto</div>
+		<div id="frmProducto" th:object="${beanSesion.producto}">
+			<input type="hidden" name="idProducto" th:value="*{idProducto}"/>
+			<div>
+				<span>Nombre Producto</span>
+				<span th:text="*{nombreProducto}"></span>
+			</div>
+			<div>
+				<span>Cantidad Disponible:</span>
+				<span th:text="*{cantidadDisponible}"></span>
+			</div>
+			<div>
+				<span th:text="*{activo}?'Activo':'Inactivo'" />
+			</div>
+		</div>
+		<div class="encabezadoTabla">Nuevo Movimiento</div>
+		<form id="frmMovimiento" name="frmMovimiento" method="POST" th:action="@{/guardarmovimiento}" th:object="${beanSesion.movimientoProducto}" onsubmit="return validarFormulario(this);" >
+			<div>
+				<span>Concepto</span>
+				<input type="text" maxlength="128" name="concepto" th:value="*{concepto}"/>
+			</div>
+			<div>
+				<span>Cantidad</span>
+				<input type="number" maxlength="5" name="cantidad" th:value="*{cantidad}" id="txtCantidad"/>
+			</div>
+			<div>
+				<span>(Cantidades negativas representan egresos)</span>
+			</div>
+			<div>
+				<span>Saldo</span>
+				<input type="number" maxlength="5" name="saldo" value ="0" id="txtSaldo" disabled="disabled"/>
+			</div>
+			<div>
+			<input class="boton" type="submit" value="Registrar">
+			<a class="boton" th:href="@{/producto?idProducto=}+${beanSesion.producto.idProducto}">Cancelar</a>
+			</div>
+		</form>
+	</div>
+	<div id="pie">
+		<span> &copy; 2018 Xavier Merizalde </span> <span> - Powered by
+			Spring Boot - </span>
+	</div>
+</body>
+</html>

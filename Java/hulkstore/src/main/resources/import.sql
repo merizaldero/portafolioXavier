@@ -1,0 +1,5 @@
+insert into USUARIO (ID_USUARIO, PASSWORD, NOMBRE_USUARIO, ACTIVO ) values ('admin', 'admin', 'Administrador', 1)
+
+insert into PRODUCTO (ID_PRODUCTO,NOMBRE_PRODUCTO, CANTIDAD_DISPONIBLE, ACTIVO, FECHA_CREACION, USUARIO_CREACION) values (SEQ_PRODUCTO.nextVal,'Gorra Spiderman', 4, 1, '2018-08-11', 'admin')
+
+insert into MOVIMIENTO_PRODUCTO (ID_MOVIMIENTO, ID_PRODUCTO, CONCEPTO, FECHA, CANTIDAD, SALDO, ID_USUARIO) values (SEQ_MOVIMIENTO.nextVal, 1, 'Inventario Inicial', '2018-08-11', 4, 4, 'admin')
