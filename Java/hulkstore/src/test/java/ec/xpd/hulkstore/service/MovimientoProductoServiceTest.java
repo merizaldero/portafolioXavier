@@ -114,7 +114,7 @@ public class MovimientoProductoServiceTest {
 	@Test
 	public void egresoSinStockTest() {
 		
-		int deltaCantidad = -11;
+		int deltaCantidad = -25;
 		
 		Producto producto = productoRepository.findById(1).get();
 		int conteoMovimientosAntes = movimientoProductoService.findByProducto(producto.getIdProducto()).size();
