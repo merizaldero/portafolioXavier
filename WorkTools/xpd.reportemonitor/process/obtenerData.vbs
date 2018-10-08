@@ -114,17 +114,35 @@ For Each aplicacion in aplicacionNodes
 	If conteoAplicacion > 0 Then
 		outputFile.Write(",")
 	End If
-	outputFile.WriteLine("{ '")
+	outputFile.WriteLine("'" & idAplicacion & "' : {" )
+	conteoItem = 0
 	
 	For Each item in itemNodes
 		idItem = item.Attributes.getNamedItem("nombre")
 		cadenaConexion = item.Attributes.getNamedItem("cadenaConexion")
 		Set consultaNodes = item.selectNodes("Consulta")
+		
+		If conteoItem > 0 Then
+			outputFile.Write(",")
+		End If
+		outputFile.WriteLine("'" & idItem & "' : {" )
+		conteoItem = 0
+
 		For Each consulta in consultaNodes
 			nombrePropiedad = consulta.Attributes.getNamedItem("dato")
-			numeroColumna = val(consulta.Attributes.getNamedItem(@a"))
+			numeroColumna = Val(consulta.Attributes.getNamedItem("numeroColumna"))
+			consultaSql = consulta.Text
+			consultaSql = Replace(consultaSql, "{0}", fechaIso)
+			consultaSql = Replace(consultaSql, "{1}", horaInicio)
+			consultaSql = Replace(consultaSql, "{2}", horaFin)
+			
+			valor = ConsultarDato(consultaSql, connectionString, numeroColumna)
 			
 		Next
+		
+		conteoItem = conteoItem + 1
+		outputFile.WriteLine("}")
+		
 	Next
 	
 	conteoAplicacion = conteoAplicacion + 1
