@@ -1,0 +1,57 @@
+table {
+	width:100%;
+	margin:0px;
+	border-top:1px solid black;
+	border-left: 1px solid black;
+	border-bottom: 0px;
+	border-right: 0px;
+	padding: none;
+	border-collapse:collapse;
+}
+
+tr {
+	margin: 0px;
+	border-top: 0px;
+	border-left: 0px;
+	border-bottom: 0px;
+	border-right: 0px;
+	padding:0px;
+}
+
+table table, tr tr{
+	border-top: none;
+	border-left: none;
+	border-bottom: none;
+	border-right: none;
+}
+
+th , td{
+	width:100%;
+	margin:0px;
+	border-top:0px;
+	border-left:0px;
+	border-bottom: 1px solid black;
+	border-right: 1px solid black;
+}
+
+.columnaAplicacion {
+	width:25%;
+}
+
+.columnaItemInfo {
+	width:75%;
+}
+
+.columnaItem {
+	width:33.33%;
+}
+
+.columnaTotal ,
+.columnaConteoExitosos,
+.columnaPorcentajeExitosos,
+.columnaConteoFallidos,
+.columnaPorcentajeFallidos
+{
+	width:13.33%;
+}
+

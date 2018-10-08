@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script src="js/angular.min.js"></script>
+<link rel="stylesheet" href="css/monitor.css">
+</head>
+<body>
+<table ng-app="monitorApp" ng-controller="monitorController">
+<tr>
+	<td colspan = "2" class="columna">
+		<input type="date" ng-model="fecha" ng-change="iniciarCargaData()">
+		<select ng-model="hora" ng-change="iniciarCargaData()">
+			<option ng-repeat="itemHora in horas" value="{{itemHora.codigoHora}}">{{itemHora.horaInicio}} a {{itemHora.horaFin}}</option>
+		</select>
+	</td>
+</tr>
+<tr>
+	<th class="columna columnaAplicacion">Aplicaci&oacute;n</th>
+	<td class="columna columnaItemInfo">
+		<table>
+			<tr>
+				<th class="columna1 columnaItem">Item</th>
+				<th class="columna1 columnaTotal">Total Trx</th>
+				<th class="columna1 columnaConteoExitosos">Exitosos</th>
+				<th class="columna1 columnaPorcentajeExitosos">% Exitosos</th>
+				<th class="columna1 columnaConteoFallidos">Fallidos</th>
+				<th class="columna1 columnaPorcentajeFallidos">% Fallidos</th>				
+			</tr>
+		</table>
+	</td>
+	
+</tr>
+<tr ng-repeat="aplicacion in aplicaciones" style="background-color:{{aplicacion.color}};">
+	<td class="columna columnaAplicacion">{{aplicacion.nombre}}</th>
+	<td class="columna columnaItemInfo">
+		<table>
+			<tr ng-repeat="item in aplicacion.items">
+				<td class="columna columnaItem">{{item.nombre}}</td>
+				<td class="columna columnaTotal">{{item.totalTrx}}</td>
+				<td class="columna columnaConteoExitosos">{{item.conteoExitosos}}</td>
+				<td class="columna columnaPorcentajeExitosos">{{item.porcentajeExitosos}} %</td>
+				<td class="columna columnaConteoFallidos">{{item.conteoFallidos}}</td>
+				<td class="columna columnaPorcentajeFallidos">{{item.porcentajeFallidos}} %</td>
+			</tr>
+		</table>	
+</tr>
+</table>
+
+
+<script src="js/monitor.js"></script>
+</body>
+</html>

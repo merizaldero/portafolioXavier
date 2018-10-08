@@ -1,0 +1,30 @@
+{
+	"Aplicacion 1":{
+		"Item Monitoreo 1": {
+			"totalTrx" : 10,
+			"conteoFallidos": 3
+		},
+		"Item Monitoreo 2": {
+			"conteoExitosos": 8,
+			"conteoFallidos": 4
+		},
+		"Item Monitoreo 3": {
+			"conteoExitosos": 7,
+			"conteoFallidos": 6
+		}
+	},
+	"Aplicacion 2": {
+		"Item Monitoreo 1": {
+			"conteoExitosos": 8,
+			"conteoFallidos": 2
+		},
+		"Item Monitoreo 2": {
+			"conteoExitosos": 3,
+			"conteoFallidos": 1
+		},
+		"Item Monitoreo 3": {
+			"conteoExitosos": 45,
+			"conteoFallidos": 12
+		}
+	}
+}

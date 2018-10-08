@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Consultas>
+
+<!--
+Parametros de Entrada
+{0} Fecha yyyy-mm-dd
+{1} Hora Inicial  hh
+{2} Hora Final    hh
+ -->
+ 
+ <Aplicacion nombre="Aplicacion 1">
+ 	
+ 	<Item nombre="Item Monitoreo 1" cadenaConexion="Data Source=(local)\SQLEXPRESS;Initial Catalog=MONITORED_BD;Integrated Security=True">
+		<Consulta dato="totalTrx" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 1
+		</Consulta>
+		<Consulta dato="conteoFallidos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 1
+and trx_result_code != '0'
+		</Consulta>		
+ 	</Item>
+
+ 	<Item nombre="Item Monitoreo 2" cadenaConexion="Data Source=(local)\SQLEXPRESS;Initial Catalog=MONITORED_BD;Integrated Security=True">
+		<Consulta dato="conteoExitosos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 1
+and trx_result_code = '0'
+		</Consulta>
+		<Consulta dato="conteoFallidos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 1
+and trx_result_code != '0'
+		</Consulta>		
+ 	</Item>
+ 	
+ 	<Item nombre="Item Monitoreo 3" cadenaConexion="Data Source=(local)\SQLEXPRESS;Initial Catalog=MONITORED_BD;Integrated Security=True">
+		<Consulta dato="conteoFallidos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 1
+and trx_result_code != '0'
+		</Consulta>		
+ 	</Item>
+ 	
+ </Aplicacion>
+ 
+ <Aplicacion nombre="Aplicacion 2">
+ 	
+ 	<Item nombre="Item Monitoreo 1" cadenaConexion="Data Source=(local)\SQLEXPRESS;Initial Catalog=MONITORED_BD;Integrated Security=True">
+		<Consulta dato="totalTrx" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 2
+		</Consulta>
+		<Consulta dato="conteoFallidos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 2
+and trx_result_code != '0'
+		</Consulta>		
+ 	</Item>
+
+ 	<Item nombre="Item Monitoreo 2" cadenaConexion="Data Source=(local)\SQLEXPRESS;Initial Catalog=MONITORED_BD;Integrated Security=True">
+		<Consulta dato="conteoExitosos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 3
+and trx_result_code = '0'
+		</Consulta>
+		<Consulta dato="conteoFallidos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 3
+and trx_result_code != '0'
+		</Consulta>		
+ 	</Item>
+ 	
+ 	<Item nombre="Item Monitoreo 3" cadenaConexion="Data Source=(local)\SQLEXPRESS;Initial Catalog=MONITORED_BD;Integrated Security=True">
+		<Consulta dato="conteoFallidos" numeroColumna="1">
+SELECT 'xxxx' as ODT, count(1) 
+FROM transaction_table WITH (NOLOCK)
+WHERE trx_date &gt;= '{0} {1}:00'
+and trx_date &lt; '{0} {2}:00'
+and trx_type = 4
+and trx_result_code != '0'
+		</Consulta>		
+ 	</Item>
+ 	
+ </Aplicacion>
+
+</Consultas>
