@@ -1,0 +1,187 @@
+<html class="x-viewport">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /*
+      x-viewport, x-viewport body {
+        margin: 0;
+        padding:0;
+        border: 0 none;
+        
+        height: 100%;
+      }
+      */
+      body {
+      
+       position: absolute;
+       
+       overflow: hidden;
+       
+       top: 0px;
+       left: 0px;
+       right: 0px;
+       bottom: 0px;
+       
+       //width: 200px;
+       //height: 400px;
+       width: 100%;
+       //height: 100%;
+       
+       
+       padding: 0px;
+       border: 0 none;
+       background-color: #000000;
+       margin:0px;
+      }
+      
+      #tablero {
+       position:fixed;
+       top: 0px;
+       left: 0px;
+       /*
+       right: 0px;
+       bottom: 0px;
+       padding: 5px;
+       */
+        width: 100%;
+        height: 100%;
+        
+      }
+      
+      #tableroPatron {
+        width: 100px;
+        height: 100px;
+      }
+      
+      #divControles{
+        position:absolute;
+        top: 0px;
+        left: 0px;
+        width:100%;
+        text-align:right;
+      }
+      
+      #divPanelControles{
+        background-color: #ffffff;
+        border: 1px solid #000000;
+        padding: 4px;
+        display:table;
+      }
+      
+      /*
+      #divPanelControles > div > div{
+      display: table-cell;
+      }
+      
+      #divPanelControles > div > input{
+      display: table-cell;
+      }
+      
+      #divPanelControles > div > span{
+      display: table-cell;
+      }
+      
+      #divPanelControles > div {
+      display: table-row;
+      }
+      */
+      
+      #btnMostrarPanel{
+        background-color: #ffffff;
+        border: 1px solid #000000;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        vertical-alignment: center;
+      }
+      
+      .tablero {
+        background-color: #000000;
+        display: table;
+        border: 1px solid #000000;
+      }
+      .fila{
+        display: table-row;
+      }
+      
+      .celda {
+        display: table-cell;
+        background-color: #000000;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        margin: 1px;
+      }
+      
+      .vive1{
+        background-color: #999900;
+        border: 1px solid #9999ff;
+        border-radius: 0% 25% 25% 25%;
+      }
+      .vive2{
+        background-color: #bbbb00;
+        border: 1px solid #bbbbff;
+        border-radius: 25% 0% 25% 25%;
+      }
+      .vive3{
+        background-color: #dddd00;
+        border: 1px solid #ddddff;
+        border-radius: 25% 25% 0% 25%;
+      }
+      .vive4{
+      background-color: #ffff00;
+      border: 1px solid #ffffff;
+      border-radius: 25% 25% 25% 0%;
+      }
+      
+      .celdaTrue {
+        background-color: #bbbb00;
+      }
+    </style>
+    <script src="js/jquery-1.11.3.min.js">
+    </script>
+    <script src="js/JuegoVida.js">
+    </script>
+    <script src="js/JuegoVidaVM.js">
+    </script>
+  </head>
+  <body>
+    <div id="tablero" class="tablero" ></div>
+    <div id="divControles">
+      <div id="divPanelControles">
+        <div>
+          <input id="txtColumnas" value="20" maxlength="4">
+          <span>x</span>
+          <input id="txtFilas" value="20" maxlength="4">
+        </div>
+        <div>
+          <div id="btnArrancar">Arrancar</div>
+          <div id="btnDetener">Detener</div>
+        </div>
+        <p>
+        </p>
+        <div>
+          <div id="tableroPatron" class="tablero" ></div>
+        </div>
+        <form onsubmit="return false;">
+          <input id="txtColumnasPatron" value="5" maxlength="3" size="3" >
+          <span>x</span>
+          <input id="txtFilasPatron" value="5" maxlength="3" size="3" >
+        </form>
+        <p></p>
+        <div id="btnRandomico">
+          &#x2754; Randomico
+        </div>
+        <p></p>
+        <div id="btnArmagedon">
+          &Omega; Armagedon
+        </div>
+      </div>
+      <div id="btnMostrarPanel">
+        &equiv;
+      </div>
+      
+    </div>
+  </body>
+</html>
