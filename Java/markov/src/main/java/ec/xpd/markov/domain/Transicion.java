@@ -4,12 +4,15 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 
-@Entity(name = "EVENTO_TRANSICION")
+@Entity(name = "TRANSICION")
 public class Transicion {
 	
 	@Id
@@ -19,7 +22,7 @@ public class Transicion {
 	private Long idTransicion;
 	
 	@Column(name = "ID_USUARIO", length=8, nullable = false)
-	private String idUsuario;
+	private Integer idUsuario;
 	
 	@Column(name = "ORIGEN", length=128, nullable = false)
 	private String origen;
@@ -27,7 +30,7 @@ public class Transicion {
 	@Column(name = "DESTINO", length=128, nullable = false)
 	private String destino;
 	
-	@Column(name = "FECHA_ACTUALIZACION", nullable = false)
+	@Column(name = "FECHA", nullable = false)
 	private Date fecha;
 
 	@Column(name = "CONTEO_EVENTOS", length=20, nullable = false)
@@ -35,7 +38,7 @@ public class Transicion {
 	
 	@Column(name = "PROBABILIDAD", length=10, precision = 9, nullable = false)
 	private double probabilidad;
-
+	
 	public Long getIdTransicion() {
 		return idTransicion;
 	}
@@ -44,11 +47,11 @@ public class Transicion {
 		this.idTransicion = idTransicion;
 	}
 
-	public String getIdUsuario() {
+	public Integer getIdUsuario() {
 		return idUsuario;
 	}
 
-	public void setIdUsuario(String idUsuario) {
+	public void setIdUsuario(Integer idUsuario) {
 		this.idUsuario = idUsuario;
 	}
 
@@ -91,5 +94,5 @@ public class Transicion {
 	public void setProbabilidad(double probabilidad) {
 		this.probabilidad = probabilidad;
 	}
-		
+
 }

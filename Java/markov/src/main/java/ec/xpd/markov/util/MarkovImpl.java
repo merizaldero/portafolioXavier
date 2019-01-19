@@ -62,7 +62,7 @@ public class MarkovImpl {
 			}
 			if(sumaFila <= 0.0){
 				sumaFila = 1.0;
-				this.valido = false;
+				//this.valido = false;
 				System.out.println("fila de matriz es cero");
 			}
 			for( j = 0; j < this.numeroEstados; j++){

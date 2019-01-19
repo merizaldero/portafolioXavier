@@ -7,7 +7,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import ec.xpd.markov.domain.EventoTransicion;
@@ -17,40 +20,27 @@ import ec.xpd.markov.util.MarkovImpl;
 import ec.xpd.markov.util.Matriz;
 
 @Transactional
+@Component
 public class MarkovProceso {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MarkovProceso.class);
+	
 	@Autowired
 	private EntityManager entityManager;
 
 	public void actualizarProbabilidades(int idUsuario) {
 		Date fechaLimite = new Date();
 		
+		logger.debug(String.format("inicia Actualizacion de probabilidades usuario %d", idUsuario ));
+		
 		crearOpcionesPendientes(idUsuario, fechaLimite);
 		crearTransicionesPendientes(idUsuario, fechaLimite);
 		actualizarProbabilidades(idUsuario, fechaLimite);
 		
+		long marcaFin = System.currentTimeMillis();
+		logger.debug(String.format("Recalculo de Probabilidades realizado en %d ms", (marcaFin - fechaLimite.getTime()) ));
 	}
-
-	private void crearTransicionesPendientes(int idUsuario, Date fechaLimite) {
-		// Crea Transiciones Pendientes
-		String consulta = ""
-				+ "select a.ID_USUARIO as idUsuario, a.ORIGEN as origen, a.DESTINO as destino, count(1) as conteoEventos, :fechaLimite as fecha, 0.0 as probabilidad "
-				+ "from EVENTO_TRANSICION a "
-				+ "where a.ID_USUARIO = :idUsuario "
-				+ "and a.FECHA <= :fechaLimite "
-				+ "and not exists (select 1 from TRANSICION b where b.ID_USUARIO = a.ID_USUARIO and b.OPCION = a.ORIGEN and b.DESTINO = b.DESTINO )"
-				+ "group by a.ID_USUARIO, a.ORIGEN, a.DESTINO "
-				+ "";
-		Query query = this.entityManager.createNativeQuery(consulta, Transicion.class);
-		query.setParameter("idUsuario", idUsuario);
-		query.setParameter("fechaLimite", fechaLimite);
-		List<Transicion> transicionesNuevas = query.getResultList();
-		for(Transicion transicion: transicionesNuevas) {
-			this.entityManager.persist(transicion);
-		};
-		this.entityManager.flush();
-		
-	}
-
+	
 	private void crearOpcionesPendientes(int idUsuario, Date fechaLimite) {
 		// crea Opciones PendientesPendientes
 		String consulta = ""
@@ -75,8 +65,37 @@ public class MarkovProceso {
 		for(Opcion opcion:opcionesNuevas) {
 			this.entityManager.persist(opcion);
 		};
+		
+		logger.debug(String.format("... incluyendo %d nuevas Opciones", opcionesNuevas.size() ));
+		
 		this.entityManager.flush();
 	}
+
+	private void crearTransicionesPendientes(int idUsuario, Date fechaLimite) {
+		// Crea Transiciones Pendientes
+		String consulta = ""
+				+ "select a.ID_USUARIO as idUsuario, a.ORIGEN as origen, a.DESTINO as destino, count(1) as conteoEventos, :fechaLimite as fecha, 0.0 as probabilidad "
+				+ "from EVENTO_TRANSICION a "
+				+ "where a.ID_USUARIO = :idUsuario "
+				+ "and a.FECHA <= :fechaLimite "
+				+ "and not exists (select 1 from TRANSICION b where b.ID_USUARIO = a.ID_USUARIO and b.ORIGEN = a.ORIGEN and b.DESTINO = a.DESTINO )"
+				+ "group by a.ID_USUARIO, a.ORIGEN, a.DESTINO "
+				+ "";
+		Query query = this.entityManager.createNativeQuery(consulta, Transicion.class);
+		query.setParameter("idUsuario", idUsuario);
+		query.setParameter("fechaLimite", fechaLimite);
+		List<Transicion> transicionesNuevas = query.getResultList();
+		for(Transicion transicion: transicionesNuevas) {
+			this.entityManager.persist(transicion);
+		};
+
+		logger.debug(String.format("... incluyendo %d nuevas Transiciones", transicionesNuevas.size() ));
+		
+		this.entityManager.flush();
+		
+	}
+
+
 	
 	private void actualizarProbabilidades(int idUsuario, Date fechaLimite) {
 		
@@ -111,7 +130,7 @@ public class MarkovProceso {
 		
 		for(Object[] secuencia:dataMatriz) {
 			Transicion transicion = (Transicion) secuencia[0];
-			Integer delta = (Integer) secuencia[1];
+			Long delta = (Long) secuencia[1];
 			if(delta > 0) {
 				transicion.setConteoEventos( transicion.getConteoEventos() + delta);
 			}
@@ -122,6 +141,9 @@ public class MarkovProceso {
 		String[] arrEstados = new String[estados.size()];
 		arrEstados = estados.toArray(arrEstados);
 		MarkovImpl markov = new MarkovImpl(arrEstados, matriz, 1);
+		
+		logger.debug(String.format("Matriz resultante obtenida \n%s", markov.getMatrizPotencia().toString() ));
+		
 		for(Object[] secuencia:dataMatriz) {
 			Transicion transicion = (Transicion) secuencia[0];
 			fila = estados.indexOf(transicion.getOrigen());

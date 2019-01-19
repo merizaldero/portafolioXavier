@@ -1,7 +1,5 @@
 package ec.xpd.markov.rest;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +12,8 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +32,8 @@ import ec.xpd.markov.repository.UsuarioRepository;
 @RestController
 public class MarkovRestApi {
 	
+	private static final Logger logger = LoggerFactory.getLogger(MarkovRestApi.class);
+	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 	@Autowired
@@ -39,6 +41,7 @@ public class MarkovRestApi {
 	@Autowired
 	private EventoTransicionRepository eventoTransicionRepository;
 	
+	@Autowired
 	private Scheduler scheduler;
 	
 	@GetMapping("/opciones/{userName}/{origen}")
@@ -52,7 +55,7 @@ public class MarkovRestApi {
 	}
 	
 	@PostMapping("/opcion")
-	public EventoTransicion registrarTransiciones(@RequestBody String userName,String origen, @RequestBody String destino){
+	public EventoTransicion registrarTransiciones(String userName,String origen, String destino){
 		List<Usuario> usuarios = usuarioRepository.findByUserName(userName);
 		if(usuarios.size() != 1) {
 			return null;
@@ -67,6 +70,9 @@ public class MarkovRestApi {
 		eventoTransicion.setDestino(destino);
 		
 		this.eventoTransicionRepository.save(eventoTransicion);
+		this.eventoTransicionRepository.flush();
+		
+		logger.debug(String.format("transicion: usuario: %s, desde %s hacia %s", userName, origen, destino));
 		
 		this.programarRecalculoUsuario(usuario.getIdUsuario());
 		

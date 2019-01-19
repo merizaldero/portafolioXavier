@@ -97,4 +97,17 @@ public class Matriz implements Cloneable{
 		}
 		return clon;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		for(int fila = 0 ; fila < this.filas ; fila++) {
+			stringBuilder.append("|\t");
+			for(int columna = 0; columna < this.columnas ; columna++ ) {
+				stringBuilder.append( String.format("%10.9f\t", this.valores[fila][columna]));
+			}
+			stringBuilder.append("|\n");
+		}
+		return stringBuilder.toString();
+	}
 }

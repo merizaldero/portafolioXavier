@@ -13,7 +13,7 @@ import ec.xpd.markov.domain.Transicion;
 public interface TransicionRepository extends JpaRepository<Transicion , Integer>{
 	
 	@Modifying
-	@Query(value="select a from ec.xpd.markov.domain.Transicion a inner join fetch ec.xpd.markov.domain.Usuario b where b.nombreUsuario = ?1 and a.origen = ?2 order by a.probabilidad desc")
-	public List<Transicion> findByUsuarioOrigen( int usuarioId, String origen );
+	@Query(value="select a from ec.xpd.markov.domain.Transicion a where a.idUsuario = ?1 and a.origen = ?2 order by a.probabilidad desc")
+	public List<Transicion> findByUsuarioOrigen( int idUsuario, String origen );
 	
 }

@@ -1,5 +1,6 @@
 package ec.xpd.markov.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -13,7 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 
 @Entity(name = "EVENTO_TRANSICION")
-public class EventoTransicion {
+public class EventoTransicion implements Serializable{
 	
 	@Id
 	@Column(name = "ID_EVENTO_TRANSICION", length=20, nullable = false)
@@ -33,10 +34,6 @@ public class EventoTransicion {
 	@Column(name = "DESTINO", length=128, nullable = false)
 	private String destino;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
-	@JoinColumn(name="ID_USUARIO", insertable = false, updatable = false)
-	private Usuario usuario;
-
 	public Long getIdEventoTransicion() {
 		return idEventoTransicion;
 	}
@@ -75,14 +72,6 @@ public class EventoTransicion {
 
 	public void setDestino(String destino) {
 		this.destino = destino;
-	}
-
-	public Usuario getUsuario() {
-		return usuario;
-	}
-
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
 	}
 		
 }
