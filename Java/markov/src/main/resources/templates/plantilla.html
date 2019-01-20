@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<header id="encabezado">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet"
+		href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</header>
+
+
+<body>
+	<div id="contenedor_menu" class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target="#myNavbar">
+					<span class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul id="miMenu" class="nav navbar-nav">
+					<li class="menuItem"><a href="profile.html"> <span
+							class="glyphicon glyphicon-home" aria-hidden="true"></span>
+							<span>Profile</span>
+					</a></li>
+					<li class="menuItem"><a href="account.html"> <span
+							class="glyphicon glyphicon-user" aria-hidden="true"></span> <span>Account</span>
+					</a></li>
+					<li class="menuItem"><a href="password.html"> <span
+							class="glyphicon glyphicon-lock" aria-hidden="true"></span> <span>Password</span>
+					</a></li>
+					<li class="menuItem"><a href="quit.html"> <span
+							class="glyphicon glyphicon-off" aria-hidden="true"></span> <span>Quit</span>
+					</a></li>
+					<li class="menuItem"><a href="period.html"> <span
+							class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+							<span>Period</span>
+					</a></li>
+					<li class="menuItem"><a href="photo.html"> <span
+							class="glyphicon glyphicon-camera" aria-hidden="true"></span> <span>Photo</span>
+					</a></li>
+					<li class="menuItem"><a href="search.html"> <span
+							class="glyphicon glyphicon-search" aria-hidden="true"></span> <span>Search</span>
+					</a></li>
+					<li class="menuItem"><a href="open_classes.html"> <span
+							class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+							<span>Open Classes</span>
+					</a></li>
+					<li class="menuItem"><a href="attendance.html"> <span
+							class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <span>Attendance</span>
+					</a></li>
+					<li class="menuItem"><a href="teacher_self_assessment.html">
+							<span class="glyphicon glyphicon-education" aria-hidden="true"></span>
+							<span>Teacher Self-Assessment</span>
+					</a></li>
+					<li class="menuItem"><a href="calendar.html"> <span
+							class="glyphicon glyphicon-calendar" aria-hidden="true"></span> <span>Calendar</span>
+					</a></li>
+					<li class="menuItem"><a href="grades.html"> <span
+							class="glyphicon glyphicon-stats" aria-hidden="true"></span> <span>Grades</span>
+					</a></li>
+					<li class="menuItem"><a href="mail.html"> <span
+							class="glyphicon glyphicon-envelope" aria-hidden="true"></span> <span>Mail</span>
+					</a></li>
+					<li class="menuItem"><a href="teacher_evaluation.html"> <span
+							class="glyphicon glyphicon-scale" aria-hidden="true"></span> <span>Teacher
+								Evaluation</span>
+					</a></li>
+					<li class="menuItem"><a href="schedule.html"> <span
+							class="glyphicon glyphicon-book" aria-hidden="true"></span> <span>Schedule</span>
+					</a></li>
+				</ul>
+
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<span id="markov_implementador"> <script
+			th:src="@{/js/cliente-markov.js}"></script> <script>
+    	aplicarMarkov('universidad','miMenu','menuItem');
+    	</script>
+	</span>
+
+</body>
+
+</html>

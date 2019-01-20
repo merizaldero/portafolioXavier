@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<header th:replace="~{plantilla :: #encabezado}"> </header>
+
+<body>
+	<div th:replace="~{plantilla :: #contenedor_menu}"></div>
+	<div id="contenido">
+		<span class="glyphicon glyphicon-book"
+					aria-hidden="true"></span> <span>Schedule</span>
+	</div>
+	<span th:replace="~{plantilla :: #markov_implementador}"></span>
+</body>
+
+</html>

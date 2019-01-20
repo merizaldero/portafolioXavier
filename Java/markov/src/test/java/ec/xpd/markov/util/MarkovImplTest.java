@@ -1,7 +1,5 @@
 package ec.xpd.markov.util;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
 class MarkovImplTest {

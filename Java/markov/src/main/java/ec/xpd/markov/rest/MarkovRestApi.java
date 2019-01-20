@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.xpd.markov.domain.EventoTransicion;
@@ -44,8 +43,9 @@ public class MarkovRestApi {
 	@Autowired
 	private Scheduler scheduler;
 	
-	@GetMapping("/opciones/{userName}/{origen}")
+	@GetMapping("/api/opciones/{userName}/{origen}")
 	public List<Transicion> obtenerTransicionesPorUsuario(@PathVariable String userName,@PathVariable String origen){
+		logger.debug(String.format("Transiciones user: %s, origen: %s", userName, origen));
 		List<Usuario> usuarios = usuarioRepository.findByUserName(userName);
 		if(usuarios.size() != 1) {
 			return null;
@@ -54,8 +54,9 @@ public class MarkovRestApi {
 		return transiciones;
 	}
 	
-	@PostMapping("/opcion")
+	@PostMapping("/api/opcion")
 	public EventoTransicion registrarTransiciones(String userName,String origen, String destino){
+		logger.debug(String.format("registrar transicion: usuario: %s, desde %s hacia %s", userName, origen, destino));
 		List<Usuario> usuarios = usuarioRepository.findByUserName(userName);
 		if(usuarios.size() != 1) {
 			return null;
@@ -71,8 +72,6 @@ public class MarkovRestApi {
 		
 		this.eventoTransicionRepository.save(eventoTransicion);
 		this.eventoTransicionRepository.flush();
-		
-		logger.debug(String.format("transicion: usuario: %s, desde %s hacia %s", userName, origen, destino));
 		
 		this.programarRecalculoUsuario(usuario.getIdUsuario());
 		
