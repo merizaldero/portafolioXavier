@@ -7,6 +7,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
+/**
+ * Entidad que representa un estado u opcion de menu desde o hacia donde se navega un numero determinado de veces
+ * Es una entidad con el fin de proveer un listado de opciones por usuario
+ * @author Marcelo Xavier Merizalde R
+ *
+ */
 @Entity(name = "OPCION")
 public class Opcion {
 	

@@ -81,11 +81,12 @@ function aplicarMarkov(userName, idMenu, claseMenuItem){
 		        listaMenu = listaMenu.sort( (a,b) => {return b.probabilidad - a.probabilidad;} );
 		        
 		        //Vacia menu
-		        contenedorMenu.innerHTML = "";
-		        
-		        // llenaMenu con elementos reordenados
-		        for(var i = 0 ; i < listaMenu.length; i++){
-		        	contenedorMenu.innerHTML += listaMenu[i].outerHtml;
+		        if( $(window).width() <= 500 ){
+		        	contenedorMenu.innerHTML = "";
+		        	// llenaMenu con elementos reordenados
+			        for(var i = 0 ; i < listaMenu.length; i++){
+			        	contenedorMenu.innerHTML += listaMenu[i].outerHtml;
+			        }
 		        }
 		        
 		        //Obtiene menus insertados
