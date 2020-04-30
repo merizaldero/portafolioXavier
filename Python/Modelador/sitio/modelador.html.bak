@@ -1,0 +1,419 @@
+<!DOCUMENT html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-control" content="no-cache"/>
+    <meta http-equiv="EXPIRES" content="0">
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <script src="js/jquery-1.11.3.min.js">
+    </script>
+    <script src="js/bootstrap.min.js">
+    </script>
+    <script src="js/jqutils.js">
+    </script>
+    <!--
+    <link rel="stylesheet" type ="text/css" href="css/modelador.css"/>
+    -->
+    <style>
+.tituloDialogo{
+  border-radius:10px;
+  width:100%;
+  background-color:#884488;
+  color:#ffffff;
+  font-weight:bold;
+  text-align:center;
+  margin:0px;
+}
+
+/*
+.instrucciones{
+  
+}
+*/
+
+.mensajeError{
+  color:red;
+  align:right;
+}
+
+.barraBotones{
+  width:100%;
+  background-color:#bbbbbb;
+  padding:5px;
+  vertical-align:middle;
+  
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+/*
+.botonDialogo{
+  
+}
+
+.dialogo{
+  
+}
+
+.dialogo > div{
+  
+}
+*/
+
+.nodoArbol{
+  white-space:nowrap;
+}
+
+body{
+  /*
+  position: fixed; 	
+  top: 0;
+  right: 0;
+  bottom: 0; 	
+  left: 0;
+  */
+
+  width:95%;
+  height:100%;
+  
+  font-size: 1em;
+  padding:0px;
+  overflow:scroll;
+}
+
+a{
+
+  //border: 2px solid #008888;
+  margin: 5px;
+  //border-radius: 10px;
+  //background-color: #44ffff;
+  color:black;
+  padding:3px;
+  //color: #008888;
+  text-decoration:none; 
+  white-space:nowrap;
+  clip:shape;
+}
+
+a.boton, button{
+
+  border: 2px solid #008888;
+  margin: 5px;
+  border-radius: 10px;
+  background-color: #44ffff;
+  padding:3px;
+  color: #008888;
+  text-decoration:none; 
+  white-space:nowrap;
+  clip:shape;
+  font-size: 1em;
+}
+
+/*
+ul{
+  
+}
+*/
+
+li{
+  list-style-type:none;
+}
+
+li.seleccionado{
+  color: white;
+  background-color:black;
+}
+
+#divProtector , form{
+ /*
+  position: absolute; 	
+  top: 250px;
+  right: 0;
+  bottom: 0; 	
+  left: 0;
+  
+  background: rgba(0,0,0,0.8);
+  z-index: 99999;
+  */
+}
+
+#divProtector > div , form > div{
+  width: 80%;
+  position: relative;
+  margin: 10% auto;
+  padding: 5px 20px 13px 20px;
+  border-radius: 10px;
+  background: #fff;
+  background: -moz-linear-gradient(#fff, #999);
+  background: -webkit-linear-gradient(#fff, #999);
+  background: -o-linear-gradient(#fff, #999);
+}
+
+#divMenuPrincipal{
+  
+}
+
+#divModelView{
+  
+}
+
+#frmEditarObjetoModelo > div {
+/*
+  width:100%;
+  height:300px;
+  overflow:scroll;
+  */
+}
+
+#frmFileDialog > div > ul{
+  width:70%;
+  height:50%;
+  overflow:scroll;
+}
+
+#iframeDesplegarContenido{
+  width:100%;
+}
+
+input, select{
+  font-size: 1em;
+}
+/*
+.container{
+  width:100%;
+  height:100%;
+  padding:0px;
+  margin:0px;
+}
+*/
+table, tr, td, span{
+  font-size: 1em;
+}
+    </style>
+  </head>
+  <body>
+   
+    <div class="tituloDialogo panel-header" id="divTitulo"> 
+      <span>Modelador</span>
+      <a href="javascript:milib.close()" class="boton">[x]</a>
+    </div>
+    
+    
+    <div id="divMenuPrincipal" class="panel-default">
+      <div class="instrucciones">Elige una opcion</div>
+      <div class="barraBotones">
+        <a id="aCrearModelo" class="menu_principal boton">Crear Modelo</a>
+        <a id="aAbrirModelo" class="menu_principal boton">Abrir Modelo</a>
+        <a id="aImportarModelo" class="menu_principal boton ">Importar Modelo</a>
+        <a id="aMantenimiento" class="menu_principal boton ">Mantenimiento</a>
+      </div>
+    </div>
+    
+    
+    
+    <div id="divModelView">
+<ul></ul>
+    </div>
+    
+    <form id="frmMantenimiento" method="POST" action="#" onsubmit="return false;">
+      <div>
+        <div class="tituloDialogo">Mantenimiento</div>
+        
+        
+        <div class="barraBotones">
+          <a id="aReiniciarBase" class="botonDialogo boton ">Reiniciar Repositorio</a>
+          <a id="aParches" class="botonDialogo boton ">Aplicar Parche</a>
+          <a id="aExpReg" class="botonDialogo boton ">Probar Exp Regulares</a>
+          <a id="aUnitTesting" class="botonDialogo boton ">Pruebas Unitarias</a>
+
+          <a id="aCancelarMantenimiento" class="botonDialogo">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmParches" method="POST" action="#" onsubmit="return false;">
+      <div>
+        <div class="tituloDialogo">Aplicar Parche</div>
+        <div class="instrucciones">
+          <input type="checkbox" name="incluirAplicados" value="1" />
+          <span>Incluir parches ya aplicados</span>
+        </div>
+        <ul id="frmParches_ul">
+        </ul>
+        <div class="barraBotones">
+          <a id="aAplicarParche" class="botonDialogo boton ">Aplicar Parche</a>
+          <a id="aCancelarParches" class="botonDialogo boton ">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmCrearModelo" method="POST" action="#" onsubmit="return false;">
+      <div>
+        <div class="tituloDialogo">Crear Modelo</div>
+        <div class="instrucciones">Elige tipo de Modelo</div>
+        <div id="divListaMetamodelos"></div>
+        <div class="barraBotones">
+          <a id="aSeleccionarMetamodelo" class="botonDialogo boton ">Crear</a>
+          <a id="aCancelarCrearModelo" class="botonDialogo boton ">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmAbrirModelo" method="POST" action="#" onsubmit="return false;">
+      <div>
+        <div class="tituloDialogo">Abrir Modelo</div>
+        <div class="instrucciones">Elige un modelo existente</div>
+        <div id="divListaModelos"></div>
+        <div class="barraBotones">
+          <a id="aSeleccionarModelo" class="botonDialogo boton ">Abrir</a>
+          <a id="aCancelarAbrirModelo" class="botonDialogo boton ">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmEliminarObjetoModelo" method="POST" action="#" onsubmit="return false;">
+      <div>
+        <input type="hidden" name="idObjeto" value=""/>
+        <input type="hidden" name="idObjetoPadre" value=""/>
+        <input type="hidden" name="idListaPadre" value=""/>
+        <div class="tituloDialogo">Eliminar Objeto</div>
+        <div class="instrucciones">Se eliminara el siguiente objeto</div>
+        <div class="instrucciones">
+          <span>Nombre:</span>
+          <span id="frmEliminarObjetoModelo_nombre"></span>
+        </div>
+        <div class="instrucciones">
+          <span>Tipo:</span>
+          <span id="frmEliminarObjetoModelo_tipo"></span>
+        </div>
+        <div class="barraBotones">
+          <a id="aEliminarObjetoModelo" class="botonDialogo boton ">Eliminar</a>
+          <a id="aCancelarEliminarObjetoModelo" class="botonDialogo boton ">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmEditarObjetoModelo" method="POST" action="#" onsubmit="return false;">
+      <div>
+        <input type="hidden" name="idObjeto" value=""/>
+        <input type="hidden" name="idObjetoPadre" value=""/>
+        <input type="hidden" name="idListaPadre" value=""/>
+        <div class="tituloDialogo">
+          <span id="frmEditarObjeto_idTipoMetamodelo"></span>
+          <input type="text" name="nombreObjeto" value=""/>
+        </div>
+        <div id="msg___nombre" class="mensajeError"></div>
+        <!--
+        <div class="barraVinetasEditor">
+          <a data-tipo-editor="atributoEditor" data-id-jerarquia=""       class="vinetaEditor">Atributos</a>
+          <a data-tipo-editor="listaEditor"    data-id-jerarquia="Campos" class="vinetaEditor">Campos</a>
+          <a data-tipo-editor="listaEditor"    data-id-jerarquia="FKs"    class="vinetaEditor">FKs</a>
+        </div>
+        
+        <div class="contenidoVinetasEditor">
+          <div class="contenidoVinetaEditor" data-tipo-editor="atributoEditor" data-id-jerarquia="" >
+          </div>
+          <div class="contenidoVinetaEditor" data-tipo-editor="listaEditor" data-id-jerarquia="Campos" >
+          </div>
+          <div class="contenidoVinetaEditor" data-tipo-editor="listaEditor" data-id-jerarquia="FKs" >
+          </div>
+        </div>
+        -->
+        
+        <table>
+          <tr>
+            <td>Descripcion:</td>
+            <td>
+              <input type="text" name="descripcion" value=""/>
+            </td>
+          </tr>
+        </table>
+        
+        <table class="contenidoVinetasEditor">
+        </table>
+        <div class="barraBotones">
+          <a id="aGuardarObjetoModelo" class="botonDialogo boton ">Guardar</a>
+          <a id="aCancelarEditarObjetoModelo" class="botonDialogo boton ">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmGenerador" method="POST" action="/generarModelo.html" onsubmit="" target="iframeDesplegarContenido" >
+      <div>
+        <input type="hidden" name="idModelo" value=""/>
+        <div class="tituloDialogo">Generacion</div>
+        <div class="instrucciones">Seleccionar un patron de generacion:</div>
+        <ul class="listaGeneradores">
+        </ul>
+        <div class="barraBotones">
+          <a id="aGenerarModelo" class="botonDialogo boton ">Generar</a>
+          <a id="aCancelarGenerarModelo" class="botonDialogo boton ">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmExpReg" method="POST" action="#" onsubmit="return false;" >
+      <div>
+        <div class="tituloDialogo">Validar Expresion Regular</div>
+        <div class="instrucciones">
+          Cadena: <input name="cadena"/>
+        </div>
+        <div class="instrucciones">
+          Expresion: <input name="expresion"/>
+        </div>
+        <div class="barraBotones">
+          <a id="aVerificarExpReg" class="botonDialogo boton ">Verificar</a>
+          <a id="aCancelarExpReg" class="botonDialogo boton ">Cancelar</a>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmExportarModelo" method="POST" action="/exportarModelo.html" target="iframeDesplegarContenido" >
+      <input type="hidden" name="idModelo" value=""/>
+      <div>exportando...</div>
+    </form>
+    
+    <form id="frmImportarModelo" method="POST" action="/importarModelo.html" enctype="multipart/form-data" target="iframeResultadoImport" >
+      <div>
+        <div class="tituloDialogo">Importar Modelo</div>
+        <div class="instrucciones">
+          Archivo: <input type="file" name="modeloImportado" onchange="this.form.submit();" />
+        </div>
+        <iframe id="iframeResultadoImport" name="iframeResultadoImport" ></iframe>
+        
+        <div class="barraBotones">
+          <a id="aCerrarImportacion" class="botonDialogo boton ">Cerrar</a>
+        </div>
+        
+      </div>
+    </form>
+    
+    <form id="frmFileDialog" method="POST" action="#" onsubmit="return false;">
+      
+    </form>
+    
+    <form id="frmDesplegarContenido">
+      <div>
+        <div class="tituloDialogo">Desplegando Contenido</div>
+        <iframe id="iframeDesplegarContenido" id="iframeDesplegarContenido" ></iframe>
+        <div class="barraBotones">
+          <a id="aCerrarContenido" class="botonDialogo boton ">Cerrar</a>
+        </div>
+      </div>
+    </form>
+    
+    
+    
+    <div id="divProtector"><div>Espere un momento, por favor </div> </div>
+
+    <script src="js/modelador.js?00013">
+    </script>
+
+  </body>
+</html>
+
+
+

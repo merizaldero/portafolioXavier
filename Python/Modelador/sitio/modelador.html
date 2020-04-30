@@ -1,0 +1,499 @@
+<!DOCUMENT html>
+<html langcard="es">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-control" content="no-cache"/>
+    <meta http-equiv="EXPIRES" content="0">
+    <!--
+    <link rel="stylesheet"href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    -->
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+  </head>
+  <body class="container-fluid bg-light" ng-app="modeladorApp" ng-controller="modeladorController">
+    
+    <div id="divMenuPrincipal" class="card" ng-show="currentScreen == '#divMenuPrincipal'" >
+      
+      <div class="card-header bg-dark text-white">MENU PRINCIPAL</div>
+      <div class="card-body">
+        <div class="">
+          <div id="aCrearModelo" class="card mx-5 my-5" ng-click="mostrarCrearModelo()" >
+              <h1 class="card-body">
+              &#10133; Crear Modelo
+              </h1>
+          </div>
+          <div id="aAbrirModelo" class="card mx-5 my-5" ng-click="mostrarAbrirModelo()" >
+              <h1 class="card-body">
+              &#128194; Abrir Modelo
+              </h1>
+          </div>
+          <div id="aImportarModelo" class="card mx-5 my-5" ng-click="mostrarImportarModelo()" >
+              <h1 class="card-body">
+              &#128228; Cargar Modelo
+              </h1>
+          </div>
+          <div id="aMantenimiento" class="card mx-5 my-5" ng-click="mostrarMantenimiento()" >
+              <h1 class="card-body">
+              &#9881; Mantenimiento
+              </h1>
+          </div>
+        </div>
+      </div>
+            
+    </div>
+    
+    <form id="frmMantenimiento" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmMantenimiento'">
+      <div class="card">
+        <div class="card-header bg-dark text-white">
+            <div class="nav justify-content-between">
+                <h1>&#9881; Mantenimiento</h1>
+                <button class="btn btn-secondary" ng-click="irAInicio()" >
+                    &#10096; Atr&aacute;s
+                </button>
+            </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="card-column">
+            <div class="card mx-5 my-5" ng-click="crearBaseDatos()" >
+                <h1 class="card-body">
+                &#9923; Crear Repositorio
+                </h1>
+            </div>
+            <div class="card mx-5 my-5" ng-click="regenerarMetamodelo()">
+                <h1 class="card-body">
+                &#9922; Regenerar Metamodelo
+                </h1>
+            </div>
+            <div class="card mx-5 my-5" ng-click="mostrarExpresionesRegulares()" >
+                <h1 class="card-body">
+                &#128373; Probar Exp Regulares
+                </h1>
+            </div>
+            <div class="card mx-5 my-5" ng-click="ejecutarPruebasUnitarias()" >
+                <h1 class="card-body">
+                &#128657; Pruebas Unitarias
+                </h1>
+            </div>
+
+            
+          </div>
+        </div>
+      </div>
+    </form>
+    
+    <div id="divModelView" ng-show="objetoModelo != null &amp;&amp; currentScreen == '#divModelView'">
+
+        <div class="nav bg-light justify-content-between">
+            <ul class="nav">
+                <li class="nav-item" ng-repeat="(indice,objetoPila) in pilaObjetosModelo">
+                    <a class='btn btn-secondary btn-lg' ng-click="mostrarObjetoModeloPila(indice)" >&#128196; {{objetoPila.nombre}}</a>
+                </li>
+            </ul>
+            <ul class="nav">
+                <li class="nav-item" ng-show="objetoModelo.idObjeto != modelo.idObjetoRaiz">
+                    <a class='btn btn-danger btn-lg' ng-click="eliminarObjetoModelo()" >&#128465; Eliminar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary btn-lg" ng-click="exportarModelo()">&#128229; Descargar Modelo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary btn-lg" ng-show="cambiado" ng-click="guardarObjetoModelo()">&#128190; Guardar</a>
+                </li>
+                <li class="nav-item">
+                    <a class='btn btn-secondary btn-lg' ng-click="validarModelo()" > &#128203; Validar</a>
+                </li>
+                <li class="nav-item">
+                    <a class='btn btn-secondary btn-lg' ng-click="irAInicio()" > &#10006; Cerrar</a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            
+            <div class="card-header bg-dark text-white">
+                <div class="navbar navbar-default"> 
+                    <span class="navbar-brand">&#128196; {{objetoModelo.idTipoMetamodelo}}</span>
+                    <span class="navbar-nav">
+                        <span class="navbar-item form-group">
+                            <input type="text" ng-model="objetoModelo.nombre" class="form-control-lg" ng-change="onCambiarCampo()" >
+                        </span>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="form-group-lg">
+                    <label for="objetoModeloDescripcion" class="col-sm-4">Descripci&oacute;n</label>
+                    <span class="col-sm-8">
+                        <textarea ng-model="objetoModelo.descripcion" rows="2" class="form-control" ng-change="onCambiarCampo()"></textarea>
+                    </span>
+                </div>
+                
+                <div class="form-group" ng-repeat="(indice,atributo) in atributos">
+                    <label class="col-lg-4">{{atributo.idAtributoMetamodelo}}
+                        <span ng-show=" atributo.esObligatorio == '1' ">(*)</span>
+                    :</label>
+                    <span ng-show="atributo.idCatalogo == null &amp;&amp; atributo.idTipoMetamodeloRef == null" class="col-lg-8">
+                        <input ng-model="atributo.valor" ng-maxlength="obtenerMaxLength(atributo)" class="form-control-lg" ng-change="onCambiarCampo()">
+                    </span>
+                    <span ng-show="atributo.idCatalogo != null" class="col-lg-8">
+                        <select ng-model="atributo.valor" ng-change="onCambiarCampo()" class="form-control-lg">
+                            <option value="">-Seleccionar-</option>
+                            <option ng-repeat="valorCatalogo in catalogos[atributo.idCatalogo]" value="{{valorCatalogo.clave}}" ng-selected="atributo.valor == catalogoValor.clave">
+                                {{valorCatalogo.etiqueta}}
+                            </option>
+                        </select>
+                    </span>
+                    <span ng-show="atributo.idTipoMetamodeloRef != null" class="col-lg-8">
+                        <div class="input-group" ng-click="mostrarSeleccionarReferencia(indice)">
+                          <input disabled ng-model="atributo.nombreRef" class="form-control-lg">
+                          <button class="input-group-append btn btn-secondary">...</button>
+                        </div>
+                    </span>
+                    
+                    <span ng-show="atributo.mensajeError != null" class="text-error col-sm-12">
+                        {{atributo.mensajeError}}
+                    </span>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <ul class="nav nav-pills nav-justified">
+                    <li class="nav-item" ng-repeat="(indice, lista) in listas">
+                        <a ng-click="cargarLista(indice)" class='nav-link {{lista.cssSeleccionado}}' >{{lista.idJerarquia}}</a>
+                    </li>
+                </ul>
+        
+        <div class="card" ng-show="listas.length &gt; 0">
+            
+            <div class="card-header justify-content-end">
+                <div class="btn-group">
+                    <button class="btn btn-primary" ng-click="crearHijo()">
+                       &#10133; Nuevo
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="list-group">
+                  <div class="list-group-item" ng-repeat="item in listaHijos">
+                      <div class="navbar navbar-default"> 
+                          <h1 class="navbar-brand" ng-click="abrirHijo(item)" >
+                              &#128196; {{item.nombre}}
+                          </h1>
+                          
+                          <span class="nav align-items-center">
+                              <span class="nav-item">
+                                  <span class="btn-group-vertical btn-group-lg">
+                                      <h1 class="btn btn-lg btn-block" ng-click="abrirHijo(item)" >&#9999;</h1>
+                                  </span>
+                              </span>
+                              <span class="nav-item">
+                                  <span class="btn-group-vertical btn-group-lg">
+                                      <button class="btn btn-lg" ng-click="moverObjeto(item,'1')" >&#x25B2;</button>
+                                      <button class="btn btn-lg" ng-click="moverObjeto(item,'0')">&#x25BC;</button>
+                                  </span>
+                              </span>
+                          </span>
+                          
+                      </div>
+                  </div>
+                </div>
+            </div>
+            
+        </div>
+
+
+    </div>
+    
+    <form id="frmCrearModelo" class="card" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmCrearModelo'">
+      
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+              <h1>&#10133; Crear Modelo</h1>
+              <button id="aCancelarCrearModelo" class="btn btn-secondary" ng-click="irAInicio()">
+                  &#10096; Atr&aacute;s
+              </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="divListaMetamodelos" class="">
+              <div ng-repeat="(indice, metamodelo) in metamodelos" class="card mx-5 my-5" ng-click="seleccionarMetamodelo(indice); crearModelo()">
+                  <h1 class="card-body">
+                  &#128203; {{metamodelo.nombreMetamodelo}}
+                  </h1>
+              </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="btn-group">
+            
+          </div>
+        </div>
+      
+    </form>
+    
+    <form id="frmSeleccionarReferencia" class="card" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmSeleccionarReferencia'">
+      
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+              <h1>Seleccionar {{frmSeleccionarReferencia.idTipoMetamodelo}}</h1>
+              <button class="btn btn-secondary" ng-click="irAObjetoModelo()">
+                  &#10096; Atr&aacute;s
+              </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="divListaMetamodelos" class="">
+              <div ng-repeat="(indice, objeto) in frmSeleccionarReferencia.objetos" class="card mx-0 my-0" ng-click="seleccionarReferencia(indice)">
+                  <h1 class="card-body">
+                      {{objeto.nombre}}
+                  </h1>
+                  <h2 class="text-info">
+                      {{objeto.nombrePadre}}
+                  </h2>
+              </div>
+          </div>
+        </div>
+      
+    </form>
+    
+    <form id="frmAbrirModelo" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmAbrirModelo'">
+      
+      <div class="card">
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+            <h1>&#128194; Abrir Modelo</h1>
+            <button id="aCancelarAbrirModelo" class="btn btn-secondary" ng-click="irAInicio()">
+                &#10096; Atr&aacute;s
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-text">Elige un modelo existente</div>
+          
+          <div id="divListaModelos" class="card-column">
+              <div ng-repeat="(indice, modelo) in modelos" class="card mx-5 my-5" ng-click="seleccionarModelo(indice); abrirModelo()">
+                  <h2 class="card-header">
+                      &#128209; {{modelo.nombre}}
+                  </h2>
+                  <div class="card-body">
+                      {{modelo.nombreMetamodelo}}
+                  </div>
+              </div>
+          </div>
+          
+        </div>
+
+      </div>
+
+
+    </form>
+    
+    <div id="divGeneradores" class="card" ng-show="currentScreen == '#divGeneradores'">
+        
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+            <h1>&#128119; Seleccionar Generador</h1>
+            <button id="aCancelarAbrirModelo" class="btn btn-secondary" ng-click="irAObjetoModelo()">
+                &#10096; Atr&aacute;s
+            </button>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="">
+              <div ng-repeat="(indice, objeto) in frmGeneracion.generadores" class="card mx-0 my-0" ng-click="generarCodigo(indice)">
+                  <h1 class="card-body">
+                      &#128119; {{objeto.nombreGenerador}}
+                  </h1>
+              </div>
+          </div>
+        </div>
+        
+    </div>
+    
+    <form id="frmExpReg" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmExpReg'">
+      <div class="card">
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+            <h1>Validar Expresion Regular</h1>
+            <button class="btn btn-secondary" ng-click="mostrarMantenimiento()">
+              &#10096; Atr&aacute;s
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="col-lg-4">
+                    Cadena:
+                </label>
+                <span class="col-lg-8">
+                    <input class="form-control-lg" ng-model="frmExpresionesRegulares.texto" ng-change="evaluarExpReg()"/>
+                </span>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-4">
+                    Expresi&oacute;n Regular:
+                </label>
+                <span class="col-lg-8">
+                    <input class="form-control-lg" ng-model="frmExpresionesRegulares.expresion" ng-change="evaluarExpReg()"/>
+                </span>
+            </div>
+        </div>
+        
+        <div class="card-footer">
+          <div class="card-info">
+            <div class="text-danger" ng-show="! frmExpresionesRegulares.expresionValida">
+                Expresi&oacute;n regular no es v&aacute;lida.
+            </div>
+            <div ng-show="frmExpresionesRegulares.expresionValida">
+                <span class="text-success" ng-show="frmExpresionesRegulares.textoMatchs">
+                    Texto corresponde con expresi&oacute;n regular
+                </span>
+                <span class="text-danger" ng-show="! frmExpresionesRegulares.textoMatchs">
+                    Texto NO corresponde con expresi&oacute;n regular
+                </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    
+    <form id="frmExportarModelo" method="POST" action="/exportarModelo.html" target="_BLANK" >
+      <input type="hidden" name="idModelo" value=""/>
+      <input type="hidden" name="descargar" value="1"/>
+    </form>
+    
+    <form id="frmImportarModelo" method="POST" action="/importarModelo.html" enctype="multipart/form-data" target="iframeResultadoImport" ng-show="currentScreen == '#frmImportarModelo'">
+      <div class="card">
+        
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+            <h1>&#128228; Cargar Modelo</h1>
+            <button class="btn btn-secondary" ng-click="irAInicio()">
+              &#10096; Atr&aacute;s
+            </button>
+          </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="form-group">
+                <label>
+                Archivo:
+                </label>
+                <input class="form-control" type="file" name="modeloImportado" onchange="this.form.submit();" />
+            </div>
+        </div>
+        <iframe id="iframeResultadoImport" name="iframeResultadoImport" ></iframe>
+        
+        <div class="card-footer">
+          <button id="aCerrarImportacion" class="btn btn-primary">Cerrar</button>
+        </div>
+        
+      </div>
+    </form>
+    
+    <form id="frmFileDialog" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmFileDialog'">
+      
+    </form>
+    
+    <div id="frmDesplegarContenido" class="card" ng-show="currentScreen == '#frmDesplegarContenido'">
+        
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+            <h1>&#128194; C&oacute;digo Generado</h1>
+            <button class="btn btn-secondary" ng-click="mostrarGeneradores()">
+                &#10096; Atr&aacute;s
+            </button>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="">
+              
+              <div ng-repeat="(indice, objeto) in frmGeneracion.archivos" class="card mx-0 my-0" ng-click="generarCodigo(indice)">
+                  <div class="card-header">
+                      &#128196; {{objeto.path}}
+                  </div>
+                  <div class="card-body">
+                    <div class="form-group">
+                    <textarea class="form-control" rows="10" readonly ng-model="objeto.contenido">
+                    </textarea>
+                    </div>
+                  </div>
+              </div>
+              
+          </div>
+        </div>
+        
+    </div>
+
+    <div id="divValidacion" class="card" ng-show="currentScreen == '#divValidacion'">
+
+        <div class="card-header bg-dark text-white">
+          <div class="nav justify-content-between">
+            <h1>&#128203; Validaciones</h1>
+            
+            <span>
+            
+            <button class="btn btn-secondary" ng-click="mostrarGeneradores()" ng-show="frmValidaciones.puedeGenerar()">
+                &#128119; Generar
+            </button>
+            
+            <button class="btn btn-secondary" ng-click="irAObjetoModelo()">
+                &#10096; Atr&aacute;s
+            </button>
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-text" ng-show ="frmValidaciones.lista.length == 0" >No hay observaciones</div>
+          
+          <div class="">
+              <div ng-repeat="(indice, objeto) in frmValidaciones.lista" class="card mx-0 my-0" ng-click="seleccionarValidacion(indice)">
+                  <h1 class="card-body">
+                      {{objeto.nombre}}
+                  </h1>
+                  <h2 class="text-info">
+                      {{objeto.nombrePadre}}
+                  </h2>
+                  <h3 class="text-{{objeto.nivel}}">
+                      <span ng-show=" objeto.nivel == 'danger' ">&#10060;</span>
+                      <span ng-show=" objeto.nivel == 'warning' ">&#9888;</span>
+                      {{objeto.descripcionValidacion}}
+                  </h3>
+              </div>
+          </div>
+        </div>
+
+    </div>
+    
+    <div id="divProtector" ng-show="currentScreen == '#divProtector'">
+       <div>Espere un momento, por favor </div> 
+    </div>
+    
+    
+    <script src="js/modelador.angular.js?31">
+    </script>
+    
+
+  </body>
+</html>
+
+
+
