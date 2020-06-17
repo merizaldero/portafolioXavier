@@ -56,6 +56,7 @@ def definicionCampoModel(campo, modelo, dominio = 'models'):
     
     parametros = ''
     
+    #Ajustes para campos que se convierten en Foreign key
     if tipoCampo == 'ForeignKey':
         if campo['__atributos']['refUser'] != '1':
             pass
@@ -70,9 +71,21 @@ def definicionCampoModel(campo, modelo, dominio = 'models'):
         else:
             parametros += ", on_delete = models.CASCADE"
     
+    #Ajuste de tipo cuando es incremental
+    if 'incremental' in campo['__atributos'] and campo['__atributos']['incremental'] == '1':
+        if tipoCampo in ['IntegerField','PositiveIntegerField','PositiveSmallIntegerField','SmallIntegerField']:
+            tipoCampo = 'AutoField'
+        elif tipoCampo == 'BigIntegerField' :
+            tipoCampo = 'BigAutoField'
+    
     if not ( 'req_max_length' in tipo and tipo['req_max_length'] == False):
         parametros += 'max_length = {0}'.format( campo['__atributos']['tamano'] )
-       
+    
+    if 'pk' in campo['__atributos'] and campo['__atributos']['pk'] == '1':
+        if parametros != '':
+            parametros += ', '
+        parametros += 'primary_key=True'
+        
     if 'obligatorio' in campo['__atributos'] and campo['__atributos']['obligatorio'] == '0':
         if parametros != '':
             parametros += ', '
@@ -92,11 +105,29 @@ def definicionCampoModel(campo, modelo, dominio = 'models'):
         parametros += 'help_text="{0}"'.format( campo['descripcion'] )
         
     
-    definicion = ESPACIO + "{0}{1} = {2}.{3}({4})\n".format(ESPACIO, nombreCampo, dominio, tipoCampo, parametros )
+    definicion = "{0}{1} = {2}.{3}({4})\n".format(ESPACIO, nombreCampo, dominio, tipoCampo, parametros )
     return definicion
+
+def declaracionIndice(indice, entidad):
+    campos = [ "'{0}', ".format(x['nombre']) for x in indice['__listas']['camposWhere'] ]
+    resultado = ESPACIO * 3 + "models.Index( fields=[ "
+    for x in campos:
+        resultado += x
+    resultado += "]),\n"
+    return resultado
+            
+def declaracionIndiceUnico(indice, entidad):
+    campos = [ "'{0}', ".format(x['nombre']) for x in indice['__listas']['camposWhere'] ]
+    resultado = ESPACIO * 3 + "[ "
+    for x in campos:
+        resultado += x
+    resultado += "],\n"
+    return resultado
 
 def esCampoSuelto(campo):
     es_suelto = True
+    if campo['__atributos']['pk'] == '1' and campo['nombre'].lower() == 'id' and campo['__atributos']['tipo'] == 'INTEGER' and campo['__atributos']['incremental'] == '1':
+        es_suelto = False
     return es_suelto
 
 def generarModelsPy(modelo):    
@@ -122,11 +153,33 @@ def generarModelsPy(modelo):
         nombreEntidad = entidad['nombre']
         campos = entidad['__listas']['Campos']
         definicionesCampos = [ definicionCampoModel(campo,modelo) for campo in campos if esCampoSuelto(campo) ]
+        campoId = [x for x in campos if x['__atributos']['pk'] == '1' ][0]
+        indices = [x for x in entidad['__listas']['NamedQuieries'] if not( x['__atributos']['entidadFK'].isnumeric() ) and x['__atributos']['indiceUnico'] != '1' ]
+        indicesUnicos = [x for x in entidad['__listas']['NamedQuieries'] if x['__atributos']['indiceUnico'] == '1' ]
         
         contenido += "\nclass {0}(models.Model):\n".format(nombreEntidad)
+        #implementa campos
         for x in definicionesCampos:
             contenido += x;
-    
+        
+        #implementa get_absolute_url
+        contenido += "{0}def get_absolute_url(self):\n{0}{0}return reverse('{1}', args=[str(self.{2})])\n".format( ESPACIO , nombreEntidad.lower(), campoId['nombre'] )
+        
+        #implementa class Meta
+        if len(indices) > 0 or len(indicesUnicos) > 0:
+            contenido += ESPACIO + "class Meta:\n";
+            if len(indices) > 0:
+                declaracionesIndices = [ declaracionIndice(x, entidad) for x in indices ]
+                contenido += ESPACIO * 2 + "indexes = [\n";
+                for x in declaracionesIndices:
+                    contenido += x;
+                contenido += ESPACIO * 2 + "]\n";                
+            if len(indicesUnicos) > 0:
+                declaracionesIndicesUnicos = [ declaracionIndiceUnico(x, entidad) for x in indicesUnicos ]
+                contenido += ESPACIO * 2 + "unique_together = [\n";
+                for x in declaracionesIndicesUnicos:
+                    contenido += x;
+                contenido += ESPACIO * 2 + "]\n";
     #incluye clase de au
     return contenido
 
