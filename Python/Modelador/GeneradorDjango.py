@@ -105,23 +105,21 @@ def definicionCampoModel(campo, modelo, dominio = 'models'):
         parametros += 'help_text="{0}"'.format( campo['descripcion'] )
         
     
-    definicion = "{0}{1} = {2}.{3}({4})\n".format(ESPACIO, nombreCampo, dominio, tipoCampo, parametros )
+    definicion = "{0}{1} = {2}.{3}({4})".format(ESPACIO, nombreCampo, dominio, tipoCampo, parametros )
     return definicion
 
 def declaracionIndice(indice, entidad):
-    campos = [ "'{0}', ".format(x['nombre']) for x in indice['__listas']['camposWhere'] ]
+    campos = [ "'{0}'".format(x['nombre']) for x in indice['__listas']['camposWhere'] ]
     resultado = ESPACIO * 3 + "models.Index( fields=[ "
-    for x in campos:
-        resultado += x
-    resultado += "]),\n"
+    resultado += ", ".join( campos )
+    resultado += "])"
     return resultado
             
 def declaracionIndiceUnico(indice, entidad):
-    campos = [ "'{0}', ".format(x['nombre']) for x in indice['__listas']['camposWhere'] ]
+    campos = [ "'{0}'".format(x['nombre']) for x in indice['__listas']['camposWhere'] ]
     resultado = ESPACIO * 3 + "[ "
-    for x in campos:
-        resultado += x
-    resultado += "],\n"
+    resultado += ", ".join( campos )
+    resultado += "]"
     return resultado
 
 def esCampoSuelto(campo):
@@ -138,13 +136,11 @@ def generarModelsPy(modelo):
     for catalogo in catalogos:
         nombreCatalogo = catalogo["nombre"].upper()
         valoresCatalogo = catalogo['__listas']['Valores']
-        constantesCatalogos = [ "{2}_{0} = '{1}'\n".format(valorCatalogo['nombre'].upper(), valorCatalogo['nombre'], nombreCatalogo ) for valorCatalogo in valoresCatalogo ]
-        listaConstantesCatalogos = [ ESPACIO + "({2}_{0} , '{1}'),\n".format( valorCatalogo['nombre'].upper(), valorCatalogo['nombre'], nombreCatalogo ) for valorCatalogo in valoresCatalogo ]        
-        for x in constantesCatalogos:
-            contenido += x
+        constantesCatalogos = [ "{2}_{0} = '{1}'".format(valorCatalogo['nombre'].upper(), valorCatalogo['nombre'], nombreCatalogo ) for valorCatalogo in valoresCatalogo ]
+        listaConstantesCatalogos = [ ESPACIO + "({2}_{0} , '{1}')".format( valorCatalogo['nombre'].upper(), valorCatalogo['nombre'], nombreCatalogo ) for valorCatalogo in valoresCatalogo ]         
+        contenido += "\n".join(constantesCatalogos) + "\n"
         contenido += "{0} = (\n".format(nombreCatalogo)
-        for x in listaConstantesCatalogos:
-            contenido += x
+        contenido += ",\n".join(listaConstantesCatalogos) + "\n"
         contenido += ")\n"
         
     #incluye Modelos
@@ -159,8 +155,7 @@ def generarModelsPy(modelo):
         
         contenido += "\nclass {0}(models.Model):\n".format(nombreEntidad)
         #implementa campos
-        for x in definicionesCampos:
-            contenido += x;
+        contenido += "\n".join(definicionesCampos) + "\n"
         
         #implementa get_absolute_url
         contenido += "{0}def get_absolute_url(self):\n{0}{0}return reverse('{1}', args=[str(self.{2})])\n".format( ESPACIO , nombreEntidad.lower(), campoId['nombre'] )
@@ -171,14 +166,12 @@ def generarModelsPy(modelo):
             if len(indices) > 0:
                 declaracionesIndices = [ declaracionIndice(x, entidad) for x in indices ]
                 contenido += ESPACIO * 2 + "indexes = [\n";
-                for x in declaracionesIndices:
-                    contenido += x;
+                contenido += ",\n".join( declaracionesIndices ) + "\n"
                 contenido += ESPACIO * 2 + "]\n";                
             if len(indicesUnicos) > 0:
                 declaracionesIndicesUnicos = [ declaracionIndiceUnico(x, entidad) for x in indicesUnicos ]
                 contenido += ESPACIO * 2 + "unique_together = [\n";
-                for x in declaracionesIndicesUnicos:
-                    contenido += x;
+                contenido += ",\n".join( declaracionesIndicesUnicos ) + "\n"                
                 contenido += ESPACIO * 2 + "]\n";
     #incluye clase de au
     return contenido
@@ -187,7 +180,34 @@ def generarFormsPy(modelo):
     return ''
 
 def generarAdminViewsPy(modelo):
-    return ''
+    adminPages = modelo['__objetoRaiz']['__listas']['AdminPages']
+    
+    cruce_entidades = [ ( x['nombre'] , y['nombre'] ) for x in adminPages for y in x['__listas']['Inlines']  ]
+    entidades = set ( [ x['nombre'] for x in adminPages ] + [ x[1] for x in cruce_entidades ] )            
+    contenido = "from app.models import {0}\nfrom django.contrib import admin\n\n".format( ", ".join(entidades) )    
+    
+    for adminPage in adminPages:
+        nombreAdminPage = adminPage['nombre']
+        inlines = adminPage['__listas']['Inlines']
+        
+        contenido += "# admin.site.register({0})\n".format(nombreAdminPage)
+        for inline in inlines:
+            contenido += "class {0}{1}Inline(admin.TabularInline):\n{2}model = {0}\n".format( inline['nombre'], nombreAdminPage, ESPACIO)
+            list_display = [ "'{0}'".format(x['nombre']) for x in inline['__listas']['CamposDespliegue'] ]
+            if len(list_display) > 0:
+                contenido += "{0}list_display = ({1})\n".format( ESPACIO, ", ".join(list_display) )
+        
+        contenido += "@admin.register({0})\nclass {0}Admin(admin.ModelAdmin):\n".format( nombreAdminPage )
+        list_display = [ "'{0}'".format(x['nombre']) for x in adminPage['__listas']['CamposDespliegue'] ]
+        list_inlines = [ "{0}{1}Inline".format(x['nombre'], nombreAdminPage) for x in adminPage['__listas']['Inlines'] ]
+        if len(list_display) == 0 and len(list_inlines) == 0:
+            contenido += "{0}pass\n".format( ESPACIO )
+        if len(list_display) > 0:
+            contenido += "{0}list_display = ({1})\n".format( ESPACIO, ", ".join(list_display) )
+        if len(list_inlines) > 0:
+            contenido += "{0}inlines = [{1}]\n".format( ESPACIO, ", ".join(list_inlines) )
+    
+    return contenido
 
 def generarViewsPy(modelo):
     return ''
