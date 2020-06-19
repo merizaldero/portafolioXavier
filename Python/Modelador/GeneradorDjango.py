@@ -161,18 +161,17 @@ def generarModelsPy(modelo):
         contenido += "{0}def get_absolute_url(self):\n{0}{0}return reverse('{1}', args=[str(self.{2})])\n".format( ESPACIO , nombreEntidad.lower(), campoId['nombre'] )
         
         #implementa class Meta
-        if len(indices) > 0 or len(indicesUnicos) > 0:
-            contenido += ESPACIO + "class Meta:\n";
-            if len(indices) > 0:
-                declaracionesIndices = [ declaracionIndice(x, entidad) for x in indices ]
-                contenido += ESPACIO * 2 + "indexes = [\n";
-                contenido += ",\n".join( declaracionesIndices ) + "\n"
-                contenido += ESPACIO * 2 + "]\n";                
-            if len(indicesUnicos) > 0:
-                declaracionesIndicesUnicos = [ declaracionIndiceUnico(x, entidad) for x in indicesUnicos ]
-                contenido += ESPACIO * 2 + "unique_together = [\n";
-                contenido += ",\n".join( declaracionesIndicesUnicos ) + "\n"                
-                contenido += ESPACIO * 2 + "]\n";
+        contenido += ESPACIO + "class Meta:\n{0}{0}verbose_name = '{1}'\n{0}{0}verbose_name_plural = '{1}s'\n".format( ESPACIO, nombreEntidad );
+        if len(indices) > 0:
+            declaracionesIndices = [ declaracionIndice(x, entidad) for x in indices ]
+            contenido += ESPACIO * 2 + "indexes = [\n";
+            contenido += ",\n".join( declaracionesIndices ) + "\n"
+            contenido += ESPACIO * 2 + "]\n";                
+        if len(indicesUnicos) > 0:
+            declaracionesIndicesUnicos = [ declaracionIndiceUnico(x, entidad) for x in indicesUnicos ]
+            contenido += ESPACIO * 2 + "unique_together = [\n";
+            contenido += ",\n".join( declaracionesIndicesUnicos ) + "\n"                
+            contenido += ESPACIO * 2 + "]\n";
     #incluye clase de au
     return contenido
 
@@ -206,22 +205,84 @@ def generarAdminViewsPy(modelo):
             contenido += "{0}list_display = ({1})\n".format( ESPACIO, ", ".join(list_display) )
         if len(list_inlines) > 0:
             contenido += "{0}inlines = [{1}]\n".format( ESPACIO, ", ".join(list_inlines) )
+        contenido += "\n"
+    
+    return contenido
+
+def generarSerializersPy(modelo):
+    entidades = modelo['__objetoRaiz']['__listas']['Entidades']    
+    lista_entidades = [ x['nombre'] for x in entidades ]
+    
+    # importa todas las entidades
+    contenido = ''
+    contenido += "from rest_framework import serializers\nfrom app.models import {0}\n\n".format( ", ".join( lista_entidades ) )
+    
+    #definicion de serializadores    
+    for entidad in entidades:
+        contenido += "class {1}Serializer(serializers.ModelSerializer):\n{0}class Meta:\n{0}{0}model = {1}\n\n".format(ESPACIO, entidad['nombre'])
     
     return contenido
 
 def generarViewsPy(modelo):
-    return ''
+    contenido = ''
+    
+    entidades = modelo['__objetoRaiz']['__listas']['Entidades']    
+    
+    lista_entidades = [ x['nombre'] for x in entidades ]    
+    contenido += "from rest_framework import viewsets\nfrom app.models import {0}\n".format( ", ".join( lista_entidades ) )
+    
+    lista_entidades = [ "{0}Serializer".format(x['nombre']) for x in entidades ]
+    contenido += "from app.serializers import {0}\n\n".format( ", ".join( lista_entidades ) )
+    
+    lista_entidades = [ "class {1}ViewSet(viewsets.ModelViewSet):\n{0}queryset = {1}.objects.all()\n{0}serializer_class = {1}Serializer\n".format(ESPACIO, x['nombre']) for x in entidades ]
+    contenido += "{0}\n".format( "\n".join( lista_entidades ) )
+    
+    return contenido
 
-def generarUrlsPy(modelo):
-    return ''
+def generarPryUrlsPy(modelo):
+    contenido = """
+from django.conf import settings
+from django.conf.urls import url, include
+from django.contrib import admin
+
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'^api/', include('apps.core.urls', namespace='app')),
+]
+
+if settings.DEBUG:
+    from django.conf.urls.static import static
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    """
+    return contenido
+
+def generarAppUrlsPy(modelo):
+    contenido = ''
+    
+    entidades = modelo['__objetoRaiz']['__listas']['Entidades']
+    
+    lista_entidades = [ "{0}ViewSet".format(x['nombre']) for x in entidades ]
+    contenido += "from django.conf.urls import url\nfrom rest_framework import routers\nfrom core.views import {0}\n\n".format( ", ".join( lista_entidades ) )
+    
+    contenido += "router = routers.DefaultRouter()\n\n"
+    
+    lista_entidades = [ "router.register(r'{1}s', {0}ViewSet)".format(x['nombre'], x['nombre'].lower() ) for x in entidades ]
+    contenido += "\n".join(lista_entidades) + "\n\n"
+    
+    contenido += "urlpatterns = router.urls\n"
+    
+    return contenido
 
 def generarModelo(modelo):
     
-    resultado = { 'archivos' : [ { 'path':'app/models.py', 'contenido': generarModelsPy(modelo) },
-                                 { 'path':'app/forms.py', 'contenido':  generarFormsPy(modelo) },
-                                 { 'path':'app/admin.py', 'contenido':  generarAdminViewsPy(modelo) },
-                                 { 'path':'app/views.py', 'contenido':  generarViewsPy(modelo) },
-                                 { 'path':'project/urls.py', 'contenido':  generarUrlsPy(modelo) },
+    resultado = { 'archivos' : [ { 'path':'app/models.py',      'contenido': generarModelsPy(modelo) },                                 
+                                 { 'path':'app/admin.py',       'contenido': generarAdminViewsPy(modelo) },
+                                 { 'path':'app/serializers.py', 'contenido': generarSerializersPy(modelo) },
+                                 { 'path':'app/forms.py',       'contenido': generarFormsPy(modelo) },
+                                 { 'path':'app/views.py',       'contenido': generarViewsPy(modelo) },
+                                 { 'path':'project/urls.py',    'contenido': generarPryUrlsPy(modelo) },
+                                 { 'path':'app/urls.py',        'contenido': generarAppUrlsPy(modelo) },
                                  ]}
     
     return resultado
