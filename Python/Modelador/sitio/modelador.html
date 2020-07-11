@@ -26,7 +26,7 @@
     
     <div id="divMenuPrincipal" class="card" ng-show="currentScreen == '#divMenuPrincipal'" >
       
-      <div class="card-header bg-dark text-white">MENU PRINCIPAL</div>
+      <div class="card-header bg-dark text-white fixed-top">MENU PRINCIPAL</div>
       <div class="card-body">
         <div class="">
           <div id="aCrearModelo" class="card mx-5 my-5" ng-click="mostrarCrearModelo()" >
@@ -56,7 +56,7 @@
     
     <form id="frmMantenimiento" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmMantenimiento'">
       <div class="card">
-        <div class="card-header bg-dark text-white">
+        <div class="card-header bg-dark text-white  fixed-top">
             <div class="nav justify-content-between">
                 <h1>&#9881; Mantenimiento</h1>
                 <button class="btn btn-secondary" ng-click="irAInicio()" >
@@ -96,35 +96,39 @@
     
     <div id="divModelView" ng-show="objetoModelo != null &amp;&amp; currentScreen == '#divModelView'">
 
-        <div class="nav bg-light justify-content-between">
-            <ul class="nav">
-                <li class="nav-item" ng-repeat="(indice,objetoPila) in pilaObjetosModelo">
-                    <a class='btn btn-secondary btn-lg' ng-click="mostrarObjetoModeloPila(indice)" >&#128196; {{objetoPila.nombre}}</a>
-                </li>
-            </ul>
-            <ul class="nav">
-                <li class="nav-item" ng-show="objetoModelo.idObjeto != modelo.idObjetoRaiz">
-                    <a class='btn btn-danger btn-lg' ng-click="eliminarObjetoModelo()" >&#128465; Eliminar</a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-primary btn-lg" ng-click="exportarModelo()">&#128229; Descargar Modelo</a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-primary btn-lg" ng-show="cambiado" ng-click="guardarObjetoModelo()">&#128190; Guardar</a>
-                </li>
-                <li class="nav-item">
-                    <a class='btn btn-secondary btn-lg' ng-click="validarModelo()" > &#128203; Validar</a>
-                </li>
-                <li class="nav-item">
-                    <a class='btn btn-secondary btn-lg' ng-click="irAInicio()" > &#10006; Cerrar</a>
-                </li>
-            </ul>
-        </div>
         
         <div class="card">
             
-            <div class="card-header bg-dark text-white">
-                <div class="navbar navbar-default"> 
+            <div class="card-header bg-dark text-white fixed-top pt-1 pb-1">
+            
+		        <div class="nav justify-content-between">
+		        	
+		            <ul class="nav">
+		                <li class="nav-item" ng-repeat="(indice,objetoPila) in pilaObjetosModelo">
+		                    <a class='btn btn-secondary' ng-click="mostrarObjetoModeloPila(indice)" >&#128196; {{objetoPila.nombre}}</a>
+		                </li>
+		            </ul>
+		            <ul class="nav">
+		                <li class="nav-item" ng-show="objetoModelo.idObjeto != modelo.idObjetoRaiz">
+		                    <a class='btn btn-danger' ng-click="eliminarObjetoModelo()" >&#128465; Eliminar</a>
+		                </li>
+		                <li class="nav-item">
+		                    <a class="btn btn-primary" ng-click="exportarModelo()">&#128229; Descargar Modelo</a>
+		                </li>
+		                <li class="nav-item">
+		                    <a class="btn btn-primary" ng-show="cambiado" ng-click="guardarObjetoModelo()">&#128190; Guardar</a>
+		                </li>
+		                <li class="nav-item">
+		                    <a class='btn btn-secondary' ng-click="validarModelo()" > &#128203; Validar</a>
+		                </li>
+		                <li class="nav-item">
+		                    <a class='btn btn-secondary' ng-click="irAInicio()" > &#10006; Cerrar</a>
+		                </li>
+		            </ul>
+		            
+		        </div>
+            
+                <div class="navbar navbar-default pb-1"> 
                     <span class="navbar-brand">&#128196; {{objetoModelo.idTipoMetamodelo}}</span>
                     <span class="navbar-nav">
                         <span class="navbar-item form-group">
@@ -135,6 +139,14 @@
             </div>
             
             <div class="card-body">
+            	
+            	<div class="mt-3 mb-3">  
+            	&nbsp;                  
+                </div>
+            	<div class="mt-4 mb-4">  
+            	&nbsp;                  
+                </div>
+            	
                 <div class="form-group-lg">
                     <label for="objetoModeloDescripcion" class="col-sm-4">Descripci&oacute;n</label>
                     <span class="col-sm-8">
@@ -250,7 +262,7 @@
     
     <form id="frmSeleccionarReferencia" class="card" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmSeleccionarReferencia'">
       
-        <div class="card-header bg-dark text-white">
+        <div class="card-header bg-dark text-white fixed-top">
           <div class="nav justify-content-between">
               <h1>Seleccionar {{frmSeleccionarReferencia.idTipoMetamodelo}}</h1>
               <button class="btn btn-secondary" ng-click="irAObjetoModelo()">
@@ -276,7 +288,7 @@
     <form id="frmAbrirModelo" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmAbrirModelo'">
       
       <div class="card">
-        <div class="card-header bg-dark text-white">
+        <div class="card-header bg-dark text-white fixed-top">
           <div class="nav justify-content-between">
             <h1>&#128194; Abrir Modelo</h1>
             <button id="aCancelarAbrirModelo" class="btn btn-secondary" ng-click="irAInicio()">
@@ -307,7 +319,7 @@
     
     <div id="divGeneradores" class="card" ng-show="currentScreen == '#divGeneradores'">
         
-        <div class="card-header bg-dark text-white">
+        <div class="card-header bg-dark text-white fixed-top">
           <div class="nav justify-content-between">
             <h1>&#128119; Seleccionar Generador</h1>
             <button id="aCancelarAbrirModelo" class="btn btn-secondary" ng-click="irAObjetoModelo()">
@@ -317,6 +329,11 @@
         </div>
         
         <div class="card-body">
+        
+        	    <div class="mt-4 mb-4">  
+            	&nbsp;                  
+                </div>
+                
           <div class="">
               <div ng-repeat="(indice, objeto) in frmGeneracion.generadores" class="card mx-0 my-0" ng-click="generarCodigo(indice)">
                   <h1 class="card-body">
@@ -415,7 +432,7 @@
     
     <div id="frmDesplegarContenido" class="card" ng-show="currentScreen == '#frmDesplegarContenido'">
         
-        <div class="card-header bg-dark text-white">
+        <div class="card-header bg-dark text-white fixed-top">
           <div class="nav justify-content-between">
             <h1>&#128194; C&oacute;digo Generado</h1>
             <button class="btn btn-secondary" ng-click="mostrarGeneradores()">
@@ -425,6 +442,11 @@
         </div>
         
         <div class="card-body">
+        
+                <div class="mt-3 mb-3">  
+            	&nbsp;                  
+                </div>
+                
           <div class="">
               
               <div ng-repeat="(indice, objeto) in frmGeneracion.archivos" class="card mx-0 my-0">
@@ -446,7 +468,7 @@
 
     <div id="divValidacion" class="card" ng-show="currentScreen == '#divValidacion'">
 
-        <div class="card-header bg-dark text-white">
+        <div class="card-header bg-dark text-white fixed-top">
           <div class="nav justify-content-between">
             <h1>&#128203; Validaciones</h1>
             
@@ -463,6 +485,11 @@
           </div>
         </div>
         <div class="card-body">
+        
+                <div class="mt-4 mb-4">  
+            	&nbsp;                  
+                </div>
+        
           <div class="card-text" ng-show ="frmValidaciones.lista.length == 0" >No hay observaciones</div>
           
           <div class="">

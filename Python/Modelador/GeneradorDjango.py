@@ -229,13 +229,22 @@ def generarViewsPy(modelo):
     entidades = modelo['__objetoRaiz']['__listas']['Entidades']    
     
     lista_entidades = [ x['nombre'] for x in entidades ]    
-    contenido += "from rest_framework import viewsets\nfrom app.models import {0}\n".format( ", ".join( lista_entidades ) )
+    contenido += "from rest_framework import generics\n#from rest_framework import viewsets\nfrom rest_framework.authentication import SessionAuthentication, TokenAuthentication\nfrom rest_framework.permissions import IsAuthenticated\nfrom app.models import {0}\n".format( ", ".join( lista_entidades ) )
     
     lista_entidades = [ "{0}Serializer".format(x['nombre']) for x in entidades ]
     contenido += "from app.serializers import {0}\n\n".format( ", ".join( lista_entidades ) )
     
-    lista_entidades = [ "class {1}ViewSet(viewsets.ModelViewSet):\n{0}queryset = {1}.objects.all()\n{0}serializer_class = {1}Serializer\n".format(ESPACIO, x['nombre']) for x in entidades ]
-    contenido += "{0}\n".format( "\n".join( lista_entidades ) )
+    #ViewSet para API
+    #lista_entidades = [ "#class {1}ViewSet(viewsets.ModelViewSet):\n#{0}authentication_classes = [SessionAuthentication, BasicAuthentication]\n#{0}permission_classes = [IsAuthenticated]\n{0}queryset = {1}.objects.all()\n#{0}serializer_class = {1}Serializer\n".format(ESPACIO, x['nombre']) for x in entidades ]
+    #contenido += "{0}\n".format( "\n".join( lista_entidades ) )
+    for entidad in entidades:
+        contenido += "\nclass {1}CRUD(generics.RetrieveUpdateDestroyAPIView):\n{0}authentication_classes = [SessionAuthentication, BasicAuthentication]\n{0}permission_classes = [IsAuthenticated]\n{0}queryset = {1}.objects.all()\n{0}serializer_class = {1}Serializer\n".format(ESPACIO, entidad['nombre'])
+        finders = [finder for finder in entidad['__listas']['NamedQuieries'] if 'finder' in finder['__atributos'] and finder['__atributos']['finder'] is not None and len(finder['__atributos']['finder']) > 0 ]
+        for finder in finders:            
+            parametros = [ parametro for parametro in finder['__listas']['camposWhere'] ]
+            lista_lectura_parametros = [ "{0}{0}{1} = self.kwargs['{1}']".format(ESPACIO, parametro['nombre'] ) for parametro in parametros]
+            lista_parametros = [ "{0} = {0}".format( parametro['nombre'] ) for parametro in parametros]
+            contenido += "class {1}{2}List(generics.ListAPIView):\n{0}authentication_classes = [SessionAuthentication, BasicAuthentication]\n{0}permission_classes = [IsAuthenticated]\n{0}serializer_class = {1}Serializer\n{0}def get_queryset(self):\n{3}\n{0}{0}return {1}.objects.filter({4})\n\n".format(ESPACIO, entidad['nombre'], finder['__atributos']['finder'].capitalize(), '\n'.join(lista_lectura_parametros), ', '.join(lista_parametros))        
     
     return contenido
 
@@ -244,10 +253,12 @@ def generarPryUrlsPy(modelo):
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
+from rest_framework.authtoken import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('apps.core.urls', namespace='app')),
+    url(r'^api-token-auth/', views.obtain_auth_token)
 ]
 
 if settings.DEBUG:
@@ -274,9 +285,45 @@ def generarAppUrlsPy(modelo):
     
     return contenido
 
+def generarInitSequence(modelo):
+    contenido = """
+mkdir {0}_env
+cd {0}_env 
+
+rem virtualenv .env 
+rem pip install "Django >= 1.9, < 1.10" 
+
+django-admin startproject {0} --template=https://github.com/ambivalentno/django-skeleton/archive/master.zip 
+
+mkdir log
+mkdir {0}\db
+
+    """.format(modelo['nombre'])
+    return contenido
+
+def generarSettingsPy(modelo):
+    contenido = """
+...
+
+INSTALLED_APPS = [
+...
+    'rest_framework',
+    'rest_framework.authtoken',
+]
+...
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+...
+    """
+    return contenido
+
 def generarModelo(modelo):
     
-    resultado = { 'archivos' : [ { 'path':'app/models.py',      'contenido': generarModelsPy(modelo) },                                 
+    resultado = { 'archivos' : [ { 'path':'Secuencia init',     'contenido': generarInitSequence(modelo) },
+                                 { 'path':'project/settings.py','contenido': generarSettingsPy(modelo) },
+                                 { 'path':'app/models.py',      'contenido': generarModelsPy(modelo) },                                 
                                  { 'path':'app/admin.py',       'contenido': generarAdminViewsPy(modelo) },
                                  { 'path':'app/serializers.py', 'contenido': generarSerializersPy(modelo) },
                                  { 'path':'app/forms.py',       'contenido': generarFormsPy(modelo) },
