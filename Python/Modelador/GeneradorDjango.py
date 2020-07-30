@@ -273,15 +273,25 @@ def generarAppUrlsPy(modelo):
     
     entidades = modelo['__objetoRaiz']['__listas']['Entidades']
     
-    lista_entidades = [ "{0}ViewSet".format(x['nombre']) for x in entidades ]
-    contenido += "from django.conf.urls import url\nfrom rest_framework import routers\nfrom core.views import {0}\n\n".format( ", ".join( lista_entidades ) )
+    rutas = {}
+    
+    for entidad in entidades:
+        rutas[ entidad['nombre'].lower() + '/<int:pk>/' ] = entidad['nombre'] + 'CRUD'
+        finders = [finder for finder in entidad['__listas']['NamedQuieries'] if 'finder' in finder['__atributos'] and finder['__atributos']['finder'] is not None and len(finder['__atributos']['finder']) > 0 ]
+        for finder in finders:            
+            rutas [ finder['__atributos']['endPoint'] ] = entidad['nombre'] + finder['__atributos']['finder'].capitalize() + 'List'        
+    
+    contenido += "from django.conf.urls import url\nfrom rest_framework import routers\nfrom core.views import {0}\n\n".format( ", ".join( set(rutas.values()) ) )
     
     contenido += "router = routers.DefaultRouter()\n\n"
     
-    lista_entidades = [ "router.register(r'{1}s', {0}ViewSet)".format(x['nombre'], x['nombre'].lower() ) for x in entidades ]
-    contenido += "\n".join(lista_entidades) + "\n\n"
+    keys_ordenados = list( rutas.keys() )
+    keys_ordenados.sort( reverse = True )
     
-    contenido += "urlpatterns = router.urls\n"
+    lista_entidades = [ "{0}path('{1}', {2}.as_view())".format(ESPACIO, clave, rutas[clave] ) for clave in keys_ordenados ]
+    contenido += "urlpatterns = [\n{0}\n]".format("\n".join(lista_entidades))
+    
+    contenido += "urlpatterns = format_suffix_patterns(urlpatterns)"
     
     return contenido
 

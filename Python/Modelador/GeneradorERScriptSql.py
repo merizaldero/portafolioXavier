@@ -17,48 +17,45 @@ def getTipo(campo):
         
 def getObligatorio(campo):
     if campo['__atributos']["obligatorio"] == "1":
-        return ("NOT NULL")
+        return "NOT NULL"
     else:
-        return ("")
+        return ""
+def getAutonumerico(campo):
+    if campo['__atributos']["incremental"] == "1":
+        return "auto_increment"
+    else:
+        return ""
 
+def defaultTableNamer(entidad,modelo):
+    prefijo = modelo['__objetoRaiz']['__atributos']['prefijo'].lower()
+    nombreTabla = entidad['__atributos']['nombreTabla']
+    return "{0}{1}".format(prefijo,nombreTabla)
+
+def obtenerCreateTable(entidad, modelo, table_namer = defaultTableNamer):    
+    nombreTabla = entidad['__atributos']['nombreTabla']
+    campos = entidad['__listas']['Campos']
+    camposPk = [x for x in campos if x['__atributos']['pk'] == '1' ]
+    lista_campos = []
+    for campo in campos:
+        nombreCampo = campo['__atributos']['nombreCampo'].lower()
+        tipo = getTipo(campo)
+        obligatorio = getObligatorio(campo)
+        autonumerico = getAutonumerico(campo)
+        lista_campos.append( "\t{0} {1} {2} {3}".format( nombreCampo , tipo , obligatorio, autonumerico ) ) 
+    if len(camposPk) > 0:
+        lista_pk = [ campo['__atributos']['nombreCampo'].lower() for campo in camposPk ]
+        lista_campos.append( "\tPRIMARY KEY ( {0} )".format(", ".join(lista_pk)) )
+    archivo = "create table {0} (\n{1}\n);\n".format( table_namer(entidad,modelo) , ",\n".join(lista_campos) )
+    return archivo
+            
 def generarModelo(modelo):
     resultado = { 'archivos' : [ { 'path':'/script.sql', 'contenido':''} ]}
     archivo = ''
-    try:
-        prefijo = modelo['__objetoRaiz']['__atributos']['prefijo'].lower()
-        entidades = modelo['__objetoRaiz']['__listas']['Entidades']
+    entidades = modelo['__objetoRaiz']['__listas']['Entidades']    
+    for entidad in entidades:
+        archivo += obtenerCreateTable(entidad , modelo )
+    archivo += "-- Fin de Generacion\n"
     
-        for entidad in entidades:
-            nombreTabla = entidad['__atributos']['nombreTabla']
-            campos = entidad['__listas']['Campos']
-            camposPk = [x for x in campos if x['__atributos']['pk'] == '1' ]
-        
-            archivo += "create table {0}_{1}(\n".format( prefijo, nombreTabla )
-        
-            primerCampo = True
-            for campo in campos:
-          
-                nombreCampo = campo['__atributos']['nombreCampo']
-                tipo = getTipo(campo)
-                obligatorio = getObligatorio(campo)
-                if not(primerCampo):
-                    archivo += ","
-                archivo += "\t {0} {1} {2}\n".format( nombreCampo , tipo , obligatorio )
-                primerCampo = False
-            if len(camposPk) > 0:
-                archivo += ",\tPRIMARY KEY ("
-                primerCampo = True
-                for campo in camposPk:
-                    nombreCampo = campo['__atributos']['nombreCampo']
-                    if not(primerCampo):
-                        archivo += ","
-                    archivo += " {0} ".format(nombreCampo)
-                    primerCampo = False
-                archivo += ")\n"
-            archivo += ");\n"
-        archivo += "-- Fin de Generacion\n"
-    except (Exception) as ex:
-        pass    
     #print(archivo)
     resultado['archivos'][0]['contenido'] = archivo
     return resultado
