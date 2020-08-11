@@ -180,7 +180,7 @@ class """+entidad['nombre']+""" extends MvcModel {
         """ + ",\n        ".join(lista_fks) + """
     ];
     var $per_page = 7;
-    var $display_name = '"""+ display_name['__atributos']['nombreCampo'].lower() +"""';
+    var $display_field = '"""+ display_name['__atributos']['nombreCampo'].lower() +"""';
 }
 ?>"""
         resultado.append( { "path" : path , "contenido" : contenido } )
@@ -202,7 +202,10 @@ def anexarControllerClases(modelo):
         for campo in campos:
             nombreCampo = campo['__atributos']['nombreCampo'].lower()
             default_columns.append("'{0}' => [\n            'label'=>'{2}',\n            'value_method'=>'print_{1}'\n        ]".format( nombreCampo, campo['nombre'], campo['nombre'].capitalize() ))
-            default_column_methods.append("public function print_" + campo['nombre'] + " ($object) {\n        return empty($object->"+nombreCampo+") ? null : $object->"+nombreCampo+" ; \n    }\n")
+            if campo['__atributos']['tipo'] == 'BOOLEAN':
+                default_column_methods.append("public function print_" + campo['nombre'] + " ($object) {\n        return ($object->"+nombreCampo+" == '1') ? 'SI' : 'NO' ; \n    }\n")
+            else:
+                default_column_methods.append("public function print_" + campo['nombre'] + " ($object) {\n        return empty($object->"+nombreCampo+") ? null : $object->"+nombreCampo+" ; \n    }\n")
 
         lista_fk_methods = []
         lista_fk_method_calls = []
@@ -212,7 +215,7 @@ def anexarControllerClases(modelo):
             campos_fk, pk_fk, fks_fk, display_name_fk = obtenerCamposPksFks(entidad_fk,entidades)
             campos_nombre = [ "'{0}'".format(pk_fk['__atributos']['nombreCampo'].lower()) , "'{0}'".format(display_name_fk['__atributos']['nombreCampo'].lower()) ]
             lista_fk_methods.append("""private function set_""" + entidad_fk['nombre'].lower() + """s() {
-        $this->loadModel('""" + entidad_fk['nombre'] + """');
+        $this->load_model('""" + entidad_fk['nombre'] + """');
         $"""+ entidad_fk['nombre'].lower() +"""s = $this->""" + entidad_fk['nombre'] + """->find( ['selects' => ["""+", ".join(campos_nombre)+"""] ] );
         $this->set('"""+ entidad_fk['nombre'].lower() +"""s', $"""+ entidad_fk['nombre'].lower() +"""s );
     }
@@ -229,16 +232,13 @@ class Admin"""+entidad['nombre']+"""sController extends MvcAdminController {
 """ + "\n".join(lista_fk_methods) + """
 
     public function add(){
-        
-        $this->set_object();
-        $this->create();
+        """+ "\n".join(lista_fk_method_calls) +"""
+        parent::add();
     }
     
     public function edit(){
         """+ "\n".join(lista_fk_method_calls) +"""
-        $this->verify_id_param();
-        $this->set_object();
-        $this->create_or_save();
+        parent::edit();
     }
 }
 ?>"""
@@ -287,6 +287,15 @@ if(!empty($object->""" + nombreCampo.lower() + """)){
     """
     return contenido
 
+def obtenerEntidadFK(campo, fks):
+    for fk in fks:
+        named_query = fk[0]
+        entidad = fk[1]
+        camposfk = [ campofk for campofk in named_query['__listas']['camposWhere'] if campofk['nombre'] == campo['nombre'] ]
+        if len(camposfk) > 0:
+            return entidad
+    return None
+
 def contenidoAdminAddView( entidad, entidades ):
     campos, pk, fks, display_name = obtenerCamposPksFks(entidad,entidades)
     lista_campos = []
@@ -294,7 +303,13 @@ def contenidoAdminAddView( entidad, entidades ):
         if campo['nombre'] == pk['nombre'] :
             continue
         nombreCampo = campo['__atributos']['nombreCampo']
-        lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )        
+        entidad_fk = obtenerEntidadFK(campo, fks)
+        if not(entidad_fk is None):
+            lista_campos.append( "<?php echo $this->form->belongs_to_dropdown('{0}', ${1}s, ['label' => '{2}', 'type' => 'checkbox', 'empty' => true ]); ?>".format( nombreCampo.lower()[:-3], entidad_fk['nombre'].lower() ,campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'BOOLEAN':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'checkbox', 'value' => '1']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        else:
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )        
     contenido = """<h2>Nuevo """ + entidad['nombre'] + """</h2>
 
 <?php echo $this->form->create($model->name, array('is_admin' => $this->is_admin)); ?>
@@ -314,8 +329,14 @@ def contenidoAdminEditView( entidad, entidades ):
     for campo in campos:
         if campo['nombre'] == pk['nombre']:
             continue
-        nombreCampo = campo['__atributos']['nombreCampo']        
-        lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )        
+        nombreCampo = campo['__atributos']['nombreCampo']       
+        entidad_fk = obtenerEntidadFK(campo, fks)
+        if not(entidad_fk is None):
+            lista_campos.append( "<?php echo $this->form->belongs_to_dropdown('{0}', ${1}s, ['label' => '{2}', 'type' => 'checkbox', 'empty' => true ]); ?>".format( nombreCampo.lower()[:-3], entidad_fk['nombre'].lower() ,campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'BOOLEAN':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'checkbox', 'value' => '1']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        else:
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )                
     contenido = """<h2>Editar """ + entidad['nombre'] + """</h2>
 
 <?php echo $this->form->create($model->name, array('is_admin' => $this->is_admin)); ?>
