@@ -1,0 +1,149 @@
+<?php
+
+class MicondominioLoader extends MvcPluginLoader {
+
+    var $db_version = '1.0';
+    var $tables = array();
+
+    function activate() {
+
+        // This call needs to be made to activate this app within WP MVC
+
+        $this->activate_app(__FILE__);
+
+        // Perform any databases modifications related to plugin activation here, if necessary
+
+        require_once ABSPATH.'wp-admin/includes/upgrade.php';
+
+        add_option('micondominio_db_version', $this->db_version);
+
+        // Use dbDelta() to create the tables for the app here
+        // $sql = '';
+        // dbDelta($sql);
+
+    $sqls = [
+        'create table '.$this->tables['flujoestados'].' (
+	id INTEGER  auto_increment,
+	nombre VARCHAR (32) NOT NULL ,
+	habilitado CHAR(1) NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table '.$this->tables['estados'].' (
+	id INTEGER  auto_increment,
+	flujoestado_id INTEGER NOT NULL ,
+	nombre VARCHAR (16) NOT NULL ,
+	estado_final CHAR(1) NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table '.$this->tables['transicionestados'].' (
+	id INTEGER  auto_increment,
+	flujoestado_id INTEGER NOT NULL ,
+	estado_origen_id INTEGER NOT NULL ,
+	estado_destino_id INTEGER NOT NULL ,
+	habilitado CHAR(1) NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table '.$this->tables['tipoconstruccions'].' (
+	id INTEGER  auto_increment,
+	nombre VARCHAR (32) NOT NULL ,
+	habilitado CHAR(1) NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table '.$this->tables['documentosoportes'].' (
+	id INTEGER  auto_increment,
+	descripcion VARCHAR (64) NOT NULL ,
+	path VARCHAR (256) NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table '.$this->tables['venues'].' (
+	id INTEGER NOT NULL auto_increment,
+	nombre VARCHAR (32) NOT NULL ,
+	provincia VARCHAR (16) NOT NULL ,
+	ciudad VARCHAR (32) NOT NULL ,
+	direccion VARCHAR (256) NOT NULL ,
+	tipoconstruccion_id INTEGER NOT NULL ,
+	creador_id BIGINT NOT NULL ,
+	administrador_id BIGINT NOT NULL ,
+	saldo DECIMAL (10,2) NOT NULL ,
+	fecha_saldo DATETIME NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table {prefix}xmc_HBTNT (
+	id INTEGER  auto_increment,
+	user_id BIGINT NOT NULL ,
+	condominio_id INTEGER NOT NULL ,
+	nombre VARCHAR (64) NOT NULL ,
+	direccion VARCHAR (64) NOT NULL ,
+	estado_id INTEGER NOT NULL ,
+	saldo_pagar DECIMAL (10,2) NOT NULL ,
+	fecha_saldo DATETIME NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table {prefix}xmc_TRNSCCN (
+	id INTEGER  auto_increment,
+	condominio_id INTEGER NOT NULL ,
+	fecha_hora DATETIME NOT NULL ,
+	descripcion VARCHAR (64) NOT NULL ,
+	monto DECIMAL (10,2) NOT NULL ,
+	saldo DECIMAL (10,2) NOT NULL ,
+	user_registro_id BIGINT NOT NULL ,
+	estado_id INTEGER NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table {prefix}xmc_GST (
+	id INTEGER  auto_increment,
+	condominio_id INTEGER NOT NULL ,
+	fecha DATE NOT NULL ,
+	descripcion VARCHAR (64) NOT NULL ,
+	monto DECIMAL (10,2) NOT NULL ,
+	habitante_abono_id INTEGER  ,
+	estado_id INTEGER NOT NULL ,
+	transaccion_id INTEGER  ,
+	PRIMARY KEY ( id )
+);',
+        'create table {prefix}xmc_ALCT (
+	id INTEGER  auto_increment,
+	habitante_id INTEGER NOT NULL ,
+	fecha DATE NOT NULL ,
+	monto DECIMAL (10,2) NOT NULL ,
+	saldo VARCHAR (10)  ,
+	user_creacion_id BIGINT NOT NULL ,
+	fecharegistro DATETIME NOT NULL ,
+	user_modificacion_id BIGINT NOT NULL ,
+	fechamodificacion DATETIME NOT NULL ,
+	estado_id INTEGER NOT NULL ,
+	PRIMARY KEY ( id )
+);',
+        'create table {prefix}xmc_ABN (
+	id INTEGER  auto_increment,
+	habitante_id INTEGER NOT NULL ,
+	fecha DATE NOT NULL ,
+	monto DECIMAL (10,2) NOT NULL ,
+	saldo DECIMAL (10,2)  ,
+	estado_id INTEGER NOT NULL ,
+	transaccion_id INTEGER  ,
+	usuario_registro_id BIGINT NOT NULL ,
+	fecharegistro DATETIME NOT NULL ,
+	usuario_modificacion_id BIGINT NOT NULL ,
+	fechamodificacion DATETIME NOT NULL ,
+	PRIMARY KEY ( id )
+);'
+    ];
+    foreach( $sqls as $sql){
+        dbDelta($sql);
+    }
+
+
+    }
+
+    function deactivate() {
+
+        // This call needs to be made to deactivate this app within WP MVC
+
+        $this->deactivate_app(__FILE__);
+
+        // Perform any databases modifications related to plugin deactivation here, if necessary
+
+    }
+
+}
