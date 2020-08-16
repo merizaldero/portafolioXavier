@@ -5,7 +5,7 @@ class Transicionestado extends MvcModel {
     var $display_field = 'descripcion';
     var $table = '{prefix}xmc_TRNSCNSTD';    
     var $primary_key = 'id';
-    var $selects = ['id', 'flujoestado_id', 'estado_origen_id', 'estado_destino_id', 'habilitado'];
+    var $selects = ['id', 'flujoestado_id', 'descripcion', 'estado_origen_id', 'estado_destino_id', 'habilitado'];
     var $validate = [
         'flujoestado_id' => [
             'message' => 'flujoestado_id no v&aacute;lido',
@@ -39,4 +39,5 @@ class Transicionestado extends MvcModel {
         //'Estado' => [ 'foreign_key' => 'estado_origen_id' ],
         'Estado' => [ 'foreign_key' => 'estado_destino_id' ]
     ];
+    //var $hide_menu = true;
 }

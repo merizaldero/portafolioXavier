@@ -32,5 +32,5 @@ class Estado extends MvcModel {
     ];
     var $per_page = 7;
     var $display_field = 'nombre';
-
+    // var $hide_menu = true;
 }
