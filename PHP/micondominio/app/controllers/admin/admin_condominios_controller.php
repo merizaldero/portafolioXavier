@@ -22,15 +22,15 @@ class AdminCondominiosController extends MvcAdminController {
             'value_method'=>'print_direccion'
         ],
         'tipoconstruccion_id' => [
-            'label'=>'Tipoconstruccion_id',
+            'label'=>'Tipo Construccion',
             'value_method'=>'print_tipoconstruccion_id'
         ],
         'creador_id' => [
-            'label'=>'Creador_id',
+            'label'=>'Creador',
             'value_method'=>'print_creador_id'
         ],
         'administrador_id' => [
-            'label'=>'Administrador_id',
+            'label'=>'Administrador',
             'value_method'=>'print_administrador_id'
         ],
         'saldo' => [
@@ -38,7 +38,7 @@ class AdminCondominiosController extends MvcAdminController {
             'value_method'=>'print_saldo'
         ],
         'fecha_saldo' => [
-            'label'=>'Fechasaldo',
+            'label'=>'Fecha Saldo',
             'value_method'=>'print_fechasaldo'
         ]
     ];
@@ -62,24 +62,58 @@ public function print_id ($object) {
         return empty($object->direccion) ? null : $object->direccion ; 
     }
 
-        public function print_tipoconstruccion_id ($object) {
-        return empty($object->tipoconstruccion_id) ? null : $object->tipoconstruccion_id ; 
+    public function buscar_tipo_construccion($tipoconstruccion_id){
+        foreach ($this->tipoconstruccions as $tipo){
+            if ($tipo->id == $tipoconstruccion_id){
+                return $tipo;
+            }
+        }
+        return null;
     }
-
-        public function print_creador_id ($object) {
-        return empty($object->creador_id) ? null : $object->creador_id ; 
+    
+    public function print_tipoconstruccion_id ($object) {
+        $tipo = $this->buscar_tipo_construccion($object->tipoconstruccion_id);
+        return is_null($tipo) ? null : $tipo->nombre ;
     }
-
-        public function print_administrador_id ($object) {
-        return empty($object->administrador_id) ? null : $object->administrador_id ; 
+    
+    public function buscar_usuario($user_id){
+        foreach ($this->usuarios as $usuario){
+            if ($usuario->id == $user_id){
+                return $usuario;
+            }
+        }
+        return null;
     }
-
-        public function print_saldo ($object) {
-        return empty($object->saldo) ? null : $object->saldo ; 
+    
+    public function print_creador_id ($object) {
+        $usuario = $this->buscar_usuario($object->creador_id);
+        return is_null($usuario) ? null : $usuario->name ;
     }
-
-        public function print_fechasaldo ($object) {
-        return empty($object->fecha_saldo) ? null : $object->fecha_saldo ; 
+    
+    public function print_administrador_id ($object) {
+        $usuario = $this->buscar_usuario($object->administrador_id);
+        return is_null($usuario) ? null : $usuario->name ;
+    }
+    
+    public function print_saldo ($object) {
+        return empty($object->saldo) ? null : $object->saldo ;
+    }
+    
+    public function print_fechasaldo ($object) {
+        return empty($object->fecha_saldo) ? null : $object->fecha_saldo ;
+    }
+    
+    var $before = array('cargar_usuarios');
+    
+    public function cargar_usuarios(){
+        //$this->load_model('MvcUser');
+        $user_model = mvc_model('MvcUser');
+        //$usuarios = $this->MvcUser->find();
+        $usuarios = $user_model->find();
+        $this->set('usuarios', $usuarios);
+        $this->load_model('Tipoconstruccion');
+        $tiposConstruccion = $this->Tipoconstruccion->find();
+        $this->set('tipoconstruccions', $tiposConstruccion);
     }
 
 

@@ -13,6 +13,10 @@ class EstadosController extends MvcPublicController {
             'label'=>'Nombre',
             'value_method'=>'print_nombre'
         ],
+        'activo_negocio' => [
+            'label'=>'Activo_negocio',
+            'value_method'=>'print_activo_negocio'
+        ],
         'estado_inicial' => [
             'label'=>'Estadoinicial',
             'value_method'=>'print_estadoInicial'
@@ -34,6 +38,9 @@ public function print_id ($object) {
         return empty($object->nombre) ? null : $object->nombre ; 
     }
 
+    public function print_activo_negocio ($object) {
+        return ($object->activo_negocio == '1') ? 'SI' : 'NO' ;
+    }
         public function print_estadoInicial ($object) {
         return ($object->estado_inicial == '1') ? 'SI' : 'NO' ; 
     }

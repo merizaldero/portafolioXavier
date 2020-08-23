@@ -4,7 +4,7 @@ class Estado extends MvcModel {
 
     var $table = '{prefix}xmc_ESTD';    
     var $primary_key = 'id';
-    var $selects = ['id', 'flujoestado_id', 'nombre', 'estado_inicial', 'estado_final'];
+    var $selects = ['id', 'flujoestado_id', 'nombre', 'activo_negocio',  'estado_inicial', 'estado_final'];
     var $validate = [
         'flujoestado_id' => [
             'message' => 'flujoestado_id no v&aacute;lido',
@@ -15,6 +15,11 @@ class Estado extends MvcModel {
             'message' => 'nombre no v&aacute;lido',
             'required' => true,
             'rule' => 'alphanumeric'
+        ],
+        'activo_negocio' => [
+            'message' => 'activo_negocio no v&aacute;lido',
+            'required' => true,
+            'pattern' => '/^1|0$/'
         ],
         'estado_inicial' => [
             'message' => 'estadoInicial no v&aacute;lido',
@@ -32,5 +37,5 @@ class Estado extends MvcModel {
     ];
     var $per_page = 7;
     var $display_field = 'nombre';
-    // var $hide_menu = true;
+    //var $hide_menu = true;
 }

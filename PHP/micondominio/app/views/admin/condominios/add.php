@@ -7,11 +7,17 @@
 <?php echo $this->form->input('provincia', ['label' => 'Provincia']); ?>
 <?php echo $this->form->input('ciudad', ['label' => 'Ciudad']); ?>
 <?php echo $this->form->input('direccion', ['label' => 'Direccion']); ?>
-<?php echo $this->form->input('tipoconstruccion_id', ['label' => 'Tipoconstruccion_id']); ?>
-<?php echo $this->form->input('creador_id', ['label' => 'Creador_id']); ?>
-<?php echo $this->form->input('administrador_id', ['label' => 'Administrador_id']); ?>
+<?php echo $this->form->belongs_to_dropdown('tipoconstruccion', $tipoconstruccions, ['label' => 'Tipo Construcci&oacute;n', 'empty' => true ]); ?>
+<?php 
+//echo $this->form->input('creador_id', ['label' => 'Creador_id']); 
+echo $this->form->belongs_to_dropdown('creador', $usuarios, ['label' => 'Creador', 'empty' => true ]);
+?>
+<?php 
+//echo $this->form->input('administrador_id', ['label' => 'Administrador_id']);
+echo $this->form->belongs_to_dropdown('administrador', $usuarios, ['label' => 'Administrador', 'empty' => true ]);
+?>
 <?php echo $this->form->input('saldo', ['label' => 'Saldo']); ?>
-<?php echo $this->form->input('fecha_saldo', ['label' => 'Fechasaldo']); ?>
+<?php echo $this->form->input('fecha_saldo', ['label' => 'Fecha Saldo']); ?>
 
 <?php echo $this->form->close_admin_table(); ?>
 <?php echo $this->form->end('Guardar'); ?>

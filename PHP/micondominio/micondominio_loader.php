@@ -34,6 +34,7 @@ class MicondominioLoader extends MvcPluginLoader {
 	id integer  auto_increment,
 	flujoestado_id integer NOT NULL ,
 	nombre varchar (16) NOT NULL ,
+    activo_negocio char(1) NOT NULL ,
 	estado_inicial char(1) NOT NULL ,
 	estado_final char(1) NOT NULL ,
 	PRIMARY KEY  ( id ),
@@ -77,6 +78,7 @@ class MicondominioLoader extends MvcPluginLoader {
 	fecha_saldo DATETIME NOT NULL ,
 	PRIMARY KEY  ( id ),
 	KEY xmc_cndmn_i_admnstrdr (administrador_id)
+    KEY xmc_cndmn_i_tpcnstrccn (tipoconstruccion_id)
 )',
 'CREATE TABLE ' . $wpdb->prefix . 'xmc_HBTNT (
 	id integer  auto_increment,

@@ -1,6 +1,6 @@
 <h2><?php echo $object->nombre; ?></h2>
 
-<$php
+<?php
 if(!empty($object->habilitado)){
     echo '<div><span>habilitado</span><span>' . $object->habilitado . '</span></div>';
 } 

@@ -5,12 +5,13 @@
 <input type="hidden" name="data[Estado][id]" value="">
 <input type="hidden" name="data[Estado][flujoestado_id]" value="<?php echo $object->id; ?>">
 <input type="hidden" name="data[Estado][nombre]" value="">
+<input type="hidden" name="data[Estado][activo_negocio]" value="">
 <input type="hidden" name="data[Estado][estado_inicial]" value="">
 <input type="hidden" name="data[Estado][estado_final]" value="">
 </form>
 	<table class="widefat post fixed striped" cellspacing="0">
     <thead>
-        <tr><th scope="col" class="manage-column">Nombre</th><th scope="col" class="manage-column">Estado Inicial</th><th scope="col" class="manage-column">Estado Final</th><th scope="col" class="manage-column"></th></tr>    
+        <tr><th scope="col" class="manage-column">Nombre</th><th scope="col" class="manage-column">Activo Negocio</th><th scope="col" class="manage-column">Estado Inicial</th><th scope="col" class="manage-column">Estado Final</th><th scope="col" class="manage-column"></th></tr>    
     </thead>
     <tbody>  
 	<?php
@@ -18,6 +19,8 @@
 	    echo '<tr><td>';
 	    //echo $estado->nombre;
 	    echo MvcFormTagsHelper::text_input('nombre_'.$estado->id ,['id' => 'nombre_'.$estado->id ,'value'=> $estado->nombre , 'onkeyup' => 'habilitar_submit_estado( '.$estado->id.' )']) ;  
+	    echo '</td><td>';
+	    echo MvcFormTagsHelper::checkbox_input( 'activo_negocio_'.$estado->id ,[ 'id'=> 'activo_negocio_'.$estado->id ,'value'=> '1', 'checked'=> ($estado->activo_negocio == '1'), 'onchange' => 'habilitar_submit_estado( '.$estado->id.' )' ]) ;
 	    echo '</td><td>';
 	    echo MvcFormTagsHelper::checkbox_input( 'estado_inicial_'.$estado->id ,[ 'id'=> 'estado_inicial_'.$estado->id ,'value'=> '1', 'checked'=> ($estado->estado_inicial == '1'), 'onchange' => 'habilitar_submit_estado( '.$estado->id.' )' ]) ;
 	    echo '</td><td>';
@@ -35,6 +38,8 @@
 	echo '<tr id="nuevo_estado" style="display:none;visibility:hidden"><td>';
 	//echo $estado->nombre;
 	echo MvcFormTagsHelper::text_input('nombre_' ,['id' => 'nombre_' ] ) ;
+	echo '</td><td>';
+	echo MvcFormTagsHelper::checkbox_input( 'activo_negocio_' ,[ 'id'=> 'activo_negocio_' ,'value'=> '1' ]) ;
 	echo '</td><td>';
 	echo MvcFormTagsHelper::checkbox_input( 'estado_inicial_' ,[ 'id'=> 'estado_inicial_' ,'value'=> '1' ]) ;
 	echo '</td><td>';
@@ -122,11 +127,13 @@
 	
 	function submit_estado( idEstado ){
 		var txtNombre = document.getElementById('nombre_' + idEstado);
+		var chkActivoNegocio = document.getElementById('activo_negocio_' + idEstado);
 		var chkEstadoInicial = document.getElementById('estado_inicial_' + idEstado);
 		var chkEstadoFinal = document.getElementById('estado_final_' + idEstado);
 		var frmEstado = document.forms['frm_estado'];
 		frmEstado['data[Estado][id]'].value = idEstado;
 		frmEstado['data[Estado][nombre]'].value = txtNombre.value;
+		frmEstado['data[Estado][activo_negocio]'].value = chkActivoNegocio.checked ? '1' : '0';
 		frmEstado['data[Estado][estado_inicial]'].value = chkEstadoInicial.checked ? '1' : '0';
 		frmEstado['data[Estado][estado_final]'].value = chkEstadoFinal.checked ? '1' : '0';
 		frmEstado.submit();

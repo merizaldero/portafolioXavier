@@ -14,6 +14,10 @@ class AdminFlujoestadosController extends MvcAdminController {
         'habilitado'  => array(
             'label'=>'Estado',
             'value_method'=>'print_habilitado'
+        ),
+        'ver_flujo'  => array(
+            'label'=>'Flujo',
+            'value_method'=>'print_link_ver_flujo'
         )
     );
 public function print_id ($object) {
@@ -28,6 +32,9 @@ public function print_id ($object) {
         return ($object->habilitado == '1') ? 'Habilitado' : 'Deshabilitado' ; 
     }
 
+    public function print_link_ver_flujo($object){
+        return '<a href="' . mvc_admin_url( ['controller' => 'flujoestados','action' => 'ver_flujo', 'id' => $object->id ]) . '">Ver Flujo</a>';
+    }
 
     /*
     public function add(){
