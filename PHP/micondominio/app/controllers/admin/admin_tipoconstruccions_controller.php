@@ -26,7 +26,11 @@ public function print_id ($object) {
         return ($object->habilitado == '1') ? 'SI' : 'NO' ; 
     }
 
-
+    public function index(){
+        $collection = $this->model->paginate($this->params);
+        $this->set('objects', $collection['objects']);
+        $this->set_pagination($collection);
+    }
 
     public function add(){
         

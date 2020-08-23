@@ -17,7 +17,7 @@ echo $this->form->belongs_to_dropdown('creador', $usuarios, ['label' => 'Creador
 echo $this->form->belongs_to_dropdown('administrador', $usuarios, ['label' => 'Administrador', 'empty' => true ]);
 ?>
 <?php echo $this->form->input('saldo', ['label' => 'Saldo']); ?>
-<?php echo $this->form->input('fecha_saldo', ['label' => 'Fecha Saldo']); ?>
+<?php echo $this->form->input('fecha_saldo', ['label' => 'Fechasaldo']); ?>
 
 <?php echo $this->form->close_admin_table(); ?>
 <?php echo $this->form->end('Guardar'); ?>

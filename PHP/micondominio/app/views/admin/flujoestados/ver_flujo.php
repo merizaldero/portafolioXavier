@@ -1,6 +1,6 @@
 
 <h2>Flujo - <?php echo $object->__name; ?></h2>
-<h3 class="card-header">Estados ( <?php echo count($estados) ;?> ) <button onclick="agregar_estado()">Agregar</button></h3>
+<h3 class="card-header">Estados ( <?php echo count($estados) ;?> ) <button class="button button-primary" onclick="agregar_estado()">Agregar</button></h3>
 <form id="frm_estado" enctype="application/x-www-form-urlencoded" action="<?php echo mvc_admin_url([ 'controller' => 'flujoestados' , 'action' => 'crear_editar_estado', 'id' => $object->id ]); ?>" method="post">
 <input type="hidden" name="data[Estado][id]" value="">
 <input type="hidden" name="data[Estado][flujoestado_id]" value="<?php echo $object->id; ?>">
@@ -27,8 +27,8 @@
 	    echo MvcFormTagsHelper::checkbox_input( 'estado_final_'.$estado->id ,  [ 'id'=> 'estado_final_'.$estado->id   ,'value'=> '1', 'checked'=> ($estado->estado_final == '1'),   'onchange' => 'habilitar_submit_estado( '.$estado->id.' )' ]) ;
 	    echo '</td><td>';
 	    echo '<span id="submit_estado_'.$estado->id.'" style="display:none;visibility:hidden">';
-	    echo '<button onclick="submit_estado( '. $estado->id .' )">Guardar</button>';
-	    echo '<button onclick="cancelar_edicion()">Cancelar</button>';
+	    echo '<a href="#" onclick="submit_estado( '. $estado->id .' )">Guardar</a>';
+	    echo ' | <a href="#" onclick="cancelar_edicion()">Cancelar</a>';
 	    echo '</span>';
         echo '</td></tr>';
 	}
@@ -45,15 +45,15 @@
 	echo '</td><td>';
 	echo MvcFormTagsHelper::checkbox_input( 'estado_final_' ,  [ 'id'=> 'estado_final_'   ,'value'=> '1' ]) ;
 	echo '</td><td>';
-	echo '<button onclick="submit_estado( \'\' )">Guardar</button>';
-	echo '<button onclick="cancelar_nuevo_estado()">Cancelar</button>';
+	echo '<a href="#" onclick="submit_estado( \'\' )">Guardar</a>';
+	echo ' | <a href="#" onclick="cancelar_nuevo_estado()">Cancelar</a>';
 	echo '</td></tr>';
 	
 	?>
 	</tbody>
 	</table>
 
-<h3 class="card-header">Transiciones ( <?php echo count($transiciones) ;?> ) <button onclick="agregar_transicion()">Agregar</button></h3>
+<h3 class="card-header">Transiciones ( <?php echo count($transiciones) ;?> ) <button class="button button-primary" onclick="agregar_transicion()">Agregar</button></h3>
 <form id="frm_transicion" enctype="application/x-www-form-urlencoded" action="<?php echo mvc_admin_url([ 'controller' => 'flujoestados' , 'action' => 'crear_editar_transicion', 'id' => $object->id ]); ?>" method="post">
 <input type="hidden" name="data[Transicionestado][id]" value="">
 <input type="hidden" name="data[Transicionestado][flujoestado_id]" value="<?php echo $object->id; ?>">
@@ -80,8 +80,8 @@
 	    echo MvcFormTagsHelper::checkbox_input( 'habilitado_'.$transicion->id ,  [ 'id'=> 'habilitado_'.$transicion->id   ,'value'=> '1', 'checked'=> ($transicion->habilitado == '1'),   'onchange' => 'habilitar_submit_transicion( '.$transicion->id.' )' ]) ;   
 	    echo '</td><td>';
 	    echo '<span id="submit_transicion_'.$transicion->id.'" style="display:none;visibility:hidden">';
-	    echo '<button onclick="submit_transicion( '. $transicion->id .' )">Guardar</button>';
-	    echo '<button onclick="cancelar_edicion()">Cancelar</button>';
+	    echo '<a href="#" onclick="submit_transicion( '. $transicion->id .' )">Guardar</a>';
+	    echo ' | <a href="#" onclick="cancelar_edicion()">Cancelar</a>';
 	    echo '</span>';
 	    echo '</td></tr>';
 	}
@@ -95,8 +95,8 @@
 	echo '</td><td>';
 	echo MvcFormTagsHelper::checkbox_input( 'habilitado_' ,  [ 'id'=> 'habilitado_'  ,'value'=> '1',  'onchange' => 'habilitar_submit_transicion( "" )' ]) ;
 	echo '</td><td>';
-	echo '<button onclick="submit_transicion( \'\' )">Guardar</button>';
-	echo '<button onclick="cancelar_nueva_transicion()">Cancelar</button>';
+	echo '<a href="#" onclick="submit_transicion( \'\' )">Guardar</a>';
+	echo ' | <a href="#" onclick="cancelar_nueva_transicion()">Cancelar</a>';
 	echo '</td></tr>';	
 	?>
 
