@@ -268,7 +268,7 @@ def contenidoShowView( entidad, entidades ):
         if campo['nombre'] == pk['nombre'] or campo['__atributos']['displayName'] == '1' :
             continue
         nombreCampo = campo['__atributos']['nombreCampo']
-        lista_campos.append( """<$php
+        lista_campos.append( """<?php
 if(!empty($object->""" + nombreCampo.lower() + """)){
     echo '<div><span>"""+ campo['nombre'] +"""</span><span>' . $object->""" + nombreCampo.lower() + """ . '</span></div>';
 } 
@@ -308,6 +308,16 @@ def contenidoAdminAddView( entidad, entidades ):
             lista_campos.append( "<?php echo $this->form->belongs_to_dropdown('{0}', ${1}s, ['label' => '{2}', 'type' => 'checkbox', 'empty' => true ]); ?>".format( nombreCampo.lower()[:-3], entidad_fk['nombre'].lower() ,campo['nombre'].capitalize() ) )
         elif campo['__atributos']['tipo'] == 'BOOLEAN':
             lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'checkbox', 'value' => '1']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'DATE':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'date']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'DATETIME':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'datetime-local']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'EMAIL':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'email']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] in ['FILE','IMAGE']:
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'file']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )            
+        elif campo['__atributos']['tipo'] in ['INTEGER','LONG','DECIMAL','FLOAT','POS_INTEGER','POS_LONG','POS_SM_INTEGER','SM_INTEGER']:
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'number']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )            
         else:
             lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )        
     contenido = """<h2>Nuevo """ + entidad['nombre'] + """</h2>
@@ -335,6 +345,16 @@ def contenidoAdminEditView( entidad, entidades ):
             lista_campos.append( "<?php echo $this->form->belongs_to_dropdown('{0}', ${1}s, ['label' => '{2}', 'type' => 'checkbox', 'empty' => true ]); ?>".format( nombreCampo.lower()[:-3], entidad_fk['nombre'].lower() ,campo['nombre'].capitalize() ) )
         elif campo['__atributos']['tipo'] == 'BOOLEAN':
             lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'checkbox', 'value' => '1']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'DATE':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'date']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'DATETIME':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'datetime-local']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] == 'EMAIL':
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'email']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )
+        elif campo['__atributos']['tipo'] in ['FILE','IMAGE']:
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'file']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )            
+        elif campo['__atributos']['tipo'] in ['INTEGER','LONG','DECIMAL','FLOAT','POS_INTEGER','POS_LONG','POS_SM_INTEGER','SM_INTEGER']:
+            lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}', 'type' => 'number']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )            
         else:
             lista_campos.append( "<?php echo $this->form->input('{0}', ['label' => '{1}']); ?>".format( nombreCampo.lower(), campo['nombre'].capitalize() ) )                
     contenido = """<h2>Editar """ + entidad['nombre'] + """</h2>
@@ -346,6 +366,35 @@ def contenidoAdminEditView( entidad, entidades ):
 
 <?php echo $this->form->close_admin_table(); ?>
 <?php echo $this->form->end('Actualizar'); ?>
+"""
+
+    return contenido
+
+def contenidoAdminIndexView( entidad, entidades ):
+    nombreEntidad = entidad['nombre']    
+    contenido = """<h2>""" + nombreEntidad + """s</h2>
+<div>
+<a class="button button-primary" href="<?php echo mvc_admin_url([ 'controller' => '""" + nombreEntidad.lower() + """s', 'action' => 'add' ]) ?>">Agregar</a>
+</div>
+<table class="widefat post fixed striped" cellspacing="0">
+    <thead>
+        <?php 
+        echo $this->html->admin_header_cells($this);
+        ?>
+    </thead>
+    <tfoot>
+        <?php 
+        echo $this->html->admin_header_cells($this);
+        ?>
+    </tfoot>
+    <tbody>
+        <?php 
+        echo $this->html->admin_table_cells($this, $objects, []);
+        ?>
+    </tbody>
+    <?php // echo $this->pagination(); ?>
+    
+</table>
 """
 
     return contenido
@@ -371,19 +420,96 @@ def anexarPages(modelo):
                     "contenido": contenidoAdminEditView( entidad, entidades ) }
         for entidad in entidades
         ]
+    
+    resultado += [ { "path": "sudo vim ../{0}/app/views/admin/{1}s/index.php".format( nombrePlugin, entidad['nombre'].lower() ) , 
+                    "contenido": contenidoAdminIndexView( entidad, entidades ) }
+        for entidad in entidades
+        ]
 
     return resultado
 
+def generarBootstrap(modelo):
+    prefijo = modelo['__objetoRaiz']['__atributos']['prefijo'].lower()
+    entidades = modelo['__objetoRaiz']['__listas']['Entidades']
+    adminPages = modelo['__objetoRaiz']['__listas']['AdminPages']
+    lista_entidades = ["""'ver_{0}s' => ['label' => '{1}s']""".format(entidad['nombre'].lower() , entidad['nombre']) for entidad in adminPages] 
+    lista_entidades = [ """    '{0}mains' => [ 'label' => '{1}' , 
+            {2}
+            ]""".format( prefijo , modelo['nombre'], ",\n                ".join(lista_entidades) ) ]
+    lista_entidades += [ """        '{0}s' => [ 'label' => '{1}s', 'parent_slug' => 'admin.php?page=mvc_{2}mains',
+            'add' , 'edit', 'delete'
+        ]""".format(entidad['nombre'].lower() , entidad['nombre'], prefijo) for entidad in entidades ]
+    contenido = """
+<?php
+
+MvcConfiguration::set(array(
+    'Debug' => false
+));
+
+MvcConfiguration::append(array(
+    'AdminPages' => array(
+        """ + ",\n".join(lista_entidades) + """
+    )
+));    
+    """
+    return contenido
+
+def anexarMainAdminControllers(modelo):
+    nombrePlugin = modelo['__objetoRaiz']['nombre']
+    prefijo = modelo['__objetoRaiz']['__atributos']['prefijo']
+    adminPages = modelo['__objetoRaiz']['__listas']['AdminPages']
+    path = 'nano vim ../{0}/app/controllers/admin/admin_{1}mains_controller.php'.format(nombrePlugin, prefijo.lower() )
+    lista_metodos = [ """    public function ver_"""+ entidad['nombre'].lower() +"""s(){
+        $url = MvcRouter::admin_url(array('controller' => '"""+ entidad['nombre'].lower() +"""s', 'action' => 'index'));
+        $this->redirect($url);
+    }""" for entidad in adminPages]
+    contenido = """<?php
+
+class Admin"""+ prefijo.capitalize().replace('_','') +"""MainsController extends MvcAdminController {
+
+    var $default_columns = array('id', 'name');
+    public function index(){
+        
+    }
+    
+"""+ "\n".join(lista_metodos) +"""
+
+}
+    """
+    lista = [ {'path': path, 'contenido': contenido} ]
+    return lista
+
+def anexarMainAdminViews(modelo):
+    nombrePlugin = modelo['__objetoRaiz']['nombre']
+    prefijo = modelo['__objetoRaiz']['__atributos']['prefijo'].lower()
+    adminPages = modelo['__objetoRaiz']['__listas']['AdminPages']
+    lista_modulos = [ """<div class="card" style="display:flex; flex-direction: row; align-items: center ; justify-content: space-between;align-content:flex-start"  >
+    <h3>""" + entidad['nombre'] + """</h3>
+    <a href="<?php echo MvcRouter::admin_url(array('controller' => '""" + entidad['nombre'].lower() + """s', 'action' => 'index')); ?>">Detalles</a>
+</div>""" for entidad in adminPages ]
+    path = 'nano vim ../{0}/app/views/admin/{1}mains/index.php'.format(nombrePlugin, prefijo)
+    contenido = """
+<h2>"""+ nombrePlugin +"""</h2>    
+    """ + "\n".join(lista_modulos)
+    lista = [ {'path': path, 'contenido': contenido} ]
+    return lista
+
 def generarModelo(modelo):
     nombrePlugin = modelo['__objetoRaiz']['nombre']
+    prefijo = modelo['__objetoRaiz']['__atributos']['prefijo'].capitalize().replace('_','')
     resultado = { 'archivos' : [ 
                                  { 'path':'SECUENCIA INICIAL',     'contenido': generarInitSequence(modelo) },
                                  { 'path':'sudo nano ../{0}/{0}_loader.php'.format( nombrePlugin ), 'contenido': generarPluginLoader(modelo) },
                                  ]}
     resultado['archivos'] +=  anexarModelClases(modelo)
-    resultado['archivos'].append( {'path' : 'SECUENCIA GENERACION CONTROLLERS', 'contenido' : generarSecuenciaGen(modelo,'controllers') } )
+    resultado['archivos'].append( {'path' : 'SECUENCIA GENERACION CONTROLLERS', 
+                                   'contenido' : "sudo ./wpmvc generate controllers micondominio {0}Main\n".format(prefijo) + generarSecuenciaGen(modelo,'controllers') } )
+    resultado['archivos'] +=  anexarMainAdminControllers(modelo)
     resultado['archivos'] +=  anexarControllerClases(modelo)
-    resultado['archivos'].append( {'path' : 'SECUENCIA GENERACION VIEWS', 'contenido' : generarSecuenciaGen(modelo,'views') } )
-    resultado['archivos'] +=  anexarPages(modelo)
+    resultado['archivos'].append( {'path' : 'SECUENCIA GENERACION VIEWS', 
+                                   'contenido' : "sudo ./wpmvc generate views micondominio {0}Main\n".format(prefijo) + generarSecuenciaGen(modelo,'views') } )
+    resultado['archivos'] +=  anexarMainAdminViews(modelo)
+    resultado['archivos'] +=  anexarPages(modelo)    
+    resultado['archivos'].append( { 'path':'sudo nano ../{0}/app/config/bootstrap.php'.format( nombrePlugin ), 'contenido': generarBootstrap(modelo) } )
     return resultado
     
