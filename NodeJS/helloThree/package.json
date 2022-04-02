@@ -1,0 +1,17 @@
+{
+  "name": "hellothree",
+  "version": "1.0.0",
+  "description": "Coqueteo inicial con three",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "copiar3win":"echo hola",
+    "start":"node server"
+  },
+  "author": "Xavier Merizalde",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "express": "^4.17.1",
+    "three": "^0.135.0"
+  }
+}
