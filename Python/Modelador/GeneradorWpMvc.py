@@ -503,11 +503,11 @@ def generarModelo(modelo):
                                  ]}
     resultado['archivos'] +=  anexarModelClases(modelo)
     resultado['archivos'].append( {'path' : 'SECUENCIA GENERACION CONTROLLERS', 
-                                   'contenido' : "sudo ./wpmvc generate controllers micondominio {0}Main\n".format(prefijo) + generarSecuenciaGen(modelo,'controllers') } )
+                                   'contenido' : "sudo ./wpmvc generate controllers {1} {0}Main\n".format(prefijo, nombrePlugin) + generarSecuenciaGen(modelo,'controllers') } )
     resultado['archivos'] +=  anexarMainAdminControllers(modelo)
     resultado['archivos'] +=  anexarControllerClases(modelo)
     resultado['archivos'].append( {'path' : 'SECUENCIA GENERACION VIEWS', 
-                                   'contenido' : "sudo ./wpmvc generate views micondominio {0}Main\n".format(prefijo) + generarSecuenciaGen(modelo,'views') } )
+                                   'contenido' : "sudo ./wpmvc generate views {1} {0}Main\n".format(prefijo, nombrePlugin) + generarSecuenciaGen(modelo,'views') } )
     resultado['archivos'] +=  anexarMainAdminViews(modelo)
     resultado['archivos'] +=  anexarPages(modelo)    
     resultado['archivos'].append( { 'path':'sudo nano ../{0}/app/config/bootstrap.php'.format( nombrePlugin ), 'contenido': generarBootstrap(modelo) } )

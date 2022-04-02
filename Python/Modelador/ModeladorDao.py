@@ -105,7 +105,9 @@ class JerarquiaTipoMetamodeloDao(xpdbdd.DaoBase):
         metamodelo["propiedades"].append({"nombre":"idJerarquia","nombreCampo":"ID_JERARQUIA","incremental":False,"pk":True,"tipo":xpdbdd.XPDSTRING,"tamano":32,"insert": False ,"update":False,"opcional":False})
         metamodelo["propiedades"].append({"nombre":"idTipoMetamodeloHijo","nombreCampo":"ID_TIPO_METAMODELO_HIJO","incremental":False,"pk":False,"tipo":xpdbdd.XPDSTRING,"tamano":32,"insert": False ,"update": False ,"opcional":False})
         metamodelo["propiedades"].append({"nombre":"esMultiple","nombreCampo":"ES_MULTIPLE","incremental":False,"pk":False,"tipo":xpdbdd.XPDSTRING,"tamano":1,"insert":False,"update": False ,"opcional":True})
-        metamodelo["namedQueries"].append({"nombre":"getByTipoMetamodelo","whereClause":["idMetamodelo","idTipoMetamodeloPadre","esMultiple"],"orderBy":["idJerarquia"]})
+        metamodelo["propiedades"].append({"nombre":"orden","nombreCampo":"ORDEN","incremental":False,"pk":False,"tipo":xpdbdd.XPDINTEGER,"tamano":0,"insert":True,"update":True,"opcional":True})
+        
+        metamodelo["namedQueries"].append({"nombre":"getByTipoMetamodelo","whereClause":["idMetamodelo","idTipoMetamodeloPadre","esMultiple"],"orderBy":["orden", "idJerarquia"]})
         metamodelo["namedQueries"].append({"nombre":"getById","whereClause":["idMetamodelo","idTipoMetamodeloPadre","idJerarquia"],"orderBy":[]})
 
         self.setMetamodelo (metamodelo)

@@ -2,7 +2,7 @@ import ModeladorDao
 import config
 
 def getTipo(campo):
-    if campo['__atributos']["tipo"] == "STRING":
+    if campo['__atributos']["tipo"] in ["STRING","EMAIL"]:
         return "varchar (%s)" % campo['__atributos']["tamano"]
     elif campo['__atributos']["tipo"] == 'INTEGER':
         return "integer"
