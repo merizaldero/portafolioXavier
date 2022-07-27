@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</head>
+<body class="container-fluid d-flex flex-lg-row flex-md-row flex-sm-column flex-xs-column" >
+
+<div class="card" id="card_parametros">
+  <div class="card-header">
+    Parametrizacion
+  </div>
+  <div class="card-body">
+
+    <div class="form-group">
+      <input class="form-control" placeholder="T&iacute;tulo" id="txt_title">
+    </div>
+    <div class="form-group">
+      <input class="form-control" placeholder="Etiqueta X" id="txt_xlabel">
+    </div>
+    <div class="form-group">
+      <input class="form-control" placeholder="Etiqueta Y" id="txt_ylabel">
+    </div>
+    <div class="form-group">
+      <label for="sel_grid">Grid</label>
+      <select class="form-control" id="sel_grid">
+        <option value="None" selected>Ninguno</option>
+        <option value="solid">Solid ___ </option>
+        <option value="dotted">Dotted ...</option>
+        <option value="dashed">Dashed ---</option>
+        <option value="dashdot">Dashdot .-.-</option>
+      </select>
+    </div>
+    <div class="form-group form-check">
+      <label class="form-check-label">
+        <input class="form-check-input" type="checkbox" id="chk_legend"> Mostrar Leyenda
+      </label>
+    </div>
+    <div class="form-group">
+      <label for="txt_size">Tama&ntilde;o X:</label>
+      <input class="form-control" type="number" min="1" max="1024" value="3" id="txt_xsize">
+    </div>
+
+    <div class="form-group">
+      <button id="btn_x" class="form-control btn btn-primary">Valores X ...</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-check-label">
+        Series <button id="btn_add_serie" class = "btn btn-primary">&#10009; Agregar</button>
+      </label>
+    </div>
+
+    <ul class="list-group" id="ul_lista_series">
+      <!--
+      <li class="list-group-item serie">Plot</li>
+      <li class="list-group-item serie">Scatter</li>
+      -->
+    </ul>
+
+
+    <textarea id="txt_json" class="collapse">
+    {
+        "title":"Avg. Daily Temperature of Jan 2018",
+        "x" : [1, 5, 8, 12, 15, 19, 22, 26, 29, 35],
+        "xlabel" : "Day",
+        "ylabel" : "Temperature (in deg)",
+        "legend" : true,
+        "grid" : "--",
+        "series":[
+            {
+                "tipo":"scatter",
+                "y": [29.3, 30.1, 30.4, 31.5, 12.3, 32.6, 31.8, 32.4, 32.7, 10],
+                "z": ["blue", "red", "green", "blue", "red", "green", "blue", "red", "green", "red"],
+                "label":"temperatura"
+            },
+            {
+                "tipo" : "plot",
+                "y" : [19.3, 20.1, 20.4, 11.5, 22.3, 22.6, 11.8, 22.4, 22.7, 20],
+                "color": "red",
+                "label":"otro gato"
+            }
+        ]
+    }
+    </textarea>
+  </div>
+  <div class="card-footer">
+      <button id="btn_generar" class="btn btn-primary">Generar</button>
+  </div>
+
+</div>
+
+<div id="card_serie" class="card">
+  <div class="card-header">
+    Serie
+    <button id="btn_actualizar_serie">Actualizar</button>
+    <button id="btn_cancelar_act_serie">Cancelar</button>
+  </div>
+  <div class="card-body">
+    <div class="form-group">
+      <input class="form-control" placeholder="Etiqueta" id="txt_etiqueta_serie">
+    </div>
+    <div class="form-group">
+      <select class="form-control" id="sel_tipo_serie">
+        <option value="plot">Plot</option>
+        <option value="scatter">Scatter</option>
+        <!--
+        <option value="bar">Barra</option>
+        <option value="barh">Barra Horizontal</option>
+        <option value="pie">Pie</option>
+        <option value="hist">Histograma</option>
+        -->
+      </select>
+    </div>
+    <div class="form-group">
+      <button id="btn_y" class="form-control btn btn-primary">Valores Y ...</button>
+    </div>
+    <div class="form-group valores-z">
+      <button id="btn_z" class="form-control btn btn-primary">Valores Z ...</button>
+    </div>
+    <div class="form-group">
+      <select class="form-control" id="sel_color_serie">
+        <option value="black">Negro</option>
+        <option value="yellow">Amarillo</option>
+        <option value="blue" selected>Azul</option>
+        <option value="red">Rojo</option>
+        <option value="orange">Naranja</option>
+        <option value="green">Verde</option>
+        <option value="purple">Purpura</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <select class="form-control" id="sel_linestyle_serie">
+        <option value="None" selected>(Estilo de Linea)</option>
+        <option value="solid">Solid ___ </option>
+        <option value="dotted">Dotted ...</option>
+        <option value="dashed">Dashed ---</option>
+        <option value="dashdot">Dashdot .-.-</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <select class="form-control" id="sel_marker_serie">
+        <option value="None" selected>(Sin Marcador)</option>
+        <option value="o">Circulo</option>
+        <option value="^">Trg arriba</option>
+        <option value="v">Trg abajo</option>
+      </select>
+    </div>
+  </div>
+  <div class="card-footer">
+    <button id="btn_eliminar_serie">Eliminar</button>
+  </div>
+</div>
+
+<div id="card_vector" class="card">
+  <div class="card-header">
+    Serie
+  </div>
+  <div class="card-body">
+    <ul class="list-group" id="listgroup_vector">
+
+    </ul>
+  </div>
+  <div class="card-footer">
+    <button id="btn_ok_vector" class="btn btn-primary">Aceptar</button>
+    <button id="btn_cancelar_vector" class="btn btn-secondary">Cancelar</button>
+  </div>
+</div>
+
+<img id="img_grafico" class="bg-light">
+
+<script type = "text/javascript" src = "/static/js/app.js?05" ></script>
+
+</body>
+</html>
