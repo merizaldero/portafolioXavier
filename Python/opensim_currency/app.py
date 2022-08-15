@@ -4,6 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 from flask_xmlrpcre.xmlrpcre import XMLRPCHandler, Fault
 import currency
 import region_validator
+import xpd_os_session
 
 # configuration
 
@@ -13,6 +14,11 @@ USERNAME = 'admin'
 PASSWORD = 'default'
 HOST = '0.0.0.0'
 PORT = 80
+
+ENCABEZADOS_INTERES = ["X-Forwarded-For", "X-SecondLife-Shard", "X-SecondLife-Region", "X-SecondLife-Owner-Name",
+    "X-SecondLife-Owner-Key", "X-SecondLife-Object-Name","X-SecondLife-Object-Key","X-SecondLife-Local-Velocity",
+    "X-SecondLife-Local-Rotation","X-SecondLife-Local-Position"
+    ]
 
 # create our little application :)
 app = Flask(__name__)
@@ -26,7 +32,8 @@ def error404(er):
 
 @app.before_request
 def before_request_callback():
-    print(request.get_data())
+    #print(request.get_data())
+    pass
 
 @app.route('/')
 def index():
@@ -54,6 +61,25 @@ VIDEOS= [
     {'label':'Evolucion de Canciones de Caricaturas', 'url':'https://www.youtube.com/embed/evJaa6xcr3Y'},
     {'label':'Caricaturas de los 80s', 'url':'https://www.youtube.com/embed/3J6iieVfw-w'},
 ]
+
+@app.route('/whoiam')
+def whoiam():
+    return render_template('whoiam.html', encabezados_interes = ENCABEZADOS_INTERES,argumentos = request.args, encabezados = request.args, url = request.url, formulario = request.form, remote_addr = request.remote_addr, remote_user = request.remote_user, user_agent = request.user_agent.string)
+
+@app.route('/requestSession',methods = ["POST",])
+def request_session():
+    return xpd_os_session.crear_sesion( request.form.get('request_id',''), request.form.get('userid',''), request.form.get('username','') )
+
+@app.route('/home/<request_id>/<session_id>')
+def home_user(request_id, session_id):
+    try:
+        sesion = xpd_os_session.validar_sesion(request_id, session_id)
+        return render_template('home.html', sesion = sesion)
+    except Exception as ex:
+        return "No Autorizado", 401
+    finally:
+        pass
+
 
 @app.route('/videos')
 def lista_videos():
