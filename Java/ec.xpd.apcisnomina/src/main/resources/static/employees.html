@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employees</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script src="js/comun.js"></script>
+</head>
+<body class="container-fluid">
+
+<div class="" ng-app = "employeeApp" ng-controller= "employeeController">
+
+  <div ng-show="currentUser == null">
+   acceso denegado
+  </div> 
+
+  <div ng-show="currentUser != null">
+
+    <div ng-include="'navbar.html?2'"></div>
+    <h1 class="text-primary">Employees</h1>
+    
+    <table class="table table-striped" ng-show="currentItem == null">
+      <a class="" ng-click="nuevo()">+ New</a>
+      
+      <tr class="table-row table-striped row" ng-repeat="item in list">
+        <td class="col-10">
+          {{item.surname}}&nbsp;{{item.name}}
+        </td>
+        <td class="col-2 small">
+        <a class="text-primary" ng-click="editar(item)">
+          Editar
+        </a>
+        </td>
+      </tr>
+    </table>
+    
+    <div class="card" ng-show="currentItem != null" >
+      <form name="form" class="card-body">
+        <div class="" ng-show="currentItem.id != null">
+          <label class="form-label" for="id">Id:</label>
+          <span class="form-label">{{currentItem.id}}</span>
+        </div>
+        <div class="">
+          <label class="form-label" for="surname">Surname:</label>
+          <input class="form-control" name="surname" type="text" ng-model="currentItem.surname" required>
+          <span class="form-label" ng-show="forma.surname.$invalid">Surname Required</span>
+        </div>
+        <div class="">
+          <label class="form-label" for="name">Name:</label>
+          <input class="form-control" name="name" type="text" ng-model="currentItem.name" required>
+          <span class="form-label" ng-show="forma.name.$invalid">Name Required</span>
+        </div>
+        <div class="">
+          <label class="form-label" for="position">Position:</label>
+          <input class="form-control" name="position" type="text" ng-model="currentItem.position" required>
+          <span class="form-label" ng-show="forma.position.$invalid">Position Required</span>
+        </div>
+        <div class="">
+          <label class="form-label" for="age">Age:</label>
+          <input class="form-control" name="age" type="integer" ng-model="currentItem.age" required>
+          <span class="form-label" ng-show="forma.age.$invalid">Age required</span>
+        </div>
+        <div class="">
+          <label class="form-label" for="email">Email:</label>
+          <input class="form-control" name="email" type="email" ng-model="currentItem.email" required>
+          <span class="form-label" ng-show="forma.email.$invalid">Email required</span>
+        </div>
+        <div class="form-check form-switch">
+          <label class="form-label" for="status">Status</label>
+          <input class="form-control" name="status" class="form-check-input" type="checkbox" ng-model="currentItem.status">
+          <span class="form-label" ng-show="forma.phone.$invalid">Phone required</span>
+        </div>
+        <div class="" ng-show="currentItem.createdBy != null">
+          <label class="form-label" for="id">Created By:</label>
+          <span class="form-label">{{currentItem.createdBy}}</span>
+        </div>
+        <div class="" ng-show="currentItem.modifiedBy != null">
+          <label class="form-label" for="id">Modified By:</label>
+          <span class="form-label">{{currentItem.modifiedBy}}</span>
+        </div>
+        <div class="" ng-show="currentItem.createdDate != null">
+          <label class="form-label" for="id">Created Date:</label>
+          <span class="form-label">{{currentItem.createdDate}}</span>
+        </div>
+        <div class="form-label" ng-show="currentItem.modifiedDate != null">
+          <label for="id">Modified Date:</label>
+          <span class="form-label">{{currentItem.modifiedDate}}</span>
+        </div>
+        <div class="">
+          <button class="btn btn-primary" ng-disabled= "esInvalido()" ng-click="guardar()">Save</button>
+          <button class="btn btn-secondary" ng-click="cancelar()">Cancel</button>
+        </div>
+      
+      </form>
+    <div>
+      
+  </div>
+</div>
+<script type="text/javascript" src="js/employeeController.js?1"></script>
+</body>
+</html>
+
+
+
+
+
