@@ -12,7 +12,9 @@ Database engine Used is MySQL.
 
 # Installing sourcecode
 
-Source code have to be retrieved by 
+Sourcecode , once retrieved, have to be built using maven.
+
+mvn package
 
 # Installing Database
 
