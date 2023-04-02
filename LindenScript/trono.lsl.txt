@@ -1,0 +1,33 @@
+vector POS = <0.0 ,0, 0.25>;
+vector ANGULO = <0,0,180>;
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        llSitTarget( POS, llEuler2Rot(ANGULO * DEG_TO_RAD) );
+        
+    }
+    
+    changed(integer change){
+        if(change & CHANGED_LINK){
+            key avatar = llAvatarOnSitTarget();
+            if( avatar ){
+               
+                llRequestPermissions(avatar, PERMISSION_TRIGGER_ANIMATION);
+            }
+        }
+    }
+    
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {            
+            llStopAnimation("sit");
+            llStartAnimation("sentado_trono");
+        }
+    }
+  
+}
+

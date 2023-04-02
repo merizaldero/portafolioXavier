@@ -1,0 +1,196 @@
+integer LISTEN_CHANNEL = 29;
+integer LISTEN_HANDLE = 0;
+integer CONTEO_VISITANTES = 0;
+integer INICIA_STATE=0;
+integer TIMER_TICK = 5;
+list NPC_NAMES = ["Boo Boo"];
+list NOTECARDS = [];
+
+key NPC = NULL_KEY;
+vector POS_NPC = <0.27 , 3.21, 0.5>;
+vector ROT_NPC = <0, 0, 180>;
+
+integer NUMERO_HITOS = 6;
+integer HITO_STEP = 1;
+integer HITO_ACTUAL = 0;
+string PREFIJO_HITO = "Casa Embrujada Hito ";
+
+string elegir_notecard(){
+    integer indice = (integer) llFrand( llGetListLength( NOTECARDS ) );    
+    return llList2String(NOTECARDS, indice);
+}
+
+secuencia_inicio(){
+    NPC = osNpcCreate("Boo", "Boo", llGetPos() + POS_NPC, elegir_notecard(), 0 );
+    osNpcSetRot(NPC, llEuler2Rot( ROT_NPC * DEG_TO_RAD ) );
+    HITO_ACTUAL = 0;
+    HITO_STEP = 1;
+}
+
+secuencia_bucle(){
+    if( HITO_ACTUAL < 0 || HITO_ACTUAL >= NUMERO_HITOS){
+        return;
+    } 
+    string objetivo = PREFIJO_HITO + (string) HITO_ACTUAL;
+    //llOwnerSay("Buscando " + objetivo);
+    llSensor( objetivo, NULL_KEY, PASSIVE | ACTIVE , 7.0, PI );
+    HITO_ACTUAL += HITO_STEP;
+    if( HITO_ACTUAL >= NUMERO_HITOS ){
+        HITO_STEP = -1;
+        HITO_ACTUAL += HITO_STEP * 2;
+    }else if( HITO_ACTUAL < 0 ){        
+        HITO_STEP = 1;
+        HITO_ACTUAL = 0;
+    }
+    if( HITO_ACTUAL == 0 && HITO_STEP == 1){
+        osNpcLoadAppearance( NPC, elegir_notecard() );
+    }
+}
+
+secuencia_listen(integer channel, string name, key id, string message){
+    
+}
+
+secuencia_sensor(key detected){
+    vector posicion = llList2Vector(llGetObjectDetails(detected, [OBJECT_POS]), 0);
+    osNpcMoveToTarget(NPC, posicion + <0.0, 0.0, 1.0 >, OS_NPC_NO_FLY);
+    
+}
+
+
+
+secuencia_fin(){
+    osNpcRemove(NPC);
+    NPC = NULL_KEY;
+}
+
+leer_listado_notecards(){
+    integer i;    
+    integer conteo = llGetInventoryNumber( INVENTORY_NOTECARD );
+    NOTECARDS = [];
+    for( i=0; i< conteo; i++){
+        NOTECARDS += llGetInventoryName( INVENTORY_NOTECARD, i );
+    }
+}
+
+default
+{
+    state_entry()
+    {
+        leer_listado_notecards();
+        CONTEO_VISITANTES = 0;
+        INICIA_STATE = 0;
+        LISTEN_HANDLE = llListen( LISTEN_CHANNEL, "", NULL_KEY, "");
+    }
+    state_exit(){
+        llListenRemove(LISTEN_HANDLE);
+    }
+    
+    listen(integer channel, string name, key id, string message){
+        llOwnerSay("Recibo mensaje " + message);
+
+        if(message == "sentado"){
+            CONTEO_VISITANTES ++;
+            state visitado;
+        }
+    }
+    
+    collision_start(integer detected){        
+        integer i;
+        integer j;
+        string nombre;
+        integer encontrado;
+                
+        for( i=0; i < detected ; i++){
+            nombre = llDetectedName(i);
+            encontrado = FALSE;
+            for(j=0 ; encontrado == FALSE && j< llGetListLength(NPC_NAMES); j++){
+                if( nombre == llList2String(NPC_NAMES, j) ){
+                    encontrado = TRUE;
+                }
+            }
+            if( encontrado == FALSE ){
+                //llSay(LISTEN_CHANNEL, "sentado");
+                CONTEO_VISITANTES ++;
+            }            
+        }
+        if(CONTEO_VISITANTES > 0){
+            state visitado;
+        }
+    }
+    
+}
+
+state visitado{
+    state_entry(){
+        INICIA_STATE = 1;        
+        secuencia_inicio();
+        llSetTimerEvent(TIMER_TICK);
+        llOwnerSay("Inicia Visita");
+        LISTEN_HANDLE = llListen( LISTEN_CHANNEL, "", NULL_KEY, "");
+    }
+    listen(integer channel, string name, key id, string message){
+        integer indice;
+        if(message == "sentado"){
+            CONTEO_VISITANTES ++;
+        }else if(message == "levantado"){
+            CONTEO_VISITANTES --;           
+        }else{
+            secuencia_listen( channel,  name,  id, message);
+        }
+    }    
+    state_exit(){
+        llOwnerSay("Finaliza Visita");
+        secuencia_fin();
+        llListenRemove(LISTEN_HANDLE);
+    }
+    timer(){
+        secuencia_bucle();
+        if( CONTEO_VISITANTES <= 0){
+            state default;
+        }
+    }
+    sensor(integer detected){
+        secuencia_sensor(llDetectedKey(0));
+    }
+    
+    collision_start(integer detected){
+        integer i;
+        integer j;
+        string nombre;
+        integer encontrado;
+        for( i=0; i < detected ; i++){
+            nombre = llDetectedName(i);
+            encontrado = FALSE;
+            for(j=0 ; encontrado == FALSE && j< llGetListLength(NPC_NAMES); j++){
+                if( nombre == llList2String(NPC_NAMES, j) ){
+                    encontrado = TRUE;
+                }
+            }
+            if( encontrado == FALSE ){
+                //llSay(LISTEN_CHANNEL, "sentado");
+                CONTEO_VISITANTES ++;            
+            }        
+        }        
+    }
+    
+    collision_end(integer detected){
+        integer i;
+        integer j;
+        string nombre;
+        integer encontrado;
+        for( i=0; i < detected ; i++){
+            nombre = llDetectedName(i);
+            encontrado = FALSE;
+            for(j=0 ; encontrado == FALSE && j< llGetListLength(NPC_NAMES); j++){
+                if( nombre == llList2String(NPC_NAMES, j) ){
+                    encontrado = TRUE;
+                }
+            }
+            if( encontrado == FALSE ){
+                //llSay(LISTEN_CHANNEL, "levantado");
+                CONTEO_VISITANTES --;
+            }            
+        }
+    }
+} 

@@ -1,0 +1,28 @@
+vector POS_CERRADO = < 0 , 0 , -4.20019721984863>;
+vector POS_ABIERTO = < - 1.83294677734375 , 0 , -5.86371231079102>;
+vector ROT_CERRADO = <0,0,0>;
+vector ROT_ABIERTO = <0,270,0>;
+default
+{
+    state_entry()
+    {
+        llSetLinkPrimitiveParams(2,[ PRIM_ROT_LOCAL, llEuler2Rot( ROT_CERRADO * DEG_TO_RAD ) , PRIM_POS_LOCAL, POS_CERRADO ]);
+        //vector pos1 = llList2Vector(llGetLinkPrimitiveParams(2, [PRIM_POS_LOCAL]),0);
+        //llSay(0,"pos "+pos1.x+" , "+pos1.y+" , "+pos1.z);
+    }
+    touch_end(integer nomeacuerdo)
+    {
+        state abierto;
+    }
+}
+
+state abierto{
+    state_entry()
+    {
+        llSetLinkPrimitiveParams(2,[ PRIM_ROT_LOCAL, llEuler2Rot( ROT_ABIERTO * DEG_TO_RAD ) , PRIM_POS_LOCAL, POS_ABIERTO ]);
+    }
+    touch_end(integer nomeacuerdo)
+    {
+        state default;
+    }
+}

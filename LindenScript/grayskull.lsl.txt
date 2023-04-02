@@ -1,0 +1,129 @@
+integer CONTEO_VISITANTES = 0;
+integer INICIA_STATE=0;
+integer TIMER_TICK = 5;
+list NPC_NAMES = ["Sorceress Na", "Tela Na", "He Man", "Skeletor Rie"];
+
+vector POS = <-0.35,0,0.6>;
+vector ANGULO = <0,0,180>;
+
+key NPC_SORCERESS = NULL_KEY;
+key NPC_HEMAN = NULL_KEY;
+key NPC_SKELETOR = NULL_KEY;
+key NPC_TELA = NULL_KEY;
+
+integer getIndexFromName(string nombre){
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i;
+        }
+    }
+    return -1;
+}
+
+secuencia_inicio(){
+        llSitTarget( POS, llEuler2Rot(ANGULO * DEG_TO_RAD) );
+        
+        key key_asiento = llGetLinkKey(LINK_ROOT);
+        // llSay(0,"El asiento tiene clave " + key_asiento );
+        NPC_SORCERESS = osNpcCreate("Sorceress", "Na", llGetPos() + <0, -1, 1>, "Sorceress");
+        NPC_TELA = osNpcCreate("Tela", "Na", llGetPos() + <0, 1, 1>, "tela");
+        osNpcSetRot(NPC_TELA, llEuler2Rot(<0,0,180>*DEG_TO_RAD));
+        llSleep(5.0);
+        //Sentar a Lisa en el asiento
+
+        osNpcSit(NPC_SORCERESS, key_asiento, OS_NPC_SIT_NOW);
+        
+        NPC_HEMAN = osNpcCreate("He", "Man", llGetPos() + <0, -1, 1>, "adam");
+        osNpcSetRot(NPC_HEMAN, llEuler2Rot(<0,0,180>*DEG_TO_RAD));
+        llPlaySound("TRansformacionHeman", 1.0);
+        llSleep(2.0);
+        osNpcMoveToTarget(NPC_HEMAN, llGetPos() + <-1,-1,1>, OS_NPC_NO_FLY);
+        llSleep(2.0);
+        osNpcPlayAnimation(NPC_HEMAN,"greyskull");
+        llSleep(2.5);
+        osNpcLoadAppearance(NPC_HEMAN,"heman");
+        llSleep(4.5);
+        
+        NPC_SKELETOR = osNpcCreate("Skeletor", "Rie", llGetPos() + <-2, 1, 1>, "skeletor");
+        osNpcSetRot(NPC_SKELETOR, llEuler2Rot(<0,0,180>*DEG_TO_RAD));
+        llSleep(2.0);
+        osNpcPlayAnimation(NPC_SKELETOR,"express_laugh");
+    
+    
+}
+
+secuencia_bucle(){
+    
+}
+
+secuencia_fin(){
+     osNpcStopAnimation(NPC_HEMAN,"greyskull");
+        osNpcStopAnimation(NPC_SKELETOR,"express_laugh");
+        osNpcRemove(NPC_SORCERESS);
+        NPC_SORCERESS = NULL_KEY;
+        osNpcRemove(NPC_HEMAN);
+        NPC_HEMAN = NULL_KEY;
+        osNpcRemove(NPC_SKELETOR);
+        NPC_SKELETOR = NULL_KEY;
+        osNpcRemove(NPC_TELA);
+        NPC_TELA = NULL_KEY;
+}
+
+default
+{
+    state_entry()
+    {
+        CONTEO_VISITANTES = 0;
+        INICIA_STATE = 0;
+    }
+    collision(integer involucrados){
+        CONTEO_VISITANTES += involucrados;
+        state visitado;
+    }
+}
+
+state visitado{
+    state_entry(){
+        INICIA_STATE = 1;        
+        secuencia_inicio();
+        llSetTimerEvent(TIMER_TICK);
+        llOwnerSay("Inicia Visita");
+    }
+    collision_start(integer involucrados){
+        integer indice;
+        if( INICIA_STATE == 1 ){
+            INICIA_STATE = 0;
+        }else{
+            for(indice = 0; indice < involucrados; indice++){
+                //llOwnerSay("Ingresa " + llDetectedName(indice) );
+                if( llListFindList( NPC_NAMES, (list)llDetectedName(indice) ) == -1 ){
+                    CONTEO_VISITANTES ++;
+                }                
+            }            
+        }
+    }
+    collision_end(integer involucrados){
+        integer indice;
+        for(indice = 0; indice < involucrados; indice++){
+                //llOwnerSay("sale " + llDetectedName(indice) );
+               if( llListFindList( NPC_NAMES, (list)llDetectedName(indice) ) == -1 ){
+                    CONTEO_VISITANTES --;
+                }                
+        }
+    }
+    state_exit(){
+        llOwnerSay("Finaliza Visita");
+        secuencia_fin();
+        llResetScript();
+    }
+    timer(){
+        secuencia_bucle();
+        if( CONTEO_VISITANTES <= 0){
+            state default;
+        }
+    }
+} 
+

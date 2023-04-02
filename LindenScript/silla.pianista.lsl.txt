@@ -1,0 +1,38 @@
+string animation;
+
+default
+{
+    state_entry()
+    {
+        llSitTarget(<0.0, -0.2, 0.6>, llEuler2Rot(<0,0,-90>*DEG_TO_RAD)); //The vector's components must not all be set to 0 for effect to take place.
+    }
+    
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK)
+        {
+            key av = llAvatarOnSitTarget();
+            if (av) //evaluated as true if not NULL_KEY or invalid
+                llRequestPermissions(av, PERMISSION_TRIGGER_ANIMATION);
+            else // avatar is standing up
+            {
+                if (animation)
+                    llStopAnimation(animation); // stop the started animation
+                llResetScript(); // release the avatar animation permissions
+            }
+        }
+    }
+ 
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            animation = llGetInventoryName(INVENTORY_ANIMATION,0); // get the first animation from inventory
+            if (animation)
+            {
+                //llStopAnimation("sit"); // stop the default sit animation
+                llStartAnimation(animation);
+            }
+        }
+    }
+}

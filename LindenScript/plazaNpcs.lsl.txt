@@ -1,0 +1,147 @@
+list SEGUIDORES = [];
+integer MAX_SEGUIDORES = 5;
+integer MAX_TICKS = 10;
+float GAP = 3.0;
+vector POSICION_RELATIVA = <1.5, -0.5, 0>;
+
+integer LISTEN_CHANNEL = 4;
+integer LISTEN_HANDLE;
+
+list obtener_posicion_ideal_npc(key seguido){
+    list posicion_rotacion = llGetObjectDetails( seguido , [OBJECT_POS, OBJECT_ROT] );
+    vector posicion_avatar = llList2Vector(posicion_rotacion, 0);
+    rotation rotacion_avatar = llList2Rot(posicion_rotacion, 1);
+    vector posicion_npc = (POSICION_RELATIVA * rotacion_avatar)  + posicion_avatar;
+    rotation rotacion_npc =  rotacion_avatar * llEuler2Rot(<0,0,PI>) ;
+    return [ posicion_npc, rotacion_npc ];
+}
+
+integer ya_sigue_a(key seguido){
+    integer indice;
+    list registro;
+    key seguido1;
+    for(indice = 0; indice < llGetListLength(SEGUIDORES) ; indice ++){
+        registro = llParseString2List(llList2String(SEGUIDORES, indice), ["|"], []);
+        seguido1 = (key) llList2String(registro, 1);
+        if(seguido == seguido1){
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+crear_npc(string nombre, string apellido, string notecardo, key seguido){
+    if( llGetListLength(SEGUIDORES) >= MAX_SEGUIDORES ){
+            llSay(0,"Se ha alcanzado el máximo de seguidores. Intentar más tarde.");
+            return;
+    }
+    if( ya_sigue_a(seguido) ){
+            llInstantMessage(seguido, "Ya tienes un avatar. Intenta de nuevo cuando se haya retirado.");
+            return;
+    }
+    list posicion_ideal_npc = obtener_posicion_ideal_npc(seguido);
+    vector posicion_npc = llList2Vector(posicion_ideal_npc, 0);
+    rotation rotacion_npc = llList2Rot(posicion_ideal_npc, 1);
+    key npc = osNpcCreate( nombre + (string)llGetListLength(SEGUIDORES) , apellido, posicion_npc , notecardo);
+    osNpcSetRot(npc, rotacion_npc);
+    SEGUIDORES += ( "" + (string) MAX_TICKS + "|" + (string) seguido + "|" + (string) npc );
+    llSay(0, llKey2Name(npc) + " ha entrado para seguir a " + llKey2Name(seguido) );
+}
+
+crear_notecard(string notecardo, key modelo){
+    if( modelo != llGetOwner() ){
+        llOwnerSay( llKey2Name(modelo) + " no está permitido de crear apariencias");
+        return;
+    }
+    osOwnerSaveAppearance(notecardo);
+    llOwnerSay("Se ha creado la apariencia " + notecardo);
+}
+
+default
+{
+    state_entry()
+    {
+        llSay(0, "Script running");
+        LISTEN_HANDLE = llListen( LISTEN_CHANNEL,"",NULL_KEY,"");
+        llSetTimerEvent( GAP );
+    }
+    state_exit(){
+        list seguidores_purgar = SEGUIDORES;        
+        integer indice;
+        SEGUIDORES = [];
+        list registro;
+        key npc;
+        for(indice = 0; indice < llGetListLength(seguidores_purgar) ; indice ++){
+            registro = llParseString2List(llList2String(seguidores_purgar, indice), ["|"], []);            
+            npc = (key) llList2String(registro, 2);
+            osNpcRemove(npc);
+        }
+        llListenRemove(LISTEN_HANDLE);
+    }
+    
+    timer(){
+        list nuevos_seguidores = [];        
+        integer indice;
+        list registro;
+        key seguido;
+        key npc;
+        integer iteracion;
+        
+        for(indice = 0; indice < llGetListLength(SEGUIDORES) ; indice ++){
+            registro = llParseString2List(llList2String(SEGUIDORES, indice), ["|"], []);
+            iteracion = (integer) llList2String(registro, 0);
+            seguido = (key) llList2String(registro, 1);
+            npc = (key) llList2String(registro, 2);
+            vector posicion_seguido = llList2Vector( llGetObjectDetails( seguido , [ OBJECT_POS ] ) , 0);
+
+            if(iteracion <= 0){
+                // Elimina al NPC y NO lo incluye en la lista temporal
+                osNpcSayTo(npc, seguido, 0, "Ha sido un gusto seguirte. Hasta la próxima");
+                osNpcRemove(npc);
+            }else if(posicion_seguido == ZERO_VECTOR){
+                osNpcShout(npc, 0, "Adios. Me han abandonado :(");
+                osNpcRemove(npc);
+            }else{
+                // opera al seguidor
+                list posicion_ideal_npc = obtener_posicion_ideal_npc(seguido);
+                vector posicion_npc = llList2Vector(posicion_ideal_npc, 0);
+                rotation rotacion_npc = llList2Rot(posicion_ideal_npc, 1);
+                vector posicion_actual_npc = llList2Vector( llGetObjectDetails( npc , [ OBJECT_POS ] ) , 0);
+                if( llFabs(llVecDist(posicion_actual_npc , posicion_seguido)) >= llVecMag(POSICION_RELATIVA) ){
+                    osNpcMoveToTarget(npc, posicion_npc, OS_NPC_NO_FLY);
+                }else{
+                     osNpcStopMoveToTarget(npc);
+                     osNpcSetRot(npc, rotacion_npc);
+                }
+                
+                // decrementa en 1 el iterador y agrega el registro al temporal
+                iteracion --;
+                nuevos_seguidores += ( "" + (string) iteracion + "|" + (string) seguido + "|" + (string) npc );
+            }
+        }
+        SEGUIDORES = nuevos_seguidores;
+    }
+    
+    listen(integer channel, string name, key id, string msg)
+    {
+        if (msg == ""){
+            return;
+        }
+        
+        list commands = llParseString2List(msg, [ " " ], []);
+        string msg0 = llList2String(commands, 0);
+        string msg1 = llList2String(commands, 1);            
+        string msg2 = llList2String(commands, 2);
+        string msg3 = llList2String(commands, 3);
+        string msg4 = llList2String(commands, 4);
+        
+        if( msg0 == "clonar" && msg1 != ""){
+            crear_notecard( msg1, id );
+        }else if( msg0 == "crear" && msg1 != "" && msg2 != "" && msg3 != "" && msg4 != ""){
+            crear_npc(msg1, msg2, msg3, (key) msg4 );
+        }else{
+            llSay(0,"He recibido una orden que no puedo reconocer");
+        }
+    }
+    
+}

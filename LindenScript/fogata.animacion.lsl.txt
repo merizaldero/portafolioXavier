@@ -1,0 +1,16 @@
+default
+{
+    state_entry()
+    {
+        llSay(0, "Script running");
+        llSetTimerEvent(1.0);
+    }
+    timer(){
+        vector escala = llGetTextureScale(ALL_SIDES);
+        if(escala.x >= 0){
+            llScaleTexture( -1.0 ,1.0,ALL_SIDES);
+        }else{
+            llScaleTexture( 1.0 ,1.0,ALL_SIDES);
+        }
+    }
+}

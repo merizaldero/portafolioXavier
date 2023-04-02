@@ -1,0 +1,19 @@
+string ANIMACION = "stand_1";
+
+default
+{
+    state_entry()
+    {
+        llStartObjectAnimation(ANIMACION);
+    }
+    state_exit()
+    {
+        llStopObjectAnimation(ANIMACION);
+    }
+    
+    changed(integer change){
+        if(change & CHANGED_REGION_START){
+            llResetScript();
+        }
+    }
+}

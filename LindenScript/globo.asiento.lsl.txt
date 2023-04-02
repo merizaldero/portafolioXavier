@@ -1,0 +1,27 @@
+vector SIT_POS = <0, 0, - 0.5>;
+
+default
+{
+    state_entry()
+    {
+        llSitTarget(SIT_POS, ZERO_ROTATION);
+                
+    }
+    
+    changed(integer change){
+        if(change & CHANGED_LINK){
+            key avatar = llAvatarOnSitTarget();
+            if( avatar != NULL_KEY ){
+                llRequestPermissions(avatar, PERMISSION_TRIGGER_ANIMATION);
+            }
+        }        
+    }
+    
+    run_time_permissions(integer perm) {
+        if(perm & PERMISSION_TRIGGER_ANIMATION) {
+            llStopAnimation("sit");
+            llStartAnimation("stand");
+            llOwnerSay("Un avatar se ha sentado en el globo");
+        }
+    }
+}

@@ -1,0 +1,44 @@
+key avatar;
+vector pos = <-0.25,0,1.0>;
+vector rot = <0,0,-90>;
+string ANIMACION = "sleep";
+vector POS_CAMARA = < -4, 0, -0.5 >;
+vector OBJETIVO_CAMARA = < 0, 0 ,0 >;
+
+
+default
+{
+    state_entry()
+    {
+        llSetCameraEyeOffset( POS_CAMARA );
+        llSetCameraAtOffset( OBJETIVO_CAMARA );
+        llSitTarget(pos, llEuler2Rot(rot * DEG_TO_RAD) );
+    }
+    changed(integer change)
+    {
+        avatar = llAvatarOnSitTarget();
+        if(avatar == NULL_KEY)
+        {
+            llStopAnimation( ANIMACION );
+            llReleaseControls();
+            llResetScript();
+        }
+        else if(avatar == llAvatarOnSitTarget())
+        {
+            llRequestPermissions(avatar,PERMISSION_TRIGGER_ANIMATION );
+        }
+        
+    }
+    run_time_permissions(integer perms)
+    {
+        if(perms)
+        {
+            llStopAnimation("sit");
+            llStartAnimation( ANIMACION );
+        }
+        else
+        {
+            llUnSit(avatar);
+        }
+    }
+}

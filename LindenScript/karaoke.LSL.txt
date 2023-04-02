@@ -1,0 +1,162 @@
+integer CARA = 0;
+integer INPUT_CHANNEL = 25;
+integer SELECCION_CHANNEL = 26;
+integer LISTEN_HANDLE = 0;
+string LISTA_KARAOKE = "lista_karaoke";
+key CONTEO_REQUEST_ID = NULL_KEY;
+key ITEM_REQUEST_ID = NULL_KEY;
+integer NUMERO_REGISTROS = -1;
+list LISTA_TITULOS = [];
+string DEFAULT_SITE = "data:text/html,<h1>BIENVENIDOS AL KARAOKE</h1><h2>Tocar el borde de esta pantalla para buscar una canci&oacute;n</h2>";
+
+desplegar_contenido(string url){
+    if(url == ""){
+        llClearPrimMedia( ALL_SIDES );
+        //llOwnerSay("Se Quita medios");
+    }else{
+        integer resultado = llSetPrimMediaParams( CARA , [ 
+       PRIM_MEDIA_AUTO_PLAY , TRUE, 
+       PRIM_MEDIA_CURRENT_URL, url,
+       PRIM_MEDIA_HOME_URL, url,
+       PRIM_MEDIA_HEIGHT_PIXELS, 512,
+       PRIM_MEDIA_WIDTH_PIXELS, 512
+        ]);
+        
+        if( resultado == 0 ){
+            //llOwnerSay("Media "+ url +" puesta exitosamente");
+        }else{
+            llClearPrimMedia( ALL_SIDES );
+            //llOwnerSay((string) resultado);
+        }
+
+    }
+    
+}
+
+string nombre_cancion(integer indice){
+    if( indice >= NUMERO_REGISTROS){
+        return "";
+    }
+    
+    string linea = llList2String(LISTA_TITULOS, indice );
+    list linea_array = llParseString2List(linea, ["|"],[]);
+    return llList2String( linea_array ,0);    
+}
+
+string url_cancion(integer indice){
+    if( indice >= NUMERO_REGISTROS){
+        return "";
+    }
+    
+    string linea = llList2String(LISTA_TITULOS, indice );
+    list linea_array = llParseString2List(linea, ["|"],[]);
+    return llList2String( linea_array ,1);
+}
+
+list buscar_canciones(string busqueda){
+    list resultado = [];
+    
+    list busqueda_array = llParseString2List(llToLower(busqueda),[" "],[]);
+    integer palabras_busqueda = llGetListLength(busqueda_array);
+    integer coincidencias = 0;
+    integer indice_registro ;
+    integer indice_busqueda;
+    string linea;
+    string titulo;
+    
+    // llOwnerSay("buscando "+busqueda);
+    
+    for(indice_registro = 0  ; indice_registro < NUMERO_REGISTROS ; indice_registro ++){        
+        titulo = nombre_cancion(indice_registro);
+        coincidencias = 0;
+        for( indice_busqueda = 0; indice_busqueda < palabras_busqueda; indice_busqueda ++){
+            if ( llSubStringIndex( llToLower(titulo), llList2String(busqueda_array, indice_busqueda) ) >= 0){
+                coincidencias ++;
+            }
+            
+        }
+        if(coincidencias >= palabras_busqueda){
+            resultado += (string)indice_registro;
+        }else{
+            //llOwnerSay(titulo + " no cumple con la busqueda");
+        }      
+    }
+    return resultado;
+}
+
+default
+{
+    state_entry()
+    {
+        
+        llClearPrimMedia( ALL_SIDES );
+        llOwnerSay("inicializado");
+        LISTA_TITULOS = [];
+        CONTEO_REQUEST_ID = llGetNumberOfNotecardLines(LISTA_KARAOKE);
+        desplegar_contenido(DEFAULT_SITE );
+    }
+    
+    dataserver(key requested, string data){
+        integer numero_lineas;
+        if (requested == CONTEO_REQUEST_ID)
+        {
+            NUMERO_REGISTROS = (integer)data;
+            llOwnerSay("Se registran "+ data +" entradas en " + LISTA_KARAOKE);
+            CONTEO_REQUEST_ID = NULL_KEY;
+        } else if (requested == ITEM_REQUEST_ID){
+            LISTA_TITULOS += data;
+            ITEM_REQUEST_ID = NULL_KEY;
+            if( llGetListLength( LISTA_TITULOS ) == NUMERO_REGISTROS ){
+                llOwnerSay("Carga de Lista de Karaoke completada");
+            }
+        }
+        numero_lineas = llGetListLength( LISTA_TITULOS );
+        if( numero_lineas < NUMERO_REGISTROS ){
+            ITEM_REQUEST_ID = llGetNotecardLine(LISTA_KARAOKE, numero_lineas );
+        } 
+    }
+    
+    touch( integer tocadores ){
+        if( LISTEN_HANDLE != 0){
+            llListenRemove(LISTEN_HANDLE);
+        }
+             
+        LISTEN_HANDLE = llListen( INPUT_CHANNEL, "", llDetectedKey(0), "");
+        llTextBox(llDetectedKey(0), "Búsqueda de Canciones", INPUT_CHANNEL);
+        
+        // llOwnerSay((string)llDetectedTouchFace(0));
+    } 
+    
+    listen(integer channel, string name, key id, string message){
+        //llOwnerSay(llKey2Name(id)+":"+ ((integer)channel) + " dijo " + message );
+        llListenRemove(LISTEN_HANDLE);
+        LISTEN_HANDLE = 0;
+        if(channel == INPUT_CHANNEL){
+            //llOwnerSay("Generando menu ...");
+            list opciones = buscar_canciones(message);
+            if( llGetListLength(opciones) >12 ){
+                opciones = llDeleteSubList(opciones,12,-1);
+            }
+            string titulo = "**LISTA CANCIONES**\n";
+            integer indice;
+            integer indice_cancion;
+            for(indice = 0; indice < llGetListLength(opciones); indice++){
+                indice_cancion = (integer)llList2String(opciones, indice);
+                titulo+= (string)indice_cancion + ". "+ nombre_cancion(indice_cancion) +" \n";
+            }
+            //llOwnerSay("para "+llKey2Name(id)+":"+ titulo  );
+            LISTEN_HANDLE = llListen( SELECCION_CHANNEL, "", id, "");
+            llDialog(id, titulo,opciones, SELECCION_CHANNEL);
+        }else if(channel == SELECCION_CHANNEL){
+            string cancion = url_cancion((integer)message);
+            if( cancion == "" ){
+                //llOwnerSay("No se encontró URL para " + message);
+            }else{
+                desplegar_contenido( cancion );
+            }
+        }
+        
+    }
+    
+    
+}

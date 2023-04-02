@@ -1,0 +1,34 @@
+vector POS = <-0.35,0,0.6>;
+vector ANGULO = <0,0,180>;
+vector CAMARA_OFFSET = <-1.5, -2.5, 2.45>;
+vector FOCUS_OFFSET = <-1.0, 0.5, 1.1>;
+
+key npc;
+integer listenChannel = 10;
+
+key NPC_SORCERESS = NULL_KEY;
+
+integer getIndexFromName(string nombre){
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i; 
+        }
+    }
+    return -1;
+}
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        llSitTarget( POS, llEuler2Rot(ANGULO * DEG_TO_RAD) );
+        llSetCameraAtOffset( FOCUS_OFFSET );
+        llSetCameraEyeOffset( CAMARA_OFFSET );
+    }
+  
+}
+

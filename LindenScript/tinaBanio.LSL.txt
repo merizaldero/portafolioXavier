@@ -1,0 +1,49 @@
+key avatar;
+vector pos = <0,-0.3,-0.45>;
+vector rot = <0,0,90>; 
+string ANIMACION = "sentdo_tina";
+vector POS_CAMARA = < 0, 2, 1 >;
+vector OBJETIVO_CAMARA = < 0, 0 ,0.5 >;
+integer outChannel = 29;
+
+default
+{
+    state_entry()
+    {
+        llSetCameraEyeOffset( POS_CAMARA );
+        llSetCameraAtOffset( OBJETIVO_CAMARA );
+        llSitTarget(pos, llEuler2Rot(rot * DEG_TO_RAD) );
+    }
+    changed(integer change)
+    {
+        if(change & CHANGED_LINK){
+            avatar = llAvatarOnSitTarget();        
+            if(avatar == NULL_KEY)
+            {
+                llSay(outChannel, "levantado");
+                llStopAnimation( ANIMACION );
+                llReleaseControls();
+                llResetScript();
+            }
+            else if(avatar == llAvatarOnSitTarget())
+            {
+                llSay(outChannel, "sentado");
+                llRequestPermissions(avatar,PERMISSION_TRIGGER_ANIMATION );
+            }
+        }
+        
+        
+    }
+    run_time_permissions(integer perms)
+    {
+        if(perms)
+        {
+            llStopAnimation("sit");
+            llStartAnimation( ANIMACION );
+        }
+        else
+        {
+            llUnSit(avatar);
+        }
+    }
+}

@@ -1,0 +1,18 @@
+integer CANAL = 3141;
+
+default
+{
+    state_entry()
+    {
+        llSay(0, "Script running");
+    }
+    collision_end(integer total_number)
+    {
+        integer i;
+        for(i=0; i< total_number; i++){
+            llRegionSay(CANAL, (string) llDetectedKey(i) + " gana" );
+        }
+        
+        //llSay(0, llDetectedName(0) + " ha pasado." );
+    }
+}

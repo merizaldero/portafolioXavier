@@ -1,0 +1,72 @@
+float ANGULO_INICIAL = 260;
+float RADIO = 6.25;
+ 
+
+float ANGULO = 0;
+float DELTA_ANGULO = 360.0 / 378;
+float DELTA_TIEMPO = 0.5;
+
+integer getIndexFromName(string nombre){
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i;
+        }
+    }
+    return -1;
+}
+
+setPosicion(){
+    float angulo = ANGULO * DEG_TO_RAD;
+    vector posicion = <0,0,0>;
+    posicion.x = RADIO * llCos(angulo);
+    posicion.y = RADIO * llSin(angulo);
+    //llSay( 0,"Pos: " +posicion.x +","+posicion.y );
+    llSetLinkPrimitiveParams( LINK_THIS, [ PRIM_POS_LOCAL, posicion ] );
+}
+
+default
+{
+    state_entry()
+    {
+        ANGULO = ANGULO_INICIAL;
+        string nombre = llList2String(llGetLinkPrimitiveParams(LINK_THIS, [PRIM_NAME]),0);
+        llSay(0, nombre + " inicializado");
+        setPosicion();
+        //llSetTimerEvent(DELTA_TIEMPO);
+    }
+    
+    link_message(integer sender_num, integer num, string msg, key id)
+    {
+        if(num == 1)
+        {
+            state girando;
+        }
+    }
+}
+
+state girando
+{
+    state_entry()
+    {
+        llSetTimerEvent(DELTA_TIEMPO);
+    }    
+    timer()
+    {
+        ANGULO += DELTA_ANGULO;
+        setPosicion();
+    }
+    link_message(integer sender_num, integer num, string msg, key id)
+    {
+        if(num == 0)
+        {
+            state default;
+        }
+    }    
+    state_exit()
+    {
+        llSetTimerEvent(0);
+    }    
+}

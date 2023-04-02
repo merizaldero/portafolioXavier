@@ -1,0 +1,23 @@
+
+string CURRENT_NOTECARD_NAME = "cantinflas";
+string NOMBRE_NPC = "Cantinflas";
+string APELLIDO_NPC = "Moreno";
+
+integer OUT_CHANNEL = 4;
+
+default
+{
+    state_entry()
+    {
+        llSay(0, "Inicializado");
+    }
+    
+    touch_end(integer num_toques){
+        if(num_toques > 1){
+            llSay(0,"Favor un solo toque a la vez");
+            return;
+        }
+        
+        llSay(OUT_CHANNEL, "crear " + NOMBRE_NPC + " " + APELLIDO_NPC + " " + CURRENT_NOTECARD_NAME + " " + (string) llDetectedKey(0) );
+    }
+}

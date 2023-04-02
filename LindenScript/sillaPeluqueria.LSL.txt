@@ -1,0 +1,75 @@
+vector POS = <-0.35,0,0.4>;
+vector ANGULO = <0,0,180>;
+
+key npc;
+integer listenChannel = 10;
+
+key NPC_SORCERESS = NULL_KEY;
+string ANIMACION = "cortando_pelo";
+string AVATAR = "edward";
+
+vector POS_CAMARA = < 0, -2 , 0.6 >;
+vector OBJETIVO_CAMARA = < 0, 0 , 0.6 >;
+
+integer getIndexFromName(string nombre){
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i;
+        }
+    }
+    return -1; 
+}
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        llSitTarget( POS, llEuler2Rot(ANGULO * DEG_TO_RAD) );
+        npc = NULL_KEY;
+        
+    }
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK) 
+        {
+            state cortando;
+        }
+    }
+  
+}
+
+state cortando{
+    state_entry()
+    {
+        npc = osNpcCreate( "Fleki", "Peluquero", llGetPos() + <1.5, -1.5, 0.25>, AVATAR);
+        llSleep(0.2);
+        osNpcMoveTo(npc, llGetPos() + <0.7, -0.7, 0.25>);
+        osNpcPlayAnimation(npc, ANIMACION);
+        llSetCameraEyeOffset( POS_CAMARA );
+        llSetCameraAtOffset( OBJETIVO_CAMARA );
+    }
+    changed(integer change)
+    {
+        if (change & CHANGED_LINK) 
+        {
+            state default;
+        }
+    }
+    timer(){
+        
+        osNpcStopAnimation(npc, ANIMACION);
+        osNpcPlayAnimation(npc, ANIMACION);
+    }
+    state_exit()
+    {
+        osNpcStopAnimation(npc, ANIMACION);
+        osNpcRemove(npc);
+        npc = NULL_KEY;
+    }
+    
+}
+

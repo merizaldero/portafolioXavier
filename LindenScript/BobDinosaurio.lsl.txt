@@ -1,0 +1,145 @@
+key npc;
+integer listenChannel = 17;
+string victima_wedgie = "";
+key npc_wedgie; 
+vector POS_WEDGIE = <1, -0.75, 1.0>;
+vector ANGULO_WEDGIE = <0, 45, 0>;
+string ANIMACION_SOSTENER_WEDGIE = "bob_wedgie";
+string ANIMACION_BOB = "bob_saluda";
+string COMANDO_ACTUAL = "";
+integer PAGINA_ACTUAL = 0;
+
+resetearPose(){
+    llStartObjectAnimation("stand");
+    llSleep(0.5);
+    llStopObjectAnimation("stand");
+}
+
+list obtener_notecards_pagina(integer num_pagina, integer tamano_pagina){
+    list resultado = [];
+    integer indice = 0;
+    integer num_notecards = llGetInventoryNumber(INVENTORY_NOTECARD);
+    for( indice = num_pagina * tamano_pagina; indice < num_notecards && llGetListLength(resultado) < 10 ; indice++){
+        resultado += llGetInventoryName(INVENTORY_NOTECARD, indice );
+    }
+    return resultado;
+}
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        resetearPose();
+        //llStopObjectAnimation(ANIMACION_BOB);
+        llStartObjectAnimation(ANIMACION_BOB);
+        llListen(listenChannel,"",NULL_KEY,"");
+        llSetText("Escuchando canal " + listenChannel, <0, 255, 0>, 1);
+        llOwnerSay("Say /" + (string)listenChannel + " help for commands");
+    }
+    
+    state_exit(){
+        llStopObjectAnimation(ANIMACION_BOB);
+    }
+ 
+    listen(integer channel, string name, key id, string msg)
+    {
+        if (msg != "")
+        {
+            list commands = llParseString2List(msg, [ " " ], []);
+            string msg0 = llList2String(commands, 0);
+            string msg1 = llList2String(commands, 1);            
+            string msg2 = llList2String(commands, 2);
+            string msg3 = llList2String(commands, 3);
+            
+            if (msg == "Capturar Apariencia"){
+                COMANDO_ACTUAL = "extraer_apariencia";
+                llTextBox( id, "Nombre para el personaje", listenChannel);
+            }
+            else if (msg0 == "Wedgie"){
+                COMANDO_ACTUAL="wedgie";
+                PAGINA_ACTUAL = 0;
+                list lista_opciones = obtener_notecards_pagina( PAGINA_ACTUAL, 10 );
+                if(llGetListLength(lista_opciones) == 10){
+                    lista_opciones += ">>";
+                }
+                llDialog(id, "Elegir victima", lista_opciones, listenChannel);
+            }
+            else if (COMANDO_ACTUAL=="extraer_apariencia"){
+                osAgentSaveAppearance( id, msg0 );
+                llSay(0,"La apariencia de "+ llKey2Name(id) + " ha sido almacenada como "+ msg0);
+            }
+            else if (COMANDO_ACTUAL=="wedgie" && msg0 == ">>"){
+                PAGINA_ACTUAL ++ ;
+                list lista_opciones = obtener_notecards_pagina( PAGINA_ACTUAL, 10 );
+                if(llGetListLength(lista_opciones) == 10){
+                    lista_opciones += ">>";
+                }
+                if(PAGINA_ACTUAL>0){
+                    lista_opciones = ["<<"] + lista_opciones;
+                }                
+                llDialog(id, "Elegir victima", lista_opciones, listenChannel);
+            }
+            else if (COMANDO_ACTUAL=="wedgie" && msg0 == "<<"){
+                PAGINA_ACTUAL -- ;
+                list lista_opciones = obtener_notecards_pagina( PAGINA_ACTUAL, 10 );
+                if(llGetListLength(lista_opciones) == 10){
+                    lista_opciones += ">>";
+                }
+                if(PAGINA_ACTUAL>0){
+                    lista_opciones = ["<<"] + lista_opciones;
+                }                
+                llDialog(id, "Elegir victima", lista_opciones, listenChannel);
+            }
+            else if (COMANDO_ACTUAL=="wedgie" && msg0 != ""){
+                victima_wedgie = msg0;
+                state calzon_chino;
+            }                        
+            else
+            {
+                llOwnerSay("I don't understand [" + msg + "]");
+            }
+        }   
+    }
+    
+    touch_end(integer tocadores){
+        llDialog(llDetectedKey(0), "Elegir accion", ["Wedgie","Capturar Apariencia"], listenChannel);
+    }
+    
+}
+
+state calzon_chino{
+    state_entry(){
+        resetearPose();
+        llSitTarget(POS_WEDGIE, llEuler2Rot(ANGULO_WEDGIE * DEG_TO_RAD) );        
+        npc_wedgie = osNpcCreate( victima_wedgie, "Wedgied", llGetPos() + <1, 0, 0>, victima_wedgie );        
+        osNpcSit(npc_wedgie, llGetKey(), OS_NPC_SIT_NOW);
+        llStartObjectAnimation(ANIMACION_SOSTENER_WEDGIE);
+        llSleep(0.5);
+        osAvatarStopAnimation(npc, "sit");
+        osAvatarPlayAnimation(npc_wedgie, "falldown");
+        llListen(listenChannel,"",NULL_KEY,"");
+    }
+    
+    listen(integer channel, string name, key id, string msg){
+        if (msg == "stop"){
+            state default;
+        }
+    }  
+    on_rez(integer xxx){
+        state default;
+    }
+    changed(integer change){
+        if(change & CHANGED_REGION_START){
+            state default;
+        }
+    }
+    state_exit(){
+        osNpcRemove(npc_wedgie);
+        llStopObjectAnimation(ANIMACION_SOSTENER_WEDGIE);
+        npc_wedgie = NULL_KEY;
+    }
+    touch_end(integer tocadores){
+        state default;
+    }
+}

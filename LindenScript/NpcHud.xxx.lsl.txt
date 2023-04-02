@@ -1,0 +1,415 @@
+key npc;
+integer listenChannel = 20;
+vector POSICION_RELATIVA = <1.5, -0.5, 0>;
+integer channel_dialog;
+integer TAMANO_PAGINA_DIALOGO = 10;
+//string KEY_SENTARSE = "";
+string CURRENT_ANIMATION = ""; 
+string DEFAULT_ANIMATION = "ao-sweetness-stand5";
+float TIMER_GAP = 3.0;
+integer MOVIENDOSE = 0;
+
+list NOMBRES_OBJETOS_CERCANOS=[];
+list KEY_OBJETOS_CERCANOS=[];
+
+key OBJETO_SENTADO = NULL_KEY;
+
+string CURRENT_NOTECARD_NAME = "";
+
+list obtener_notecards(string prefijo){
+    integer total = llGetInventoryNumber(INVENTORY_NOTECARD);
+    list lista = [];
+    integer indice = 0;
+    string nombre;
+    integer indice_;
+    string prefijo_nombre;
+    string subfijo_nombre;
+    integer longitud_nombre;
+    while(indice < total){        
+        nombre = llGetInventoryName(INVENTORY_NOTECARD, indice );
+        longitud_nombre = llStringLength( nombre );
+        indice_ = llSubStringIndex( nombre, "_" );
+        
+        if( indice_ >= 0 ){
+            prefijo_nombre = llGetSubString(nombre, 0, indice_ - 1 );
+            subfijo_nombre = llGetSubString(nombre, indice_ + 1, longitud_nombre);
+        }else{
+            prefijo_nombre = nombre;
+            subfijo_nombre = "";
+        }
+        
+        //llOwnerSay("prefijo "+prefijo_nombre + " subfijo " + subfijo_nombre );
+        
+        if( prefijo == "" ){
+            if( indice_ < 0 ){
+                lista += nombre;
+            }
+        } else {
+            if( prefijo ==  prefijo_nombre ){
+                lista += subfijo_nombre;
+            }           
+        }
+                
+        indice ++;
+    }
+    return lista;
+}
+
+list obtener_notecards_subfijo(string subfijo){
+    integer total = llGetInventoryNumber(INVENTORY_NOTECARD);
+    list lista = [];
+    integer indice = 0;
+    string nombre;
+    integer indice_;
+    string prefijo_nombre;
+    string subfijo_nombre;
+    integer longitud_nombre;
+    while(indice < total){        
+        nombre = llGetInventoryName(INVENTORY_NOTECARD, indice );
+        longitud_nombre = llStringLength( nombre );
+        indice_ = llSubStringIndex( nombre, "_" );
+        
+        if( indice_ >= 0 ){
+            prefijo_nombre = llGetSubString(nombre, 0, indice_ - 1 );
+            subfijo_nombre = llGetSubString(nombre, indice_ + 1, longitud_nombre);
+        }else{
+            prefijo_nombre = nombre;
+            subfijo_nombre = "";
+        }
+        
+        //llOwnerSay("prefijo "+prefijo_nombre + " subfijo " + subfijo_nombre );
+        
+        if( subfijo_nombre == subfijo ){
+            lista += nombre;
+        }
+                
+        indice ++;
+    }
+    return lista;
+}
+
+list agregar_comando_lista(string comando, list lista){
+    integer tamano = llGetListLength(lista);
+    integer i;
+    list resultado = [];
+    for( i = 0 ; i < tamano ; i++){
+        resultado += comando + " " + llList2String(lista, i);
+    }
+    return resultado;
+}
+
+list get_lista_notecards(){
+    list lista_final = [];
+    if( npc == NULL_KEY ){
+        lista_final = agregar_comando_lista("create", obtener_notecards("") );
+    }else{
+        lista_final = ["remove","mnuvar","mnuld","sit"] ;
+    }
+    lista_final = ["sorpresa","sorpresa_3x"] + lista_final;
+    return lista_final;
+}
+
+list get_lista_load(){
+    list lista_final = [];
+    lista_final = agregar_comando_lista("load", obtener_notecards("") );
+    return lista_final;
+}
+
+list get_lista_variantes(){
+    integer indice_ = llSubStringIndex( CURRENT_NOTECARD_NAME, "_" );
+    string prefijo_nombre;
+    if( indice_ >= 0 ){
+        prefijo_nombre = llGetSubString(CURRENT_NOTECARD_NAME, 0, indice_ - 1);
+    }else{
+        prefijo_nombre = CURRENT_NOTECARD_NAME;
+    }
+    list lista_final =  agregar_comando_lista("ldvar", obtener_notecards(prefijo_nombre));
+    return lista_final;
+}
+
+crear_npc(string notecard){
+    CURRENT_NOTECARD_NAME = notecard;
+    
+    list posicion_rotacion = llGetObjectDetails( llGetOwner() , [OBJECT_POS, OBJECT_ROT] );
+    vector posicion_avatar = llList2Vector(posicion_rotacion, 0);
+    rotation rotacion_avatar = llList2Rot(posicion_rotacion, 1);
+    vector posicion_npc = (POSICION_RELATIVA * rotacion_avatar)  + posicion_avatar;
+    rotation rotacion_npc =  rotacion_avatar * llEuler2Rot(<0,0,PI>) ;
+    
+    npc = osNpcCreate("XXX", "XXX", posicion_npc , CURRENT_NOTECARD_NAME);
+    
+    OBJETO_SENTADO = NULL_KEY;
+    
+    llOwnerSay("Created npc from notecard " + CURRENT_NOTECARD_NAME);
+    MOVIENDOSE = 0;
+    osNpcSetRot(npc, rotacion_npc);
+    iniciar_animacion();    
+}
+
+load_npc(string notecard){
+    CURRENT_NOTECARD_NAME = notecard;    
+    osNpcLoadAppearance(npc, notecard);
+    llOwnerSay("Loaded appearance " + notecard + " to " + npc);
+}
+
+load_variante(string variante){
+    integer indice_ = llSubStringIndex( CURRENT_NOTECARD_NAME, "_" );
+    string prefijo_nombre;
+    if( indice_ >= 0 ){
+        prefijo_nombre = llGetSubString(CURRENT_NOTECARD_NAME, 0, indice_ - 1 );
+    }else{
+        prefijo_nombre = CURRENT_NOTECARD_NAME;
+    }
+    string nuevo_notecard = prefijo_nombre;
+    if(variante != ""){
+        nuevo_notecard += "_" + variante;
+    }
+    load_npc(nuevo_notecard);
+}
+
+remover(){
+    if(npc != NULL_KEY){
+        osNpcSay(npc, "See you next, Master!!");
+        osNpcRemove(npc);
+        npc = NULL_KEY;
+        CURRENT_NOTECARD_NAME = "";
+    }
+}
+iniciar_animacion(){
+    if(npc != NULL_KEY){
+         llSetTimerEvent(TIMER_GAP);
+    }
+}
+detener_animacion(){
+    llSetTimerEvent(0.0);
+}
+generar_menu(list lista , string menu_name, string msg1){
+    //list lista = get_lista_notecards();
+    list lista_menu = [];
+    integer tamano = llGetListLength(lista);
+    integer pagina = 0;
+    if( msg1 != "" ){
+        pagina = (integer) msg1;
+    }
+    if(pagina > 0){
+        lista_menu += menu_name + " " + (pagina - 1) ;
+    }
+    integer offset = -1;
+    for(offset = pagina * TAMANO_PAGINA_DIALOGO; offset < tamano && offset < (pagina+1) * TAMANO_PAGINA_DIALOGO ; offset ++){
+        lista_menu += llList2String(lista, offset);
+    }
+    if( offset < tamano ){
+        lista_menu += menu_name + " " + (pagina + 1);
+    }
+    llDialog( llGetOwner() , "MENU NPC", lista_menu, channel_dialog);
+}
+
+list obtener_posicion_ideal_npc(){
+    list posicion_rotacion = llGetObjectDetails( llGetOwner() , [OBJECT_POS, OBJECT_ROT] );
+    vector posicion_avatar = llList2Vector(posicion_rotacion, 0);
+    rotation rotacion_avatar = llList2Rot(posicion_rotacion, 1);
+    vector posicion_npc = (POSICION_RELATIVA * rotacion_avatar)  + posicion_avatar;
+    rotation rotacion_npc =  rotacion_avatar * llEuler2Rot(<0,0,PI>) ;
+    return [ posicion_npc, rotacion_npc ];
+}
+
+sentarse(string indice_objeto){
+    if(npc != NULL_KEY && indice_objeto != NULL_KEY){
+        integer indice = (integer) llGetSubString( indice_objeto, 0 , llStringLength(indice_objeto) - 2 );
+        key objeto = llList2Key(KEY_OBJETOS_CERCANOS, indice );
+        // llOwnerSay("Me voy a sentar en " + (string) indice);
+        
+        osNpcStopMoveToTarget(npc);
+        llSetTimerEvent(0);
+        OBJETO_SENTADO = objeto;
+        osNpcSit(npc, objeto, OS_NPC_SIT_NOW);
+        
+    }
+}
+levantarse(){
+    if(npc != NULL_KEY){
+        osNpcStand(npc);
+        llSetTimerEvent(TIMER_GAP);
+        OBJETO_SENTADO = NULL_KEY;
+    }
+}
+
+cargar_sorpresa(){
+    list avatares = obtener_notecards("");
+    integer num_avatares = llGetListLength(avatares);
+    integer posicion = (integer) llFrand(num_avatares);
+    string avatar_elegido = llList2String(avatares, posicion);
+    if(npc == NULL_KEY){
+        crear_npc(avatar_elegido);
+    }else{
+        load_npc(avatar_elegido);
+    }
+}
+
+cargar_sorpresa_3x(){
+    list avatares = obtener_notecards_subfijo("xxx");
+    integer num_avatares = llGetListLength(avatares);
+    integer posicion = (integer) llFrand(num_avatares);
+    string avatar_elegido = llList2String(avatares, posicion);
+    if(npc == NULL_KEY){
+        crear_npc(avatar_elegido);
+    }else{
+        load_npc(avatar_elegido);
+    }
+}
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        llListen(listenChannel,"",llGetOwner(),"");
+        //llSetText("", <0, 255, 0>, 1);
+        channel_dialog = -1 - (integer)("0x" + llGetSubString( (string) llGetKey(), -7, -1) );
+        llListen(channel_dialog,"",llGetOwner(),"");
+        llOwnerSay("Say /" + (string)listenChannel + " help for commands");
+        npc = NULL_KEY;
+    }  
+    
+    touch_end(integer xxxx){
+        llOwnerSay("PResiona Boton");
+        generar_menu(get_lista_notecards(), "menu", "");
+    }
+ 
+    listen(integer channel, string name, key id, string msg)
+    {
+        
+        if (msg != "")
+        {
+            list commands = llParseString2List(msg, [ " " ], []);
+            string msg0 = llList2String(commands, 0);
+            string msg1 = llList2String(commands, 1);            
+            string msg2 = llList2String(commands, 2);
+            string msg3 = llList2String(commands, 3);
+ 
+            if (msg0 == "create")
+            {
+                if (msg1 != "")
+                {
+                    remover();
+                    crear_npc( msg1 );                                     
+                }
+                else
+                {
+                    llOwnerSay("Usage: create <notecard-name>");
+                }
+            }
+            else if (msg0 == "clone")
+            {
+                if (msg1 != "")
+                {
+                    osOwnerSaveAppearance(msg1);
+                    llOwnerSay("Cloned your appearance to " + msg1);
+                }
+                else
+                {
+                    llOwnerSay("Usage: clone <notecard-name-to-save>");
+                }
+            }
+            else if (msg0 == "remove" && npc != NULL_KEY)
+            {
+                remover();
+            }   
+            else if (msg0 == "load" && msg1 != "" && npc != NULL_KEY)
+            {
+                load_npc(msg1);                
+            }
+            else if (msg0 == "ldvar" && npc != NULL_KEY)
+            {
+                load_variante(msg1);                
+            }
+            else if (msg0 == "help")
+            {
+                llOwnerSay("Commands are:");
+                llOwnerSay("create <notecard-name> - Create NPC from a stored notecard");
+                llOwnerSay("remove - Remove current NPC");     
+                llOwnerSay("load <notecard-name>  - Load appearance on notecard to current npc");
+            }
+            else if (msg0 == "menu")
+            {
+                generar_menu(get_lista_notecards(), "menu" , msg1);
+            }
+            else if (msg0 == "mnuvar" && npc != NULL_KEY)
+            {
+                generar_menu(get_lista_variantes(), "mnuvar" , msg1);
+            }
+            else if (msg0 == "mnuld" && npc != NULL_KEY)
+            {
+                generar_menu(get_lista_load(), "mnuld" , msg1);
+            }
+            else if (msg0 == "stand")
+            {
+                levantarse();
+            }
+            else if (msg0 == "sit")
+            {
+                if(OBJETO_SENTADO != NULL_KEY){
+                    levantarse();
+                } else if(msg1 == ""){
+                    llSensor( "", NULL_KEY, SCRIPTED, 10.0, PI );
+                } else if( llSubStringIndex(msg1, ".") < 0 ) {
+                    generar_menu( agregar_comando_lista("sit" , NOMBRES_OBJETOS_CERCANOS ) , "sit" , msg1);
+                } else {
+                    sentarse( msg1 );
+                } 
+            }
+            else if (msg0 == "sorpresa")
+            {
+                 cargar_sorpresa();
+            }
+            else if (msg0 == "sorpresa_3x"){
+                cargar_sorpresa_3x();
+            }
+            else
+            {
+                llOwnerSay("I don't understand [" + msg + "]");
+            }
+        }   
+    }
+    
+    timer(){
+        if(npc != NULL_KEY){
+            list posicion_rotacion_av = llGetObjectDetails( llGetOwner() , [OBJECT_POS] );
+            vector posicion_avatar = llList2Vector(posicion_rotacion_av, 0);
+            vector posicion_npc = llList2Vector( llGetObjectDetails( npc , [OBJECT_POS] ) , 0);
+            
+            list pos_rot_ideal = obtener_posicion_ideal_npc();
+            vector pos_ideal = llList2Vector(pos_rot_ideal, 0);
+            rotation rot_ideal = llList2Rot(pos_rot_ideal, 1);
+            float distancia = llFabs(llVecDist(posicion_npc , pos_ideal));
+            
+            if( distancia >= llVecMag(POSICION_RELATIVA) ){
+                //if( MOVIENDOSE == 0 ){
+                    osAvatarStopAnimation(npc, DEFAULT_ANIMATION);
+                    osNpcMoveToTarget(npc, pos_ideal, OS_NPC_NO_FLY);
+                    MOVIENDOSE = 1;
+                //}                
+            }else if(MOVIENDOSE == 1){
+                osNpcStopMoveToTarget(npc);
+                osNpcSetRot(npc, rot_ideal);
+                osAvatarPlayAnimation(npc, DEFAULT_ANIMATION);
+                MOVIENDOSE = 0;                
+            }
+        }
+    }
+    
+    sensor(integer num_detected){
+        integer i=0;
+        NOMBRES_OBJETOS_CERCANOS = [];
+        KEY_OBJETOS_CERCANOS = [];
+        integer indice_actual = 0;
+        for( i = 0; i < num_detected ; i++){ 
+            if( llDetectedName(i) != "Object"){
+                NOMBRES_OBJETOS_CERCANOS += "" + (string) indice_actual + ". " + llDetectedName(i) ;
+                KEY_OBJETOS_CERCANOS += llDetectedKey(i);
+                indice_actual ++;
+            }
+        }
+        generar_menu( agregar_comando_lista("sit" , NOMBRES_OBJETOS_CERCANOS ) , "sit" , "0");
+    }
+}

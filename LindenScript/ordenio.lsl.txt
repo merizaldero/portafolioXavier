@@ -1,0 +1,37 @@
+vector POS = <0.0 ,0, 0.0>;
+vector ANGULO = <0,0,180>;
+
+vector CAMERA_EYE = <2.0, -2.5, 1>;
+vector CAMERA_TARGET = <-0.5, 0, 1>;
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        llSitTarget( POS, llEuler2Rot(ANGULO * DEG_TO_RAD) );
+        llSetCameraEyeOffset( CAMERA_EYE );
+        llSetCameraAtOffset( CAMERA_TARGET );
+    }
+    
+    changed(integer change){
+        if(change & CHANGED_LINK){
+            key avatar = llAvatarOnSitTarget();
+            if( avatar ){
+               
+                llRequestPermissions(avatar, PERMISSION_TRIGGER_ANIMATION);
+            }
+        }
+    }
+    
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {            
+            llStopAnimation("sit");
+            llStartAnimation("ordenando");
+        }
+    }
+  
+}
+

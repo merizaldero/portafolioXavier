@@ -1,0 +1,24 @@
+key  teleportee;
+vector delta_pos = <0,0,2>;
+vector delta_vista = <2,0,0>;
+
+default
+{
+    state_entry()
+    {
+        llSay(0, "Script running");
+    }
+    touch_end(integer nomeacuerdo)
+    {
+        teleportee = llDetectedKey(0);
+        llRequestPermissions(teleportee, PERMISSION_TELEPORT);
+    }
+    run_time_permissions(integer perm)
+    {
+        if(PERMISSION_TELEPORT & perm)
+        {
+            vector pos_actual = llGetPos();
+            llTeleportAgent(teleportee, "", pos_actual + delta_pos ,  delta_vista);
+        }
+    }
+}

@@ -1,0 +1,167 @@
+
+string LINK_ASIENTO = "Asiento";
+vector OFFSET_ASIENTO = <0.30,0, 0.5>;
+integer LISTEN_HANDLE = 0;
+integer INPUT_CHANNEL = 100;
+
+float forward_power = 30;
+float reverse_power = -15;
+float turning_ratio = 4.0;
+
+vector POS_INICIAL = <194,224,22>;
+vector ORIENTACION_INICIAL = <0,0,0>;
+vector IMPULSO_RETORNO = <0,0,5>;
+float MIN_DISTANCIA_POS_INICIAL = 5.0;
+
+key PILOTO = NULL_KEY;
+
+integer getIndexFromName(string nombre){
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i;
+        }
+    }
+    return -1;
+}
+
+inicializar_sittarget(){ 
+    integer link_asiento = getIndexFromName(LINK_ASIENTO);
+    vector pos_asiento = llList2Vector(llGetLinkPrimitiveParams( link_asiento, [PRIM_POS_LOCAL]),0);
+    llSitTarget( pos_asiento + OFFSET_ASIENTO, ZERO_ROTATION ); 
+}
+
+inicializar_vehiculo(){
+    llSetCameraEyeOffset(< -5, 0, 2> );
+    llSetCameraAtOffset(< 5, 0, 0> );
+
+    llSetVehicleType(VEHICLE_TYPE_CAR);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_DEFLECTION_EFFICIENCY, 0.2);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_DEFLECTION_EFFICIENCY, 0.80);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_DEFLECTION_TIMESCALE, 0.10);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_DEFLECTION_TIMESCALE, 0.10);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_MOTOR_TIMESCALE, 1.0);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_MOTOR_DECAY_TIMESCALE, 0.2);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_MOTOR_TIMESCALE, 0.1);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_MOTOR_DECAY_TIMESCALE, 0.5);
+    llSetVehicleVectorParam(VEHICLE_LINEAR_FRICTION_TIMESCALE, <1000.0, 2.0, 1000.0> );
+    llSetVehicleVectorParam(VEHICLE_ANGULAR_FRICTION_TIMESCALE, <10.0, 10.0, 1000.0> );
+    llSetVehicleFloatParam(VEHICLE_VERTICAL_ATTRACTION_EFFICIENCY, 0.50);
+    llSetVehicleFloatParam(VEHICLE_VERTICAL_ATTRACTION_TIMESCALE, 0.50);
+}
+
+escuchar(integer channel, string name, key id, string message){
+    if(message == "reset"){
+        llResetScript();
+    }
+}
+
+default
+{
+    state_entry(){
+        llSetPos(POS_INICIAL);
+        llSetRot( llEuler2Rot( ORIENTACION_INICIAL * DEG_TO_RAD ) );
+        inicializar_sittarget();
+        llListen(0, "", NULL_KEY, "");
+        llSay(0, "Inicializado");
+    }
+    changed(integer change){
+        PILOTO = llAvatarOnSitTarget();
+        if(PILOTO != NULL_KEY){
+            state corriendo;
+        }
+    }
+    listen(integer channel, string name, key id, string message){
+        escuchar(channel, name, id, message);
+    }
+}
+
+state corriendo{
+    state_entry(){
+        inicializar_vehiculo();
+        llRequestPermissions(PILOTO, PERMISSION_TAKE_CONTROLS);
+    }
+    
+    run_time_permissions(integer perm){
+        if(perm & PERMISSION_TAKE_CONTROLS) {
+            llSay(0, "Conducción Habiltada");
+            llSetStatus(STATUS_PHYSICS, TRUE);
+            llTakeControls(CONTROL_FWD | CONTROL_BACK | CONTROL_RIGHT | CONTROL_LEFT | CONTROL_ROT_RIGHT | CONTROL_ROT_LEFT | CONTROL_UP | CONTROL_DOWN, TRUE, FALSE);
+        }
+    }
+    
+    control(key driver, integer level, integer edges){
+        integer reverse=1;
+        vector angular_motor;
+          
+        //get current speed
+        vector vel = llGetVel();
+        float speed = llVecMag(vel);
+        
+        //car controls
+        if(level & CONTROL_FWD)
+        {
+            //cur_wheel_direction = "WHEEL_FORWARD";
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <forward_power,0,0> );
+            reverse=1;
+        }
+        if(level & CONTROL_BACK)
+        {
+            //cur_wheel_direction = "WHEEL_REVERSE";
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <reverse_power,0,0> );
+            reverse = -1;
+        }
+        
+        if(level & (CONTROL_RIGHT|CONTROL_ROT_RIGHT))
+        {
+            //cur_wheel_direction = "WHEEL_RIGHT";
+            angular_motor.z -= speed / turning_ratio * reverse;
+        }
+         
+        if(level & (CONTROL_LEFT|CONTROL_ROT_LEFT))
+        {
+            //cur_wheel_direction = "WHEEL_LEFT";
+            angular_motor.z += speed / turning_ratio * reverse;
+        }
+        
+        llSetVehicleVectorParam(VEHICLE_ANGULAR_MOTOR_DIRECTION, angular_motor);
+    }
+    
+    changed(integer change){
+        if( llAvatarOnSitTarget() == NULL_KEY){
+            PILOTO = NULL_KEY;
+            state retorno;
+        }
+    }
+    
+    state_exit(){
+        llReleaseControls(); 
+        llSetStatus(STATUS_PHYSICS, FALSE); 
+        llListenRemove(LISTEN_HANDLE);
+    }
+    
+    listen(integer channel, string name, key id, string message){
+        escuchar(channel, name, id, message);
+    }
+}
+
+state retorno{
+    state_entry(){
+        llSetStatus(STATUS_PHYSICS, FALSE);
+        llSetTimerEvent(5);
+    }
+    timer(){
+        vector posicion = llGetPos();
+        if( llVecDist(posicion, POS_INICIAL) < MIN_DISTANCIA_POS_INICIAL ){
+             llSetTimerEvent(0);
+             llResetScript();
+        }else{
+            llSetPos(posicion + IMPULSO_RETORNO);
+            llSleep(2.0);
+            llSetPos(POS_INICIAL);
+        }        
+    }
+}
+

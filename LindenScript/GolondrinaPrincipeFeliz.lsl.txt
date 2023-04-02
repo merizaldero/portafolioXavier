@@ -1,0 +1,120 @@
+string ALA_IZQ = "AlaIzq";
+string ALA_DER = "AlaDer";
+
+integer ALA_IZQ_OFFSET;
+integer ALA_DER_OFFSET;
+
+vector ALA_IZQ_POS_1 = <0.000000, 0.117046, 0.000000>;
+vector ALA_IZQ_ROT_1 = <0.000001, -45.000005, 45.000005>;
+rotation ALA_IZQ_ROT_1_1;
+vector ALA_IZQ_POS_2 = <-0.092874, 0.046734, -0.015944>;
+vector ALA_IZQ_ROT_2 = <90.000014, -0.000008, 157.499999>;
+rotation ALA_IZQ_ROT_2_1;
+
+vector ALA_DER_POS_1 = <0.000000, -0.118790, 0.000000>;
+vector ALA_DER_ROT_1 = <0.000001, -45.000005, 45.000005>;
+rotation ALA_DER_ROT_1_1;
+vector ALA_DER_POS_2 = <-0.092876, -0.047057, -0.015947>;
+vector ALA_DER_ROT_2 = <-90.000012, 0.000019, -67.499994>;
+rotation ALA_DER_ROT_2_1;
+
+//vector POS_INICIAL = <0.00224, -0.12688, 0.02898>;
+vector POS_INICIAL = <206.75204, 2.23503, 23.63609>;
+vector POS_VUELO = <0,0,2.5>;
+
+float TIMER_GAP = 0.25;
+
+integer ALAS_ARRIBA = 0;
+
+integer buscar_link_number(string link_nombre){
+    integer resultado = -1;
+    integer indice = 1;
+    integer numero_prims = llGetNumberOfPrims( );
+    while( indice <= numero_prims && resultado < 0 ){
+        if( link_nombre == llList2String(llGetLinkPrimitiveParams(indice,[PRIM_NAME]),0) ){
+            resultado = indice;
+        }         
+        indice ++;
+    }
+    return resultado;
+}
+
+decir_coordenadas_alas(){
+    list lista = llGetLinkPrimitiveParams(LINK_ROOT,[PRIM_LINK_TARGET, ALA_IZQ_OFFSET, PRIM_POS_LOCAL, PRIM_ROT_LOCAL, PRIM_LINK_TARGET, ALA_DER_OFFSET, PRIM_POS_LOCAL, PRIM_ROT_LOCAL]);
+    llOwnerSay("ALA_IZQ_OFFSET = "+ (string)ALA_IZQ_OFFSET );
+    llOwnerSay("ALA_DER_OFFSET = "+ (string)ALA_DER_OFFSET );
+    
+    llSay(0, "ALA_IZQ_POS = " + (string) llList2Vector(lista,0) );
+    llSay(0, "ALA_IZQ_ROT = " + (string) (llRot2Euler(llList2Rot(lista,1)) * RAD_TO_DEG) );
+    llSay(0, "ALA_DER_POS = " + (string) llList2Vector(lista,2) );
+    llSay(0, "ALA_IZQ_ROT = " + (string) (llRot2Euler(llList2Rot(lista,3)) * RAD_TO_DEG) );
+    
+}
+
+alas_abajo(){
+    llSetLinkPrimitiveParams(LINK_ROOT,[
+        PRIM_LINK_TARGET, ALA_IZQ_OFFSET, PRIM_POS_LOCAL, ALA_IZQ_POS_1, PRIM_ROT_LOCAL, ALA_IZQ_ROT_1_1,
+        PRIM_LINK_TARGET, ALA_DER_OFFSET, PRIM_POS_LOCAL, ALA_DER_POS_1, PRIM_ROT_LOCAL, ALA_DER_ROT_1_1]);
+}
+alas_arriba(){
+    llSetLinkPrimitiveParams(LINK_ROOT,[
+        PRIM_LINK_TARGET, ALA_IZQ_OFFSET, PRIM_POS_LOCAL, ALA_IZQ_POS_2, PRIM_ROT_LOCAL, ALA_IZQ_ROT_2_1,
+        PRIM_LINK_TARGET, ALA_DER_OFFSET, PRIM_POS_LOCAL, ALA_DER_POS_2, PRIM_ROT_LOCAL, ALA_DER_ROT_2_1]);    
+}
+
+default
+{
+    state_entry()
+    {
+        // POS_INICIAL = llGetPos();
+        llSetPos( POS_INICIAL );
+        ALA_IZQ_OFFSET = buscar_link_number( ALA_IZQ );
+        ALA_DER_OFFSET = buscar_link_number( ALA_DER );
+        ALA_IZQ_ROT_1_1 = llEuler2Rot( ALA_IZQ_ROT_1 * DEG_TO_RAD );
+        ALA_IZQ_ROT_2_1 = llEuler2Rot( ALA_IZQ_ROT_2 * DEG_TO_RAD );
+        ALA_DER_ROT_1_1 = llEuler2Rot( ALA_DER_ROT_1 * DEG_TO_RAD );
+        ALA_DER_ROT_2_1 = llEuler2Rot( ALA_DER_ROT_2 * DEG_TO_RAD );
+        alas_arriba();
+        
+        llSay(0, "Script running");
+        
+    }
+    touch_end(integer numro){
+        //decir_coordenadas_alas();
+        state volando;
+    }
+}
+
+state volando{
+    state_entry(){
+        llSetPos(POS_INICIAL + POS_VUELO);
+        ALAS_ARRIBA = 0;
+        llSetTimerEvent( TIMER_GAP );
+    }
+    timer(){
+        if(ALAS_ARRIBA == 1){
+            alas_abajo();
+            ALAS_ARRIBA = 0;
+        }else{
+            alas_arriba();
+            ALAS_ARRIBA = 1;
+        }
+    }
+    touch_end(integer numro){
+        llSetPos(POS_INICIAL);
+        // decir_coordenadas_alas();
+        llResetScript();
+    }
+    state_exit(){
+        llSetPos(POS_INICIAL);
+        llSetTimerEvent( 0 );
+    }
+    on_rez(integer xxx){
+       // llResetScript();
+    }
+    changed(integer change){
+        if(change & CHANGED_REGION_START){
+            state default;
+        }
+    }
+}

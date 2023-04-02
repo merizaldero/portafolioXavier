@@ -1,0 +1,185 @@
+key PILOTO = NULL_KEY;
+
+float VERTICAL_THRUST = 7;
+
+string PRIM_NAME_PUERTA = "Puerta";
+string PRIM_NAME_ASIENTO = "Asiento";
+
+
+integer getIndexFromName(string name){
+    integer contador = 0;
+    integer numero_prims = llGetNumberOfPrims();
+    for(contador = 0; contador <= numero_prims; contador ++){
+        string name1 = llList2String( llGetLinkPrimitiveParams(contador,[PRIM_NAME]) , 0);
+        if(name1 == name){
+            return contador; 
+        }
+    }
+    return -1;
+} 
+ 
+inicializar_sittarget(){  
+    vector offset_pos = < .2 , 0.2 , 0>;
+    vector angulo = < 0 , 0, 0 >;
+    integer link_asiento = getIndexFromName( PRIM_NAME_ASIENTO );
+    list pos = llGetLinkPrimitiveParams( link_asiento, [ PRIM_POS_LOCAL, PRIM_ROT_LOCAL ] );
+    vector pos_asiento = llList2Vector( pos ,0);
+    rotation angulo_asiento = llList2Rot( pos ,1);
+    llSitTarget( pos_asiento + offset_pos , angulo_asiento * llEuler2Rot( angulo * DEG_TO_RAD ) );
+    llSay(0, "Asiento Inicializado");
+}
+
+inicializar_vehiculo(){
+    
+        llSetCameraEyeOffset(< 0 , -20, 0> );
+        llSetCameraAtOffset(< 0, 20, 0> );
+    
+        llSetVehicleType(VEHICLE_TYPE_AIRPLANE);
+
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_DEFLECTION_EFFICIENCY, 0.1);
+       llSetVehicleFloatParam(VEHICLE_LINEAR_DEFLECTION_EFFICIENCY, 0.1);
+       llSetVehicleFloatParam(VEHICLE_ANGULAR_DEFLECTION_TIMESCALE, 10);
+       llSetVehicleFloatParam(VEHICLE_LINEAR_DEFLECTION_TIMESCALE, 10);
+
+       llSetVehicleFloatParam(VEHICLE_LINEAR_MOTOR_TIMESCALE, 0.2);
+       llSetVehicleFloatParam(VEHICLE_LINEAR_MOTOR_DECAY_TIMESCALE, 10);
+       llSetVehicleFloatParam(VEHICLE_ANGULAR_MOTOR_TIMESCALE, 0.2);
+       llSetVehicleFloatParam(VEHICLE_ANGULAR_MOTOR_DECAY_TIMESCALE, 0.1);
+
+       llSetVehicleVectorParam(VEHICLE_LINEAR_FRICTION_TIMESCALE, <1,1,1>);
+       llSetVehicleVectorParam(VEHICLE_ANGULAR_FRICTION_TIMESCALE, <1,1000,1000>);
+
+       llSetVehicleFloatParam(VEHICLE_BUOYANCY, 0.9);
+
+        llSetVehicleFloatParam( VEHICLE_VERTICAL_ATTRACTION_EFFICIENCY, 1 );
+        llSetVehicleFloatParam( VEHICLE_VERTICAL_ATTRACTION_TIMESCALE, 2 );
+
+        llSetVehicleFloatParam( VEHICLE_BANKING_EFFICIENCY, 1 );
+        llSetVehicleFloatParam( VEHICLE_BANKING_MIX, 0.5 );
+        llSetVehicleFloatParam( VEHICLE_BANKING_TIMESCALE, .5 );
+
+        llSay(0,"Listo para despegar");
+
+         
+}
+
+abrir_puerta(){
+    integer link_puerta = getIndexFromName(PRIM_NAME_PUERTA);
+    llMessageLinked( link_puerta, 1, "", NULL_KEY);
+}
+
+cerrar_puerta(){
+    integer link_puerta = getIndexFromName(PRIM_NAME_PUERTA);
+    llMessageLinked( link_puerta, 0, "", NULL_KEY);
+}
+
+default
+{
+    state_entry()
+    {
+        inicializar_sittarget();
+        abrir_puerta();
+        llSetStatus(STATUS_PHYSICS, FALSE);
+        llSetRot( llEuler2Rot(<0,0,30> * DEG_TO_RAD) );
+        llSay(0, "Cohete inicializado");
+    }
+    changed(integer change)
+    {
+        PILOTO = llAvatarOnSitTarget();
+        if (PILOTO != NULL_KEY)
+        {
+            state Despegando;                
+        }
+        else
+        {
+            llSay(0, "No puedo identificar piloto");
+        }
+        
+    } 
+    
+}
+
+state Despegando
+{
+    state_entry()
+    {
+        cerrar_puerta();
+        inicializar_vehiculo();
+        
+        llRequestPermissions(PILOTO,  PERMISSION_TAKE_CONTROLS);
+        
+    }
+    
+    run_time_permissions(integer perm)
+    {
+        llSay(0,"Permisos");
+        if (perm & PERMISSION_TAKE_CONTROLS) {
+            llSay(0,"Controles OK");
+            llSetStatus(STATUS_PHYSICS, TRUE);
+            llTakeControls( CONTROL_UP | CONTROL_DOWN, TRUE, FALSE);
+            
+        }
+    }
+    
+    control(key id, integer level, integer edge)
+    {
+        vector angular_motor;
+        
+        //llSay(0,"Tecla");
+        if(level & CONTROL_UP) {
+            //llSay(0,"Arriba");
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0,0,VERTICAL_THRUST>);
+        } else if (edge & CONTROL_UP) {
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0,0, -VERTICAL_THRUST >);
+        }
+        /*
+        if(level & CONTROL_DOWN) {
+            //llSay(0,"Arriba");
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0,0,-VERTICAL_THRUST>);
+        } else if (edge & CONTROL_DOWN) {
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0,0,0>);
+        }
+        */
+
+
+        angular_motor.y = 0;
+        llSetVehicleVectorParam(VEHICLE_ANGULAR_MOTOR_DIRECTION, angular_motor);
+        
+
+
+    } //end control   
+
+
+
+    
+    changed(integer change)
+    {
+        if(change & CHANGED_LINK)
+        {
+            state bajando;
+        }
+        
+    }
+    
+    state_exit(){        
+        llSetVehicleType(VEHICLE_TYPE_NONE);
+        llSetStatus(STATUS_PHYSICS, FALSE);
+    }
+}
+
+state bajando{
+    state_entry(){
+        inicializar_vehiculo();
+        llSetStatus(STATUS_PHYSICS, TRUE);
+        llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, <0,0, -VERTICAL_THRUST >);
+    }
+    collision_start(integer xxx){
+        if(llDetectedName(0) == "Base Espacial"){
+            state default;
+        }
+    }
+    state_exit(){
+        llSetVehicleType(VEHICLE_TYPE_NONE);
+        llSetStatus(STATUS_PHYSICS, FALSE);
+    }    
+}

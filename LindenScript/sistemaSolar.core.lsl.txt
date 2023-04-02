@@ -1,0 +1,27 @@
+default
+{
+    state_entry()
+    {
+        llSay(0, "Sistema Solar iniciado");
+    }
+    
+    touch_end(integer num_detected)
+    {
+        llMessageLinked(LINK_ALL_OTHERS, 1, "", NULL_KEY );
+        state girando;
+    }
+}
+
+state girando
+{
+    state_entry()
+    {
+        llSay(0, "Todos Giran");
+    }
+    touch_end(integer num_detected)
+    {
+        llMessageLinked(LINK_ALL_OTHERS, 0, "", NULL_KEY );
+        state default;
+    }
+}
+

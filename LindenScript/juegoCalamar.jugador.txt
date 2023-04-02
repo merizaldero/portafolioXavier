@@ -1,0 +1,133 @@
+key npc;
+integer listenChannel = 3143;
+integer listenHandle;
+
+integer esta_caminando = 0;
+
+integer HE_GANADO = 0;
+integer HE_MUERTO = 0;
+
+float INTERVALO = 5.0;
+
+string notecardName = "hcalamar";
+
+remove_listen_handle(){
+    llListenRemove(listenHandle);
+}
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        listenHandle = llListen(listenChannel,"",NULL_KEY,"");
+        //llSetText("Listening on " + listenChannel, <0, 255, 0>, 1);
+        //llOwnerSay("Say /" + (string)listenChannel + " help for commands");
+    }  
+    state_exit(){
+        remove_listen_handle();
+    }
+    touch_end(integer num_loquesea){
+        state jugar_calamar;
+    }
+    listen(integer channel, string name, key id, string msg)
+    {
+        if (msg != "")
+        {
+            list commands = llParseString2List(msg, [ " " ], []);
+            string msg0 = llList2String(commands, 0);
+            string msg1 = llList2String(commands, 1);            
+            string msg2 = llList2String(commands, 2);
+            string msg3 = llList2String(commands, 3);
+ 
+            if (msg0 == "jugar_calamar")
+            {
+                state jugar_calamar;
+            }
+            else
+            {
+                //llOwnerSay("I don't understand [" + msg + "]");
+            }
+        }   
+    }   
+}
+
+state jugar_calamar{
+    state_entry(){
+        HE_GANADO = 0;
+        HE_MUERTO = 0;
+        list nombres = [""];
+        npc = osNpcCreate( llGetObjectName() , "npc", llGetPos() + <0, 1, 0>, notecardName);        
+        listenHandle = llListen(listenChannel,"",NULL_KEY,"");
+        osNpcSetRot(npc, llEuler2Rot(<0,0,-90>*DEG_TO_RAD) );
+        esta_caminando = 0;
+        llSetTimerEvent( llFrand(5) );
+    }
+    touch_end(integer num_loquesea){        
+        state default;
+    }
+    
+    timer(){ 
+        if(HE_MUERTO == 1){
+            llSetTimerEvent( 0 );
+        }else if(HE_GANADO == 1){
+            osNpcStopMoveToTarget(npc);
+            osNpcSetRot(npc, llEuler2Rot(<0,0,-90>*DEG_TO_RAD));
+            osAvatarStopAnimation(npc, "jumpforjoy");            
+            osAvatarPlayAnimation(npc, "jumpforjoy");
+            llSetTimerEvent( 3 );
+        }
+        else if( esta_caminando == 0 ){
+            osNpcMoveToTarget(npc, osNpcGetPos(npc) + <0, llFrand(5) ,0>, OS_NPC_NO_FLY);
+            llSetTimerEvent( INTERVALO + llFrand( INTERVALO ) );
+        }else{
+            osNpcStopMoveToTarget(npc);
+            llSetTimerEvent( INTERVALO + llFrand( INTERVALO ) );
+        }        
+        
+    }
+    
+    listen(integer channel, string name, key id, string msg)
+    {
+        if (msg != "")
+        {
+            
+            list commands = llParseString2List(msg, [ " " ], []);
+            string msg0 = llList2String(commands, 0);
+            string msg1 = llList2String(commands, 1);            
+            string msg2 = llList2String(commands, 2);
+            string msg3 = llList2String(commands, 3);
+ 
+            if( msg0 == "inicializar")
+            {
+                state default;
+            }
+            else if (msg0 == ((string) npc) )
+            {
+                //llSay(0,"me dicen \"" + msg1 +"\"" );
+                if(msg1 == "muere"){
+                    llSetTimerEvent( 0 );
+                    //llSay(0,"Me muero!!");
+                    HE_MUERTO = 1;
+                    osNpcStopMoveToTarget(npc);
+                    osAvatarPlayAnimation(npc, "dead");                    
+                }
+                else if(msg1 == "gana"){
+                    //llSay(0,"Lo logré!!");
+                    HE_GANADO = 1;
+                }
+            }
+            else{
+                //llSay(0,"me dicen "+msg+" y no entiendo" );
+            }
+        }
+    }
+    
+    state_exit(){
+        llSetTimerEvent( 0 );
+        remove_listen_handle();
+        osNpcRemove(npc);
+        npc = NULL_KEY;
+    }
+    
+}

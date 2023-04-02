@@ -1,0 +1,105 @@
+vector POS_ASIENTO = <-0.35,0,0.6>;
+vector ANGULO = <0,0,180>;
+vector POS_OBJETIVO_CAMARA = <0, 1, 0.75>;
+vector POS_CAMARA = <-5,-2,2.0>;
+key npc = NULL_KEY;
+integer listenChannel = 10;
+
+integer getIndexFromName(string nombre){
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i;
+        }
+    }
+    return -1;
+}
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        llSitTarget( POS_ASIENTO, llEuler2Rot(ANGULO * DEG_TO_RAD) );
+        npc = NULL_KEY;
+    }
+    changed(integer change){
+        if(change & CHANGED_LINK){
+            state cena_romantica;
+        }
+    }
+  
+}
+
+state cena_romantica{
+    state_entry(){        
+        llSensor("", NULL_KEY, SCRIPTED | PASSIVE, 10.0, PI);
+    }
+    state_exit(){
+        llClearCameraParams( );
+        osNpcRemove( npc );
+        npc = NULL_KEY;
+    }
+    changed(integer change){
+        if(change & (CHANGED_LINK | CHANGED_REGION_START ) ){
+            state default;
+        }        
+    }
+    sensor(integer num_detected){
+        integer indice;
+        vector pos0 = ZERO_VECTOR;
+        vector pos1 = ZERO_VECTOR;
+        vector pos2 = ZERO_VECTOR; 
+        vector pos3 = ZERO_VECTOR;
+        key sillaF;
+        integer mis_detectados = 0;
+
+        for( indice = 0; indice < num_detected; indice++){
+            if(llDetectedName(indice) == "sillaF"){
+                sillaF = llDetectedKey(indice);
+                mis_detectados++;
+            } else if(llDetectedName(indice) == "Hito1"){
+                pos1 = llDetectedPos(indice)+ <0,0,0.6>;
+                mis_detectados++;
+            } else if(llDetectedName(indice) == "Hito2"){
+                pos2 = llDetectedPos(indice)+ <0,0,0.6>;
+                mis_detectados++;
+            } else if(llDetectedName(indice) == "Hito3"){
+                pos3 = llDetectedPos(indice)+ <0,0,0.6>;
+                mis_detectados++;
+            }  else if(llDetectedName(indice) == "Hito0"){
+                pos0 = llDetectedPos(indice) + <0,0,0.6>;
+                mis_detectados++;
+            }
+        }
+        if(mis_detectados != 5){
+            llOwnerSay("Solo he encontrado "+ (string) mis_detectados);
+            return;
+        }
+        npc = osNpcCreate("Cris","Esposita" ,pos0, "cris_loren");
+        llSleep(5.0);
+        osNpcMoveToTarget(npc, pos1, OS_NPC_NO_FLY );
+        llSleep(3.0);
+        osNpcMoveToTarget(npc, pos2, OS_NPC_NO_FLY );
+        llSleep(3.0);
+        osNpcMoveToTarget(npc, pos3, OS_NPC_NO_FLY );
+        llSleep(3.0); 
+        osNpcSit(npc, sillaF, OS_NPC_SIT_NOW);
+        key avatar = llAvatarOnSitTarget();
+        if(avatar != NULL_KEY){
+            llRequestPermissions( avatar, PERMISSION_CONTROL_CAMERA );
+        }
+        llSetCameraAtOffset( POS_OBJETIVO_CAMARA  );
+        llSetCameraEyeOffset( POS_CAMARA  );
+    }
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_CONTROL_CAMERA)
+        {
+            llSetCameraAtOffset( POS_OBJETIVO_CAMARA  );
+            llSetCameraEyeOffset( POS_CAMARA );
+        }
+    }
+}

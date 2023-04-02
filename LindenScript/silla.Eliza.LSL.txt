@@ -1,0 +1,88 @@
+vector POS = <0.3,0,0.3>;
+vector ANGULO = <0,0,180>;
+key AVATAR = NULL_KEY;
+integer LISTEN_HANDLE=0;
+string URL = "http://xpidersim/eliza";
+
+string NOTECARD = "freud";
+key NPC = NULL_KEY;
+
+key npc;
+integer listenChannel = 10;
+
+key NPC_SORCERESS = NULL_KEY;
+
+integer getIndexFromName(string nombre){
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i;
+        }
+    }
+    return -1;
+}
+
+default
+{
+    // NPC manipulator adapted by justincc 0.0.3 released 20121025
+    state_entry()
+    {
+        llSitTarget( POS, llEuler2Rot(ANGULO * DEG_TO_RAD) );
+        
+    }
+    
+    changed(integer change){
+        if( change & CHANGED_LINK){
+            AVATAR = llAvatarOnSitTarget();
+            if(AVATAR == NULL_KEY){
+                llListenRemove(LISTEN_HANDLE);
+                LISTEN_HANDLE = 0;
+                osNpcRemove(NPC);
+                NPC = NULL_KEY;
+                
+            }else{
+                
+                llSay(0,"Hola, " + llKey2Name(AVATAR) + ". Soy tu terapeuta. Estoy aquí para escucharte");                
+                llRequestPermissions( AVATAR, PERMISSION_TRIGGER_ANIMATION);
+                LISTEN_HANDLE = llListen( 0, "", AVATAR, "" );
+                llSensor( "Asiento Freud", NULL_KEY, PASSIVE | ACTIVE , 2.0, PI );
+            }
+        }
+    }
+    
+    run_time_permissions(integer perm)
+    {
+        if (perm & PERMISSION_TRIGGER_ANIMATION)
+        {
+            llStopAnimation("sit");
+            llStartAnimation("sentado_divan");
+        }
+    }
+    
+    sensor( integer detected )
+    {
+        NPC = osNpcCreate( "Sigmund", "Freud", llGetPos() + <-1,1,1>, NOTECARD);
+        osNpcSit(NPC, llDetectedKey(0), OS_NPC_SIT_NOW);
+    }
+    
+    listen(integer channel, string name, key id, string message)
+    {
+        llHTTPRequest( URL, [
+            HTTP_METHOD, "POST", 
+            HTTP_MIMETYPE, "application/x-www-form-urlencoded" 
+            ], "usuario=" + llEscapeURL((string)AVATAR) + 
+            "&pregunta="+llEscapeURL(message) );
+    }
+    
+    http_response(key request_id, integer status, list metadata, string body)
+    {
+        if(NPC != NULL_KEY){
+            osNpcSay(NPC, llJsonGetValue(body,"respuesta") );
+        }
+        
+    }
+  
+}
+

@@ -1,0 +1,272 @@
+vector POS_SIT = <0,-0.175,0.4>;
+vector ROT_SIT = <0,0,-90>;
+string ANIMACION_JINETE =  "battlecat_montura";
+string ANIMACION_CORRE = "battlecat_corre";
+integer CONTADOR_CORRER = 0;
+integer CONTADOR_CORRER_MAX = 1;
+
+
+string LINK_ASIENTO = "Asiento";
+vector OFFSET_ASIENTO = <0, 0, 0.25>;
+vector ROTACION_ASIENTO = <0,0,0>;
+integer LISTEN_HANDLE = 0;
+integer INPUT_CHANNEL = 100;
+
+vector FORWARD_POWER = <30, 0, 0>;
+vector REVERSE_POWER = <-15, 0, 0>; 
+float turning_ratio = 4.0;
+
+vector CAMARA_POS = < -5, -2, 2>;
+vector CAMARA_OBJETIVO = < 2, 0, 0>;
+
+vector POS_INICIAL = <109,35.50,22.28535>;
+vector ORIENTACION_INICIAL = <0,0,180>;
+vector IMPULSO_RETORNO = <0,0,5>;
+float MIN_DIST_RETORNO = 5.0;
+
+key PILOTO = NULL_KEY;
+
+integer getIndexFromName(string nombre){ 
+    integer n = llGetNumberOfPrims();
+    integer i;
+    for(i = 0; i<= n; i++){
+        string nombre1 = llList2String(llGetLinkPrimitiveParams( i , [PRIM_NAME] ),0);
+        if(nombre1==nombre){
+            return i;
+        }
+    }
+    return -1;
+}
+
+inicializar_sittarget(){ 
+    integer link_asiento = getIndexFromName(LINK_ASIENTO);
+    vector pos_asiento = llList2Vector(llGetLinkPrimitiveParams( link_asiento, [PRIM_POS_LOCAL]),0);
+    llSitTarget( pos_asiento + OFFSET_ASIENTO, llEuler2Rot(ROTACION_ASIENTO*DEG_TO_RAD) ); 
+}
+
+inicializar_vehiculo(){
+    llSetCameraEyeOffset( CAMARA_POS );
+    llSetCameraAtOffset( CAMARA_OBJETIVO );
+
+    llSetVehicleType(VEHICLE_TYPE_CAR);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_DEFLECTION_EFFICIENCY, 0.2);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_DEFLECTION_EFFICIENCY, 0.80);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_DEFLECTION_TIMESCALE, 0.10);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_DEFLECTION_TIMESCALE, 0.10);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_MOTOR_TIMESCALE, 1.0);
+    llSetVehicleFloatParam(VEHICLE_LINEAR_MOTOR_DECAY_TIMESCALE, 0.2);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_MOTOR_TIMESCALE, 0.1);
+    llSetVehicleFloatParam(VEHICLE_ANGULAR_MOTOR_DECAY_TIMESCALE, 0.5);
+    llSetVehicleVectorParam(VEHICLE_LINEAR_FRICTION_TIMESCALE, <1000.0, 2.0, 1000.0> );
+    llSetVehicleVectorParam(VEHICLE_ANGULAR_FRICTION_TIMESCALE, <10.0, 10.0, 1000.0> );
+    llSetVehicleFloatParam(VEHICLE_VERTICAL_ATTRACTION_EFFICIENCY, 0.50);
+    llSetVehicleFloatParam(VEHICLE_VERTICAL_ATTRACTION_TIMESCALE, 0.50);
+}
+
+escuchar(integer channel, string name, key id, string message){
+    llOwnerSay("escucho "+message);
+    if(message == "reset"){
+        llSetPos(POS_INICIAL);
+    }
+    else if(message == "correr"){
+        iniciar_animacion_correr();
+    } else if(message == "detenerse"){
+        detener_animacion_correr();
+    }
+    
+}
+
+comienza_a_correr(){
+    CONTADOR_CORRER = CONTADOR_CORRER_MAX;
+}
+
+iniciar_animacion_correr(){
+    integer estado_fisica = llGetStatus(STATUS_PHYSICS);
+    integer esta_corriendo = is_animation_running(ANIMACION_CORRE);
+    if( ! esta_corriendo ){
+        if(estado_fisica){
+            llSetStatus(STATUS_PHYSICS, FALSE);
+        }
+        llStartObjectAnimation(ANIMACION_CORRE);
+        if(estado_fisica){
+            llSetStatus(STATUS_PHYSICS, TRUE);
+        }
+        //llOwnerSay("deberia correr");
+    }
+}
+
+detener_animacion_correr(){
+    integer estado_fisica = llGetStatus(STATUS_PHYSICS);
+    integer esta_corriendo = is_animation_running(ANIMACION_CORRE);
+    if( esta_corriendo ){
+        if(estado_fisica){
+            vector rot = llRot2Euler(llGetRot());
+            llSetStatus(STATUS_PHYSICS, FALSE);            
+            llSetRot( llEuler2Rot(<0,0,rot.z>) );
+        }
+        llStopObjectAnimation(ANIMACION_CORRE);        
+        if(estado_fisica){
+            llSetStatus(STATUS_PHYSICS, TRUE);
+        }
+        //llOwnerSay("deberia detenerse");
+    }
+}
+
+integer is_animation_running(string anim)
+{
+    list curr_anims = llGetObjectAnimationNames();
+    return ~llListFindList(curr_anims, (list)anim);
+}
+
+default
+{
+    state_entry(){
+        inicializar_sittarget();
+        LISTEN_HANDLE = llListen(INPUT_CHANNEL, "", NULL_KEY, "");
+        llSay(0, "Inicializado");
+        llSetPos(POS_INICIAL);
+        llSetRot( llEuler2Rot(ORIENTACION_INICIAL*DEG_TO_RAD) );
+    }
+    changed(integer change){
+        PILOTO = llAvatarOnSitTarget();
+        if(PILOTO != NULL_KEY){
+            state corriendo;
+        }
+    }
+    state_exit(){
+        llListenRemove(LISTEN_HANDLE);
+    }
+    listen(integer channel, string name, key id, string message){
+        escuchar(channel, name, id, message);
+    }
+
+}
+
+
+state corriendo{
+    state_entry(){
+        inicializar_vehiculo();
+        CONTADOR_CORRER = 0;
+        LISTEN_HANDLE = llListen(INPUT_CHANNEL, "", NULL_KEY, "");
+        llRequestPermissions(PILOTO, PERMISSION_TAKE_CONTROLS|PERMISSION_TRIGGER_ANIMATION);
+        //llStartObjectAnimation(ANIMACION_CORRE);
+        llSetTimerEvent(1.0);
+    }
+        
+    timer(){
+        
+        if( CONTADOR_CORRER == 0 ){
+            
+            detener_animacion_correr();
+        }else{
+            if( CONTADOR_CORRER == CONTADOR_CORRER_MAX ){
+                iniciar_animacion_correr();           
+            }
+            CONTADOR_CORRER--;
+        }
+        
+    }
+    
+    run_time_permissions(integer perm){
+        if(perm & PERMISSION_TAKE_CONTROLS) {
+            llSay(0, "Conducción Habiltada");
+            llSetStatus(STATUS_PHYSICS, TRUE);
+            llTakeControls(CONTROL_FWD | CONTROL_BACK | CONTROL_RIGHT | CONTROL_LEFT | CONTROL_ROT_RIGHT | CONTROL_ROT_LEFT | CONTROL_UP | CONTROL_DOWN, TRUE, FALSE);
+        }
+        if(perm & PERMISSION_TRIGGER_ANIMATION) {
+            llStopAnimation("sit"); // stop the default sit animation
+            llStartAnimation(ANIMACION_JINETE);
+        }
+    }
+    
+    control(key driver, integer level, integer edges){
+        integer reverse=1;
+        vector angular_motor;
+          
+        //get current speed
+        vector vel = llGetVel();
+        float speed = llVecMag(vel);
+        
+        //car controls
+        if(level & CONTROL_FWD)
+        {
+            //cur_wheel_direction = "WHEEL_FORWARD";
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, FORWARD_POWER );
+            comienza_a_correr();
+            reverse=1;
+        }
+        if(level & CONTROL_BACK)
+        {
+            //cur_wheel_direction = "WHEEL_REVERSE";
+            llSetVehicleVectorParam(VEHICLE_LINEAR_MOTOR_DIRECTION, REVERSE_POWER );
+            comienza_a_correr();
+            reverse = -1;
+        }
+        
+        if(level & (CONTROL_RIGHT|CONTROL_ROT_RIGHT))
+        {
+            //cur_wheel_direction = "WHEEL_RIGHT";
+            angular_motor.z -= speed / turning_ratio * reverse;
+        }
+         
+        if(level & (CONTROL_LEFT|CONTROL_ROT_LEFT))
+        {
+            //cur_wheel_direction = "WHEEL_LEFT";
+            angular_motor.z += speed / turning_ratio * reverse;
+        }
+        
+        llSetVehicleVectorParam(VEHICLE_ANGULAR_MOTOR_DIRECTION, angular_motor);
+    }
+    
+    changed(integer change){
+        if( llAvatarOnSitTarget() == NULL_KEY){
+            llStopAnimation(ANIMACION_JINETE);
+            PILOTO = NULL_KEY;
+            llReleaseControls(); 
+            llSetStatus(STATUS_PHYSICS, FALSE); 
+            llListenRemove(LISTEN_HANDLE);
+            //llStopObjectAnimation(ANIMACION_CORRE);
+            state retorno;
+        }
+    }
+    
+   /* 
+    touch_end(integer numero){
+        llOwnerSay("lado tocado "+ (string)llDetectedTouchFace(0)  );
+    }
+    
+    */
+    
+    listen(integer channel, string name, key id, string message){
+        llOwnerSay("escucho");
+        escuchar(channel, name, id, message);
+    }
+    
+    state_exit(){
+
+    }
+    
+}
+
+state retorno{
+    state_entry(){
+        llSetStatus(STATUS_PHYSICS, FALSE);
+        iniciar_animacion_correr();
+        llSetTimerEvent(5.0);        
+    }    
+    state_exit(){
+        detener_animacion_correr();
+    }
+    timer(){
+        vector posicion = llGetPos();
+        if(llVecDist( posicion, POS_INICIAL ) < MIN_DIST_RETORNO){
+            llSetTimerEvent(0);
+            detener_animacion_correr();
+            llResetScript();
+        }else{
+            llSetPos(posicion + IMPULSO_RETORNO);
+            llSleep(2.0);
+            llSetPos(POS_INICIAL);
+        }
+    }
+}

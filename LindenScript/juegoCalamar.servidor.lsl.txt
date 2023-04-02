@@ -1,0 +1,87 @@
+integer CANAL_IN = 3141;
+integer CANAL_OUT = 3143;
+integer LISTEN_HANDLE;
+
+integer PUEDE_CAMINAR = 0;
+
+string NOTECARD_MUNECA = "rupito";
+key NPC_MUNECA;
+
+float ESPERA_MINIMA = 5.0;
+float ESPERA_MORTAL = 1.0;
+
+remove_listen_handle(){
+    llListenRemove(LISTEN_HANDLE);
+}
+
+default
+{
+    state_entry()
+    {
+        llShout(CANAL_OUT,"inicializar");
+        LISTEN_HANDLE = llListen(CANAL_IN, "", NULL_KEY, "iniciar_juego");
+    }
+    listen( integer channel, string name, key id, string message  ){ 
+        state juego_calamar;
+    }
+    state_exit(){
+        remove_listen_handle();
+    }
+}
+
+state juego_calamar{
+    state_entry()
+    {
+        NPC_MUNECA = osNpcCreate( "MUNECA" , "npc", llGetPos() + <0, 23, -3>, NOTECARD_MUNECA);        
+        llShout(CANAL_OUT, "jugar_calamar");
+        LISTEN_HANDLE = llListen(CANAL_IN, "", NULL_KEY, "");
+        llShout(0, "Que comience el Juego");
+        PUEDE_CAMINAR = 1;
+        osNpcSetRot(NPC_MUNECA, llEuler2Rot(<0,0,90>*DEG_TO_RAD));
+        llSetTimerEvent( ESPERA_MINIMA * 2 );
+    }
+    
+    timer(){
+        if( PUEDE_CAMINAR == 1 ){
+            osNpcSetRot(NPC_MUNECA, llEuler2Rot(<0,0,-90>*DEG_TO_RAD));
+            //llShout(0,"Todos Congelados!!");
+            PUEDE_CAMINAR = 0;
+            llSetTimerEvent( ESPERA_MORTAL );
+        }else{                        
+            PUEDE_CAMINAR = 1;
+            //llShout(0,"Pueden Seguir");
+            osNpcSetRot(NPC_MUNECA, llEuler2Rot(<0,0,90>*DEG_TO_RAD));
+            llSetTimerEvent( ESPERA_MINIMA + llFrand(ESPERA_MINIMA) );
+        }
+    }
+    
+    listen( integer channel, string name, key id, string msg  ){
+        if (msg != "")
+        {
+            list commands = llParseString2List(msg, [ " " ], []);
+            string msg0 = llList2String(commands, 0);
+            string msg1 = llList2String(commands, 1);            
+ 
+            if( msg0 == "reiniciar_juego"){
+                state default;
+            } else if( msg1 == "gana"){
+                llShout(0, llKey2Name((key)msg0) + " ha Ganado!!");
+                llShout(CANAL_OUT , msg0 + " gana");
+            }else if(msg1 == "mueve" && PUEDE_CAMINAR == 0){
+                //llShout(0, llKey2Name((key)msg0) + " ha Perdido!!");
+                llShout(CANAL_OUT , msg0 + " muere");                
+            }            
+        
+        }
+    }
+    touch_end(integer numloquesa){
+        state default;
+    }
+    state_exit(){
+        llSetTimerEvent( 0 );
+        llShout(0, "El juego ha Terminado!!");
+        remove_listen_handle();
+        osNpcRemove(NPC_MUNECA);
+        NPC_MUNECA = NULL_KEY;
+    }
+}

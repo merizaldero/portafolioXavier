@@ -1,0 +1,127 @@
+integer CONTEO_VISITANTES = 0;
+integer INICIA_STATE=0;
+integer TIMER_TICK = 5;
+list NPC_NAMES = ["Jose BarHeli", "Miriam BarJoaquin", "Melchor Magi", "Gaspar Magi", "Baltazar Magi", "Jesus BarJoseph"];
+
+key JOSE = NULL_KEY;
+key MARIA = NULL_KEY;
+key MELCHOR = NULL_KEY;
+key GASPAR = NULL_KEY;
+key BALTAZAR = NULL_KEY;
+key ANGEL = NULL_KEY; 
+key JESUS = NULL_KEY;
+
+secuencia_inicio(){
+        JOSE = osNpcCreate("Jose", "BarHeli", llGetPos() + < 0, -0.6, 1.5>, "jose");
+        MARIA = osNpcCreate("Miriam", "BarJoaquin", llGetPos() + < 0 , 0.6, 1.5>, "virgen");
+        MELCHOR = osNpcCreate("Melchor", "Magi", llGetPos() + < -2.6 , -1.8, 1.3>, "melchor");
+        GASPAR = osNpcCreate("Gaspar", "Magi", llGetPos() + < -2.7 , 1.8, 1.2>, "gaspar");
+        BALTAZAR = osNpcCreate("Baltazar", "Magi", llGetPos() + < -3.7 , 1.8, 1.2>, "baltazar");
+        JESUS = osNpcCreate("Jesus", "BarJoseph", llGetPos() + < -1.6 , 0, 1.0>, "jesus");
+        
+        osNpcSetRot(JOSE, llEuler2Rot( <0,0,150>*DEG_TO_RAD ) );
+        osNpcSetRot(MARIA, llEuler2Rot( <0,0,-150>*DEG_TO_RAD ) );
+        osNpcSetRot(MELCHOR, llEuler2Rot( <0,0,90>*DEG_TO_RAD ) );
+        osNpcSetRot(GASPAR, llEuler2Rot( <0,0,-90>*DEG_TO_RAD ) );
+        osNpcSetRot(BALTAZAR, llEuler2Rot( <0,0,-60>*DEG_TO_RAD ) );
+        //osNpcSetRot(JESUS, llEuler2Rot( <0,0,180>*DEG_TO_RAD ) );
+        
+        osAvatarPlayAnimation(MARIA, "virgen_pose");
+        osAvatarPlayAnimation(JOSE, "jose_pose");
+        osAvatarPlayAnimation(MELCHOR, "melchor_pose");
+        osAvatarPlayAnimation(GASPAR, "gaspar_pose");
+        osAvatarPlayAnimation(BALTAZAR, "melchor_pose");
+        osAvatarPlayAnimation(JESUS, "jesus_pose");
+        
+        osNpcSit( JESUS, llGetKey(), OS_NPC_SIT_NOW);
+}
+
+secuencia_bucle(){
+    
+}
+
+secuencia_fin(){
+    osAvatarStopAnimation(MARIA, "virgen_pose");
+        osAvatarStopAnimation(JOSE, "jose_pose");
+        osAvatarStopAnimation(MELCHOR, "melchor_pose");
+        osAvatarStopAnimation(GASPAR, "gaspar_pose");
+        osAvatarStopAnimation(BALTAZAR, "melchor_pose");
+        osAvatarStopAnimation(JESUS, "jesus_pose");
+        
+        osNpcStand(JESUS);
+        
+        osNpcRemove(BALTAZAR);
+        osNpcRemove(GASPAR);
+        osNpcRemove(MELCHOR);
+        osNpcRemove(JOSE);
+        osNpcRemove(MARIA);
+        osNpcRemove(JESUS);
+        
+        GASPAR = NULL_KEY;
+        MELCHOR = NULL_KEY;
+        JOSE = NULL_KEY;
+        MARIA = NULL_KEY;
+        BALTAZAR = NULL_KEY;
+        JESUS = NULL_KEY;
+}
+
+default
+{
+    state_entry()
+    {
+        CONTEO_VISITANTES = 0;
+        INICIA_STATE = 0;
+    }
+    collision(integer involucrados){
+        //llOwnerSay("Entidades Colision "+ (string) involucrados );
+        CONTEO_VISITANTES += involucrados;
+        state visitado;
+    }
+}
+
+state visitado{
+    state_entry(){
+        INICIA_STATE = 1;        
+        secuencia_inicio();
+        llSetTimerEvent(TIMER_TICK);
+        llOwnerSay("Inicia Visita");
+    }
+    collision_start(integer involucrados){
+        integer indice;
+        if( INICIA_STATE == 1 ){
+            INICIA_STATE = 0;
+        }else{
+            for(indice = 0; indice < involucrados; indice++){
+                //llOwnerSay("Ingresa " + llDetectedName(indice) );
+                if( llListFindList( NPC_NAMES, (list)llDetectedName(indice) ) == -1 ){
+                    //llOwnerSay("Ingresa " + llDetectedName(indice) );
+                    CONTEO_VISITANTES ++;
+                }                
+            }       
+        }
+        //llOwnerSay("visitantes: " + (string) CONTEO_VISITANTES );
+    }
+    collision_end(integer involucrados){
+        integer indice;
+        for(indice = 0; indice < involucrados; indice++){
+               //llOwnerSay("sale " + llDetectedName(indice) );
+               if( llListFindList( NPC_NAMES, (list)llDetectedName(indice) ) == -1 ){
+                    CONTEO_VISITANTES --;
+                }                
+        }
+        //llOwnerSay("visitantes: " + (string) CONTEO_VISITANTES );
+    }
+    state_exit(){
+        llOwnerSay("Finaliza Visita");
+        secuencia_fin();
+        llResetScript();
+    }
+    timer(){
+        secuencia_bucle();
+        if( CONTEO_VISITANTES <= 0){
+            state default;
+        }
+    }
+} 
+
+ 

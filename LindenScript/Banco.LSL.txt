@@ -1,0 +1,87 @@
+integer CONTEO_VISITANTES = 0;
+integer INICIA_STATE=0;
+integer TIMER_TICK = 5;
+list NPC_NAMES = ["Cajero Bancario"];
+
+list GESTOS=["type", "yes_head", "no_head"];
+
+string CURRENT_ANIM = "";
+
+key NPC = NULL_KEY;
+vector POS_NPC = <234.27, 12.5, 25>;
+vector ROT_NPC = <0, 0, -60>;
+
+secuencia_inicio(){
+    NPC = osNpcCreate("Cajero", "Bancario", POS_NPC, "cajero", 0 );
+    osNpcSetRot(NPC, llEuler2Rot( ROT_NPC * DEG_TO_RAD ) );
+}
+
+secuencia_bucle(){
+    integer num_animaciones = llGetListLength(GESTOS);
+    integer idx_animacion = (integer)llFrand(num_animaciones);
+    if(CURRENT_ANIM != ""){
+        osNpcStopAnimation(NPC, CURRENT_ANIM);        
+    }
+    CURRENT_ANIM = llList2String(GESTOS, idx_animacion);
+    osNpcPlayAnimation(NPC, CURRENT_ANIM);
+}
+
+secuencia_fin(){
+    osNpcRemove(NPC);
+    NPC = NULL_KEY;
+}
+
+default
+{
+    state_entry()
+    {
+        CONTEO_VISITANTES = 0;
+        INICIA_STATE = 0;
+    }
+    collision(integer involucrados){
+        CONTEO_VISITANTES += involucrados;
+        state visitado;
+    }
+}
+
+state visitado{
+    state_entry(){
+        INICIA_STATE = 1;        
+        secuencia_inicio();
+        llSetTimerEvent(TIMER_TICK);
+        llOwnerSay("Inicia Visita");
+    }
+    collision_start(integer involucrados){
+        integer indice;
+        if( INICIA_STATE == 1 ){
+            INICIA_STATE = 0;
+        }else{
+            for(indice = 0; indice < involucrados; indice++){
+                //llOwnerSay("Ingresa " + llDetectedName(indice) );
+                if( llListFindList( NPC_NAMES, (list)llDetectedName(indice) ) == -1 ){
+                    CONTEO_VISITANTES ++;
+                }                
+            }            
+        }
+    }
+    collision_end(integer involucrados){
+        integer indice;
+        for(indice = 0; indice < involucrados; indice++){
+                //llOwnerSay("sale " + llDetectedName(indice) );
+               if( llListFindList( NPC_NAMES, (list)llDetectedName(indice) ) == -1 ){
+                    CONTEO_VISITANTES --;
+                }                
+        }
+    }
+    state_exit(){
+        llOwnerSay("Finaliza Visita");
+        secuencia_fin();
+        llResetScript();
+    }
+    timer(){
+        secuencia_bucle();
+        if( CONTEO_VISITANTES <= 0){
+            state default;
+        }
+    }
+} 

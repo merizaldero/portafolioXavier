@@ -1,0 +1,40 @@
+vector POS_INICIO = ZERO_VECTOR;
+vector TAMANO_INICIO = ZERO_VECTOR;
+float ALTO_ABIERTO = 0.1;
+float MAX_TIEMPO = 5.0;
+
+default
+{
+    state_entry()
+    {
+        list lista = llGetPrimitiveParams([PRIM_POSITION, PRIM_SIZE]);
+        POS_INICIO = llList2Vector(lista,0);
+        TAMANO_INICIO = llList2Vector(lista,1);        
+    }
+    touch_end(integer num_loquesea){
+        key quien_toca = llDetectedKey(0);
+        state abierta;
+    }
+    collision_start(integer num_detected){
+        state abierta;
+    }
+}
+
+state abierta{
+    state_entry()
+    {
+        llSetPrimitiveParams([PRIM_POSITION, <POS_INICIO.x, POS_INICIO.y, POS_INICIO.z + TAMANO_INICIO.z / 2 - ALTO_ABIERTO / 2 > , PRIM_SIZE, < TAMANO_INICIO.x, TAMANO_INICIO.y, ALTO_ABIERTO > ]);
+        llSetTimerEvent(MAX_TIEMPO);
+    }
+    touch_end(integer num_loquesea){
+        state default;
+    }
+    timer(){
+        state default;
+    }
+    state_exit()
+    {  
+        llSetTimerEvent(0);
+        llSetPrimitiveParams([PRIM_POSITION, POS_INICIO, PRIM_SIZE, TAMANO_INICIO ]);
+    }
+}
