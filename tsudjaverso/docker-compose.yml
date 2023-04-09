@@ -1,0 +1,28 @@
+version: '3'
+services:
+
+  os_database:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:?'Se debe especificar la variable MYSQL_ROOT_PASSWORD'}"
+      - "MYSQL_USER=${MYSQL_USER:-chv_user}"
+      - "MYSQL_PASSWORD=${MYSQL_PASSWORD:?'Se debe especificar la variable MYSQL_PASSWORD'}"
+      - "MYSQL_DATABASE=${MYSQL_DATABASE:-chullabase}"
+    volumes:
+      - db_data:/var/lib/mysql
+  opensim:
+    environment:
+      - "MYSQL_USER=${MYSQL_USER:-chv_user}"
+      - "MYSQL_PASSWORD=${MYSQL_PASSWORD:?'Se debe especificar la variable MYSQL_PASSWORD'}"
+      - "MYSQL_DATABASE=${MYSQL_DATABASE:-chullabase}"
+      - "MYSQL_ADDRESS=os_database"
+    build: .
+    ports:
+      - "9000:9000"
+      - "9000:9000/udp"
+    depends_on:
+      - os_database
+volumes:
+  db_data:
