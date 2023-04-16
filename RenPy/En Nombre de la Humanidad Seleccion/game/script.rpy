@@ -13,7 +13,7 @@ define anta = Character("Alexander", color = "#363636")
 # reflejar su tranquilidad y serenidad, con tonos de gris claro (#D3D3D3) para representar su neutralidad y objetividad.
 define jefe_prota = Character("Jefe", color = "#ADD8E6")
 # Compañera de trabajo Emily representar su dulzura, junto con tonos de amarillo (#FFFF00) para reflejar su entusiasmo y optimismo.
-define emily = Character("Emily", color = "#FFB6C1")
+define emily = Character("Emily", color = "#FFB6C1", who_outlines=[( 1, "#884040", 0, 0 )] )
 # Científico jefe del proyecto: Verde oscuro (#006400) para representar su conocimiento y perspicacia, con tonos de gris claro (#D3D3D3) para representar su imparcialidad y sentido común
 define cientifico_jefe = Character("Científico Jefe", color = "#006400")
 # Piloto de la nave: Gris oscuro (#363636) para reflejar su profesionalismo y seriedad, con tonos de azul claro (#87CEFA) para representar su habilidad y seguridad.
@@ -25,8 +25,13 @@ define tecnico_nave = Character("Técnico jefe", color = "#D3D3D3")
 # Fuerzas Especiales podría ser el negro (#000000), que transmite una sensación de autoridad, misterio y oscuridad. También puede ser un tono de gris oscuro como #333333 o #444444 para representar un tono más discreto y sigiloso.
 define fuerzas_especiales = Character("Técnico jefe", color = "#444444")
 
+# Mr Thompson. jefe de recursos humanos
+define sr_thompson = Character("Sr. Thompson", color = "#ADD8E6", who_outlines=[( 1, "#566473", 0, 0 )])
+# Compañera de trabajo Emily representar su dulzura, junto con tonos de amarillo (#FFFF00) para reflejar su entusiasmo y optimismo.
+define secretaria = Character("Secretaria", color = "#FFB6C1", who_outlines=[( 1, "#884040", 0, 0 )] )
+
 #Presentador de capitulos
-define presentador_capitulos = Character(what_xalign=0.5, what_yalign=0.5, what_bold = True, what_color = "#ffffff", what_size = 40, window_background = None, window_yalign = 0.5)
+define presentador_capitulos = Character(what_xalign=0.5, what_yalign=0.5, what_bold = True, what_color = "#ffffff", what_size = 40, window_background = None, window_yalign = 0.5, what_outlines=[( 1, "#404040", 0, 0 )])
 
 # Logo Saga 
 image logo_saga text = Text("EN NOMBRE DE LA HUMANIDAD", size=40, color="#8B0000" )
@@ -47,6 +52,18 @@ transform posicion_subtitulo:
 
 transform prota_aureo:
     xalign 0.67
+    yalign 0.5
+
+transform anti_aureo:
+    xalign 0.33
+    yalign 0.5
+
+transform cuarto_1:
+    xalign 0.15
+    yalign 0.5
+
+transform cuarto_3:
+    xalign 0.85
     yalign 0.5
 
 # El juego comienza aquí.
@@ -81,6 +98,7 @@ label introduciendo_protagonista:
 
     scene bg negro
     presentador_capitulos "Capítulo 1\nIntroducción"
+    with Dissolve(1.0)
 
     # El narrador introduce al protagonista, describiéndolo como un joven ingeniero graduado de la Universidad Latinoamericana de Ingeniería y Tecnología (ULIT), que aspira a trabajar en la multinacional Sterling Dynamics.
 
@@ -130,9 +148,60 @@ label introduciendo_protagonista:
     show prota neutro at prota_aureo
 
     prota "Solo necesito empezar y seguir adelante con la búsqueda de un empleo."
+    prota "Por ahora, descansaré. Mañana será un nuevo día."
 
+label entrevista:
+
+    scene bg negro
+    presentador_capitulos "Capítulo 2\nLa Entrevista de Trabajo"
+    with Dissolve(1.0)
+
+    # La escena cambia a la oficina de Sterling Dynamics, donde el protagonista está siendo entrevistado por el gerente de recursos humanos, el Sr. Thompson.
+    prota "Cuanto tiempo he estado buscando trabajo?"
+    prota "La verdad, eso ya no importa."
+    prota "Aquel par de empresas en las que estuve aplicando, aparentemente no tenían una oferta seria para mi."
+    prota "Parece que el destino me estuvo encaminando todo este tiempo a aplicar a esta empresa ..."
+
+    scene bg sterlingco_exterior at pantalla_completa
+    with Dissolve(0.2)
+    presentador_capitulos "Sterling Dynamics !!"
+
+    prota "Una multinacional de consultoría de vanguardia en Tecnología Aeroespacial, con presencia en todo el mundo."
+    prota "Trabajar aquí te implica que eres parte de la crema y nata en tecnología."
+    prota "Y yo, tengo cita para una entrevista laboral con ellos ... HOY !!"
+
+    scene bg sala_espera_hr at pantalla_completa
+    with Dissolve(0.5)
+
+    prota "Llegué a tiempo. eso es bueno."
+    prota "De todas formas, no soy el único candidato. "
+    prota "Uno de ellos me resulta conocido ... de la Universidad."
+
+    show secretaria hr at anti_aureo
+    secretaria "Señor {b}[nombre_prota]{/b}, por favor acérquese."
+    
+    # Durante la entrevista, el Sr. Thompson le pregunta al protagonista sobre su experiencia y habilidades, y le explica sobre el proyecto "X-Odus".
+
+    scene bg oficina_hr at pantalla_completa
+    with Dissolve(0.5)
+
+    show mr thompson at cuarto_1
+    with Dissolve(0.5)
+
+    sr_thompson "Bienvenido, Sr. {b}[nombre_prota]{/b}.\nPuede llamarme {b}Thompson{/b}.\nTome asiento, por favor."
+
+    show prota terno at cuarto_3
+    with Dissolve(0.5)
+
+    prota "Muchas Gracias, Sr. Thompson."
+
+    # El protagonista se muestra muy interesado en el proyecto y hace varias preguntas sobre los detalles del mismo.
+
+label el_fin:
     # Finaliza el juego:
     scene bg negro
-    with Dissolve(5.0)
+    presentador_capitulos "FINAL #1\nNada en especial"
+
+    
 
     return
