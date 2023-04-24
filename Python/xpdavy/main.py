@@ -10,7 +10,7 @@ import avy
 from bottle import Bottle, ServerAdapter
 from bottle import run, debug, route, error, static_file, template, request, redirect, TEMPLATE_PATH
 from os.path import abspath, dirname
-import claves
+# import claves
 from random import randint
 
 TEMPLATE_PATH.append( dirname(abspath( __file__ )) + "/views" )
@@ -54,9 +54,6 @@ def home():
 def inicializar():
     avy.inicializar()
     return 'Inicializacion ok'
-
-
-
 
 ######### WEBAPP ROUTERS ###############
 

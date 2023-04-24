@@ -2,7 +2,7 @@ import xpd_orm as orm
 from os.path import abspath , dirname, exists
 from bs4 import BeautifulSoup
 from random import choice
-from numpy import arange
+import numpy as np
 
 PATH_BDD = dirname(abspath(__file__)) + "/data/base.db"
 PATH_INIT = dirname(abspath(__file__)) + "/data/init.sql"
@@ -429,7 +429,7 @@ ColoresParte.setMetamodelo({
             "nombre":"color",
             "nombreCampo":"COLOR",
             "tipo":orm.XPDSTRING,
-            "tamano":6,
+            "tamano":7,
             },
         {
             "nombre":"orden",
@@ -465,7 +465,7 @@ ColoresPiel.setMetamodelo({
             "nombre":"color",
             "nombreCampo":"COLOR",
             "tipo":orm.XPDSTRING,
-            "tamano":6,
+            "tamano":7,
             },
         {
             "nombre":"orden",
@@ -481,6 +481,7 @@ ColoresPiel.setMetamodelo({
             },
         ]
     })
+
 def inicializar():
     entidades = [Partes, Generos, Prendas, PrendasGenero, Usuarios, Avatares, PrendasAvatar, ColoresPiel, ColoresParte]
     con = orm.Conexion(PATH_BDD)
@@ -545,9 +546,9 @@ SELECT
 def lista_rango(minimo, maximo, steps):
     if maximo == minimo or steps <= 1:
         return [maximo]
-    return list(arange( minimo + 0.0, maximo + 0.0, (maximo - minimo + 0.0) / steps ) )
+    return list(np.arange( minimo + 0.0, maximo + 0.0, (maximo - minimo + 0.0) / steps ) )
 
-def generarPrendasByGenero(conexion, id_genero ):
+def generarPrendasByGenero(conexion, id_genero, verbal = False):
     partes = Partes.getNamedQuery(conexion, 'findall',{})
     prendas = findPrendasByGenero(conexion, id_genero)
     colores_piel = ColoresPiel.getNamedQuery(conexion, 'findall',{})
@@ -557,32 +558,81 @@ def generarPrendasByGenero(conexion, id_genero ):
     for parte in partes:
         prendas_parte = [ prenda for prenda in prendas if prenda['id_parte'] == parte['id'] ]
         colores_parte = [ color['color'] for color in colores_partes if color['id_parte'] == parte['id'] ]
-        if parte['opcional'] == '1':
+        if parte['opcional'] == '1' or len(prendas_parte) == 0:
             prendas_parte = [ { "id_prenda":None, "nombre":None, "id_parte":None, "svg":None } ] + prendas_parte
         prenda = choice(prendas_parte)
+        parte["id_parte"] = parte["id"]
         parte["id_prenda"] = prenda["id_prenda"]
         parte["svg"] = prenda["svg"]
         parte["offset_x"] = choice( lista_rango( parte['offset_x_min'], parte['offset_x_max'], parte['offset_x_steps'] ))
         parte["offset_y"] = choice( lista_rango( parte['offset_y_min'], parte['offset_y_max'], parte['offset_y_steps'] ))
         parte["escala"] = choice( lista_rango( parte['scale_min'], parte['scale_max'], parte['scale_steps'] ))
         parte["color"] = choice(colores_parte) if len(colores_parte) > 0 else color_piel
+        if verbal:
+            print("{0} : {1}".format(parte['nombre'],parte['color'] ))
     return {'color_piel': color_piel, 'prendas': partes}
 
+def matriz_transformacion(translate, rotate, scale):
+    """
+    Convierte valores de traslación, rotación y escala en una matriz de transformación SVG.
+    
+    :param translate: Tupla con valores de traslación en X e Y.
+    :param rotate: Valor de rotación en grados.
+    :param scale: Tupla con valores de escala en X e Y.
+    :return: Matriz de transformación SVG.
+    """
+    
+    # Matriz de identidad
+    matrix = np.identity(3)
+    
+    # Traslación
+    translation_matrix = np.array([[1, 0, translate[0]], [0, 1, translate[1]], [0, 0, 1]])
+    matrix = np.dot(matrix, translation_matrix)
+    
+    # Rotación
+    if rotate != 0:
+        rad = np.radians(rotate)
+        cos = np.cos(rad)
+        sin = np.sin(rad)
+        rotation_matrix = np.array([[cos, -sin, 0], [sin, cos, 0], [0, 0, 1]])
+        matrix = np.dot(matrix, rotation_matrix)
+    
+    # Escala
+    scale_matrix = np.array([[scale[0], 0, 0], [0, scale[1], 0], [0, 0, 1]])
+    matrix = np.dot(matrix, scale_matrix)
+    
+    return matrix
+
 def ajustarTransformaciones(data):
+    cola_prendas = [ prenda for prenda in data['prendas'] if prenda['id_parent'] is None ]
+    while True:
+        if len(cola_prendas) == 0:
+            break
+        parte = cola_prendas.pop(0)
+        filtro_padres = [x for x in data['prendas'] if x['id_parte'] == parte['id_parent'] ]
+        if len(filtro_padres) > 0:
+            padre = filtro_padres[0]
+            if parte['simetrico_x'] == '1':
+                parte['offset_xr'] = padre['offset_x'] - parte['offset_x']
+            else:
+                parte['offset_xr'] = 0
+            parte['offset_x'] += padre['offset_x']
+            parte['offset_y'] += padre['offset_y']
+        cola_prendas += [ prenda for prenda in data['prendas'] if prenda['id_parent'] == parte['id_parte'] ]
     return data['prendas']
 
 def generarSvgAvatar(data):
     color_piel = data['color_piel']
     prendas = ajustarTransformaciones(data)
-    resultado = """<svg>
-""" + "\n".join( [ aplicar_transformaciones(prenda['svg'], 'g_{1}_{0}'.format(prenda['id'], prenda['nombre']), prenda['offset_x'], prenda['offset_y'], prenda['escala'], prenda['color'], prenda['simetrico_x'] ) for prenda in prendas ] ) + """
+    resultado = """<svg width="200" height="200">
+""" + "\n".join( [ aplicar_transformaciones(prenda['svg'], 'g_{1}_{0}'.format(prenda['id'], prenda['nombre']), prenda['offset_x'], prenda['offset_y'], prenda['escala'], prenda['color'], prenda['simetrico_x'], prenda['offset_xr'] if 'offset_xr' in prenda else 0 ) for prenda in prendas ] ) + """
 </svg>"""
     return resultado
 
 def findAvatarById(id):
     resultado = None
     con = orm.Conexion(PATH_BDD)
-    lista = Avatares.getNamedQuery(conexion, "findById", {"id":id})
+    lista = Avatares.getNamedQuery(con, "findById", {"id":id})
     if len(lista) == 1:
         resultado = lista[0]
         resultado["prendas"] = findPrendasByAvatar( con, id )
@@ -602,18 +652,18 @@ def transaccionar(llamado,objeto):
         con.close()
     return objeto
 
-def aplicar_transformaciones(nodo_svg, id, offset_x, offset_y, escala, color, simetrico_x ):
+def aplicar_transformaciones(nodo_svg, id, offset_x, offset_y, escala, color, simetrico_x , offset_xr):
     if nodo_svg is None:
         return ''
     resultado = nodo_svg.format( id = id, offset_x = offset_x, offset_y = offset_y, escala = escala, color = color )
     if simetrico_x == '1':
-        resultado += """<use xlink:href="#{id}" id="m{id}" transform="translate({offset_x} {offset_y}) scale({escala_x} {escala_y})" />""".format( id = id, offset_x = - offset_x, offset_y = offset_y, escala_x = -escala, escala_y = escala )
+        resultado += """<use xlink:href="#{id}" id="m{id}" transform="translate({offset_x} {offset_y}) scale({escala_x} {escala_y})" />""".format( id = id, offset_x = offset_xr, offset_y = offset_y, escala_x = -escala, escala_y = escala )
     return resultado
 
 def importar_partes():
     if exists(PATH_IMPORT):
         con = orm.Conexion(PATH_BDD)
-        generos = {'M':1, 'F':2}
+        generos = {'M':1, 'F':2, 'X':3 }
         partes_list = Partes.getNamedQuery(con, 'findall', {})
         partes = { parte['nombre'] : parte['id'] for parte in partes_list }
         sopa = None
