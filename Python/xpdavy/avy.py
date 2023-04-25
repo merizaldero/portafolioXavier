@@ -624,7 +624,15 @@ def ajustarTransformaciones(data):
 def generarSvgAvatar(data):
     color_piel = data['color_piel']
     prendas = ajustarTransformaciones(data)
-    resultado = """<svg width="200" height="200">
+    resultado = """<svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" 
+   width="200" height="200">
 """ + "\n".join( [ aplicar_transformaciones(prenda['svg'], 'g_{1}_{0}'.format(prenda['id'], prenda['nombre']), prenda['offset_x'], prenda['offset_y'], prenda['escala'], prenda['color'], prenda['simetrico_x'], prenda['offset_xr'] if 'offset_xr' in prenda else 0 ) for prenda in prendas ] ) + """
 </svg>"""
     return resultado

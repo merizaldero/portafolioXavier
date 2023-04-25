@@ -5,6 +5,7 @@
 from bottle import Bottle, ServerAdapter
 from bottle import run, debug, route, error, static_file, template, request, response
 import os.path
+import xpd_orm as orm
 import avy
 
 from bottle import Bottle, ServerAdapter
@@ -54,6 +55,15 @@ def home():
 def inicializar():
     avy.inicializar()
     return 'Inicializacion ok'
+
+@app.route('/aleatorio/<id_genero:int>.svg')
+def aleatorio_png(id_genero):
+    conexion =  orm.Conexion(avy.PATH_BDD)
+    avatar = avy.generarPrendasByGenero(conexion, id_genero)
+    conexion.close()
+    salida_svg = avy.generarSvgAvatar(avatar)
+    response.add_header('Content-Type','image/svg+xml')
+    return salida_svg
 
 ######### WEBAPP ROUTERS ###############
 
