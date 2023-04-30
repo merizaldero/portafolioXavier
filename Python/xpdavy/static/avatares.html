@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Mis Avatares</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/comun.js"></script>
+    <style>
+        body{
+            background-color: #88cccc;
+        }
+    </style>
+  </head>
+  <body> 
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Mis Avatares</a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          </ul>
+          <span class="navbar-text">
+            Bienvenido, <span id="nombre_usuario"></span>
+          </span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div id="avatares" class="list-group">
+        <div id="btn_nuevo_avatar" class="list-group-item nuevo-avatar">+ Nuevo Avatar</div>
+      </div>
+   </div>
+
+    <script src="/static/js/avatares.js"></script>
+  </body>
+</html>

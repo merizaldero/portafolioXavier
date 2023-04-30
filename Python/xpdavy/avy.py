@@ -279,8 +279,8 @@ Usuarios.setMetamodelo({
         ],
     "namedQueries":[
         {
-            "nombre":"findAll",
-            "whereClause":["activo",],
+            "nombre":"findall",
+            "whereClause":["activo","es_admin"],
             "orderBy":["nombre",]
             },
         {
@@ -290,7 +290,11 @@ Usuarios.setMetamodelo({
         {
             "nombre":"findById",
             "whereClause":["id",]
-            }
+            },
+        {
+            "nombre":"findLogin",
+            "whereClause":["nombre","clave"]
+            },
         ]
     })
 
@@ -513,26 +517,67 @@ order by b.ID_PARTE, b.ORDEN
     prendas = conexion.consultar( sql, {"id_genero":id_genero}, ["id_prenda", "nombre", "id_parte", "svg"] )
     return prendas
 
+def findPrendasByGeneroParte(conexion, id_genero,id_parte):
+    sql = """
+select
+    b.ID as id_prenda, b.NOMBRE as nombre, b.ID_PARTE as id_parte, b.SVG as svg
+from PRENDA b
+where exists(
+select 1 from PRENDA_GENERO c
+where c.ID_PRENDA = b.ID
+and c.ID_GENERO = :id_genero
+)
+and b.ID_PARTE = :id_parte
+order by b.ID_PARTE, b.ORDEN
+"""
+    prendas = conexion.consultar( sql, { "id_genero":id_genero, "id_parte":id_parte }, ["id_prenda", "nombre", "id_parte", "svg"] )
+    return prendas
+
+def findAvataresByUsuario(conexion, id_usuario):
+    sql = """
+SELECT a.id as id, a.id_usuario as id_usuario, a.id_genero as id_genero, a.nombre as nombre, a.color_piel as color_piel, a.activo as activo 
+, b.SIMBOLO as simbolo
+FROM AVATAR a, GENERO b
+WHERE b.ID = a.ID_GENERO and a.ID_USUARIO = :id_usuario and a.ACTIVO = :activo  ORDER BY a.NOMBRE
+"""
+    avatares = conexion.consultar( sql, { "id_usuario":id_usuario, "activo":'1' }, ["id", "id_usuario", "id_genero", "nombre", "color_piel", "activo", "simbolo"] )
+    return avatares
+
 def trxCrearAvatar(conexion, avatar_info ):
     """
     Crea avatar y sus prendas
     """
-    Avatares.insertar(conexion, avatar_info)
-    avatar_info = Avatares.insertar(conexion, avatar_info)
-    prendas = findPrendasByGenero( conexion, avatar_info["id_genero"] )
+    # print('Inicia creacion de avatar')
 
-    avatar_info["prendas"] = []
-    for prenda in prendas:
-        prenda_avatar = {
-            "id_avatar" : avatar_info["id"],
-            "id_parte" : prenda["id_parte"],
-            "id_prenda" : prenda["id_prenda"],
-            "offset_x" : 0,
-            "offset_y": 0,
-            "escala": 1.0,
-            "color": prenda["default_color"],
-            }
-        avatar_info["prendas"].append( PrendasAvatar.insertar(conexion, prenda_avatar) )
+    # Asigna valores por defecto a campos que no tengan informacion
+    valores_defecto = {'nombre':'Sin Nombre', 'activo':'1'}
+    for campo in valores_defecto.keys():
+        if campo in avatar_info.keys() and avatar_info[campo] is not None:
+            break
+        avatar_info[campo] = valores_defecto[campo]
+    
+    # print('Asignados valores por defecto')
+
+    prendas = generarPrendasByGenero(conexion, avatar_info['id_genero'], verbal = True)
+
+    # print('Seleccion de partes completada\n{0}'.format(repr(prendas)))
+
+    avatar_info['color_piel'] = prendas['color_piel']
+
+    print('asignacion complementaria')
+
+    # Transacciones de insercion
+    Avatares.insertar(conexion, avatar_info)
+    print('avatar insertado')
+    for prenda in prendas['prendas']:
+        # print("asignadno id_avatar" + str(prenda))
+        prenda['id_avatar'] = avatar_info['id']
+        # print("asignado id_avatar")
+        # print("insertando {0}".format(repr(prenda)))
+        PrendasAvatar.insertar(conexion, prenda)
+    
+    print('proceso de insercion completado')
+
     return avatar_info
 
 def ajustar_coordenadas(prendasAvatar):
@@ -540,8 +585,17 @@ def ajustar_coordenadas(prendasAvatar):
 
 def findPrendasByAvatar(conexion, id_avatar ):
     sql = """
-SELECT
+SELECT a.id as id, a.id_avatar as id_avatar, c.id as id_parte, a.id_prenda as id_prenda, 
+coalesce(a.offset_x, 0) as offset_x, coalesce(a.offset_y, 0) as offset_y, coalesce(a.escala, 1.0) as escala, coalesce(a.color, ' ') as color,
+b.nombre as nombre, b.svg as svg,
+c.orden_gui as orden_gui, c.id_parent as id_parent, c.simetrico_x as simetrico_x, c.opcional as opcional, c.tiene_color as tiene_color
+FROM PARTE c
+left join PRENDA_AVATAR a on c.ID = a.ID_PARTE and a.ID_AVATAR = :id_avatar  
+left join PRENDA b on b.ID = a.ID_PRENDA   
+ORDER BY c.ORDEN_GUI
     """
+    prendas = conexion.consultar( sql, { "id_avatar":id_avatar }, ["id", "id_avatar", "id_parte", "id_prenda", "offset_x", "offset_y", "escala", "color", "nombre", "svg", "orden_gui", "id_parent", "simetrico_x", "opcional", "tiene_color"] )
+    return prendas
 
 def lista_rango(minimo, maximo, steps):
     if maximo == minimo or steps <= 1:
@@ -570,7 +624,7 @@ def generarPrendasByGenero(conexion, id_genero, verbal = False):
         parte["color"] = choice(colores_parte) if len(colores_parte) > 0 else color_piel
         if verbal:
             print("{0} : {1}".format(parte['nombre'],parte['color'] ))
-    return {'color_piel': color_piel, 'prendas': partes}
+    return { 'id_genero': id_genero, 'color_piel': color_piel, 'prendas': partes}
 
 def matriz_transformacion(translate, rotate, scale):
     """
@@ -718,3 +772,4 @@ and exists (select 1 from PRENDA_GENERO b where b.ID_PRENDA = a.ID and b.ID_GENE
             except Exception as ex:
                 con.rollback()
         con.close()
+

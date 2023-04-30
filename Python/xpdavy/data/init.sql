@@ -4,7 +4,7 @@ insert into USUARIO (NOMBRE, CLAVE, ES_ADMIN, ACTIVO) values('ivan', 'ivan', '0'
 
 insert into GENERO (ID, NOMBRE, SIMBOLO) values (1,'Masculino','&#128104;');
 insert into GENERO (ID, NOMBRE, SIMBOLO) values (2,'Femenino','&#128105;');
-insert into GENERO (ID, NOMBRE, SIMBOLO) values (3,'Plantilla','&#128105;');
+insert into GENERO (ID, NOMBRE, SIMBOLO) values (3,'Plantilla','X');
 
 insert into PARTE (ID, NOMBRE, ORDEN_Z, ORDEN_GUI, ID_PARENT, OFFSET_X_MIN, OFFSET_X_MAX, OFFSET_X_STEPS, OFFSET_Y_MIN, OFFSET_Y_MAX, OFFSET_Y_STEPS, SCALE_MIN, SCALE_MAX, SCALE_STEPS, SIMETRICO_X, OPCIONAL, TIENE_COLOR) values (1, 'torso', 2, 10, NULL, 0, 1, 1, 0, 1, 1, 1.0, 1.01, 1, '0', '1', '0');
 insert into PARTE (ID, NOMBRE, ORDEN_Z, ORDEN_GUI, ID_PARENT, OFFSET_X_MIN, OFFSET_X_MAX, OFFSET_X_STEPS, OFFSET_Y_MIN, OFFSET_Y_MAX, OFFSET_Y_STEPS, SCALE_MIN, SCALE_MAX, SCALE_STEPS, SIMETRICO_X, OPCIONAL, TIENE_COLOR) values (2, 'pantalon', 1, 11, 1, 0, 1, 1, 0, 1, 1, 1.0, 1.01, 1, '0', '1', '0');
