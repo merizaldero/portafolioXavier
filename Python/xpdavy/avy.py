@@ -717,9 +717,12 @@ def transaccionar(llamado,objeto):
 def aplicar_transformaciones(nodo_svg, id, offset_x, offset_y, escala, color, simetrico_x , offset_xr):
     if nodo_svg is None:
         return ''
-    resultado = nodo_svg.format( id = id, offset_x = offset_x, offset_y = offset_y, escala = escala, color = color )
+    print('{0} {1}'.format(offset_x, offset_xr))
+    resultado = nodo_svg.format( id = id, offset_x = offset_x, offset_y = offset_y , escala_x = escala, escala_y = escala , color = color )
     if simetrico_x == '1':
-        resultado += """<use xlink:href="#{id}" id="m{id}" transform="translate({offset_x} {offset_y}) scale({escala_x} {escala_y})" />""".format( id = id, offset_x = offset_xr, offset_y = offset_y, escala_x = -escala, escala_y = escala )
+        #print("agrega simetrico")
+        #resultado += """<svg:use height="100%" width="100%" x="0" y="0" xlink:href="#{id}" id="m{id}" transform="translate({offset_x} {offset_y}) scale({escala_x} {escala_y})" />""".format( id = id, offset_x = offset_xr, offset_y = offset_y , escala_x = -escala, escala_y = escala )
+        resultado += nodo_svg.format( id = id, offset_x = offset_xr, offset_y = offset_y , escala_x = -escala, escala_y = escala, color = color ).replace('id="','id="m')
     return resultado
 
 def importar_partes():
@@ -747,7 +750,7 @@ and exists (select 1 from PRENDA_GENERO b where b.ID_PRENDA = a.ID and b.ID_GENE
             registros_exitentes = con.consultar( sqlFindPrenda , {'id_parte' : partes[ lista_nombre[0] ], 'nombre' : lista_nombre[2], 'id_genero' : generos[ lista_nombre[1] ] }, lista_campos )
             grupo_id = grupo['id']
             grupo['id']='{id}'
-            grupo['transform'] = "translate({offset_x} {offset_y}) scale({escala})"
+            grupo['transform'] = "translate({offset_x} {offset_y}) scale({escala_x} {escala_y})"
             try:
                 if len(registros_exitentes) == 0:
                     # insertando Parte y Parte Genero
