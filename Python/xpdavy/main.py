@@ -44,6 +44,8 @@ def __exit():
 
 @app.route('/static/<filepath:path>')
 def server_static(filepath):
+    if filepath == 'ingreso.html':
+        response.set_cookie('ssn', '')
     return static_file(filepath, root = dirname(abspath(__file__)) + '/static')
 
 
@@ -107,9 +109,7 @@ def servir_login():
         del SESIONES[clave]
     clave = str(uuid.uuid4())
     SESIONES[clave] = usuarios[0]
-    response.set_cookie('ssn', clave);
-    print("Se inicia sesion {0} {1}".format(clave, SESIONES[clave]))
-    redirect("/static/avatares.html")
+    return clave
 
 @app.route('/user/info', method='POST')
 def servir_userinfo():

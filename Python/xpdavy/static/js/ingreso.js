@@ -7,20 +7,35 @@ window.addEventListener('load', function() {
   
     // Agregar evento click a cada item de la lista
     var userList = document.getElementById('user-list');
-    userList.addEventListener('click', function(event) {
+    userList.addEventListener('click', async function(event) {
       // Obtener el elemento de la lista que se ha hecho clic
       var listItem = event.target.closest('li');
       if (!listItem) return; // Si no se encuentra ningún elemento li, salir
   
       // Obtener el usuario asociado al elemento de la lista
       var usuario = JSON.parse(listItem.dataset.usuario);
+
+      const form = new FormData();
+      form.append("nombre", usuario.nombre);
+      form.append("clave", usuario.clave);
   
-      // Asignar el nombre y clave del usuario al formulario
-      form.querySelector('#form_login_nombre').value = usuario.nombre;
-      form.querySelector('#form_login_clave').value = usuario.clave;
-  
-      // Enviar el formulario
-      form.submit();
+      let response = await fetch("/login", {
+        method: "POST",
+        body: form
+      });
+
+      if(response.status == 200){
+        try{
+          let data = await response.text();
+          sessionStorage.setItem("ssntoken", data);
+          sessionStorage.setItem("ssnusr", JSON.stringify(usuario) );
+          console.log("usuario " + sessionStorage.getItem("ssnusr") );
+          document.location.href="/static/avatares.html";
+        }catch(ex){
+          console.log("Error", ex);
+        }
+      }
+
     });
   });
   

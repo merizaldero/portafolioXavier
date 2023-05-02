@@ -11,24 +11,21 @@ function getCookie(cname) {
         return c.substring(name.length, c.length);
       }
     }
-    return "";
+    return null;
   }
 
-  function validarUsuario(calback){
-    const sesion = getCookie("ssn");
-    const form = new FormData();
-    form.append("ses", sesion);
-  
-    // Recupera informacion de usuario
-    fetch("/user/info", {
-      method: "POST",
-      body: form
-    })
-    .then(response => response.json())
-    .then(data => {
-      calback(data, sesion);      
-    })
-    .catch(error => {
-      console.log("Error:", error);
-    });
+  async function validarUsuario(){
+    return sessionStorage.getItem("ssntoken") != null;
+  }
+
+  function getUsuario(){
+    let usr = sessionStorage.getItem("ssnusr");
+    if( usr !=null ){
+      return JSON.parse(usr);
+    }
+    else null;
+  }
+
+  function getToken(){
+    return sessionStorage.getItem("ssntoken")
   }
