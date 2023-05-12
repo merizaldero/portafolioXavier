@@ -159,13 +159,18 @@ def servir_avatar_svg(id_avatar):
 
 @app.route('/imagen/avatartemporal', method="POST")
 def servir_avatar_temporal_svg():
-    archivo = request.files.get('archivo').file
-    avatar = json.loads(archivo.read().decode())
-    if avatar is None:
-        abort(404, "Imagen no existe")
-    salida_svg = avy.generarSvgAvatar(avatar)
-    response.add_header('Content-Type','image/svg+xml')
-    return salida_svg
+    try:
+        avatar = request.json
+        
+        if avatar is None:
+            abort(404, "Imagen no existe")
+        
+        salida_svg = avy.generarSvgAvatar(avatar)
+        response.add_header('Content-Type','image/svg+xml')
+        return salida_svg
+    
+    except Exception as ex:
+        return repr(ex)
 
 @app.route('/avatar/<id_avatar:int>')
 def servir_crearAvatar(id_avatar):

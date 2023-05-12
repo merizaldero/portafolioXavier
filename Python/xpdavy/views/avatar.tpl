@@ -17,7 +17,7 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/static/avatares.html">&#8592;</a>
+        <a class="navbar-brand" href="/static/avatares.html">&#8678;</a>
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           </ul>
@@ -37,14 +37,14 @@
   </div>
 </div>
 
-<div class="row" id="div_contenido">
-  <div class="col-6" id="div_imagen">
+<div class="row h-100" id="div_contenido">
+  <div class="col-md-4" id="div_imagen">
     <div style="width:200px; height:300px" class="img-fluid mx-auto d-block border border-primary rounded-3" id="div_avatar" ></div>
   </div>
-  <div class="col-6" id="div_detalle">
-    <div class="d-flex flex-row flex-wrap justify-content-center" id="div_partes">
+  <div class="col-md-8 h-100 d-flex flex-md-row flex-column" id="div_detalle">
+    <div class="pt-3 pt-md-1 h-100 d-flex flex-wrap flex-md-column flex-row justify-content-center justify-content-begin" id="div_partes">
     </div>
-    <div class="d-flex flex-row flex-wrap justify-content-begin" class="row" id="div_prendas">
+    <div class="pt-3 ps-md-3 h-100 d-flex flex-row flex-wrap justify-content-begin align-self-center" class="row" id="div_prendas">
     </div>
   </div>
 </div>

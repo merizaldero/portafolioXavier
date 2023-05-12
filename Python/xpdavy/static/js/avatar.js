@@ -38,16 +38,16 @@ async function cargarAvatar(){
 }
 
 async function cargarImagenAvatar(){
-    const formData = new FormData();
-    formData.append('archivo', new Blob([ JSON.stringify(AVATAR_DATA) ]), 'input.json')
-
+    const bodyAvatar = JSON.stringify(AVATAR_DATA);
     response = await fetch('/imagen/avatartemporal',  {
         method: "POST",
-        body: formData
+        body: bodyAvatar,
+        headers: { 'Content-Type': 'application/json'}
     });
 
     if(response.status != 200){
-        console.log (response.status, response.text );
+    
+        console.log (response.status, await response.text() );
         return;
     }
 

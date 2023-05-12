@@ -547,7 +547,6 @@ def trxCrearAvatar(conexion, avatar_info ):
     """
     Crea avatar y sus prendas
     """
-    # print('Inicia creacion de avatar')
 
     # Asigna valores por defecto a campos que no tengan informacion
     valores_defecto = {'nombre':'Sin Nombre', 'activo':'1'}
@@ -556,28 +555,17 @@ def trxCrearAvatar(conexion, avatar_info ):
             break
         avatar_info[campo] = valores_defecto[campo]
     
-    # print('Asignados valores por defecto')
-
     prendas = generarPrendasByGenero(conexion, avatar_info['id_genero'], verbal = True)
-
-    # print('Seleccion de partes completada\n{0}'.format(repr(prendas)))
 
     avatar_info['color_piel'] = prendas['color_piel']
 
-    print('asignacion complementaria')
-
     # Transacciones de insercion
     Avatares.insertar(conexion, avatar_info)
-    print('avatar insertado')
+
     for prenda in prendas['prendas']:
-        # print("asignadno id_avatar" + str(prenda))
         prenda['id_avatar'] = avatar_info['id']
-        # print("asignado id_avatar")
-        # print("insertando {0}".format(repr(prenda)))
         PrendasAvatar.insertar(conexion, prenda)
     
-    print('proceso de insercion completado')
-
     return avatar_info
 
 def ajustar_coordenadas(prendasAvatar):
@@ -717,11 +705,9 @@ def transaccionar(llamado,objeto):
 def aplicar_transformaciones(nodo_svg, id, offset_x, offset_y, escala, color, simetrico_x , offset_xr):
     if nodo_svg is None:
         return ''
-    print('{0} {1}'.format(offset_x, offset_xr))
+    
     resultado = nodo_svg.format( id = id, offset_x = offset_x, offset_y = offset_y , escala_x = escala, escala_y = escala , color = color )
     if simetrico_x == '1':
-        #print("agrega simetrico")
-        #resultado += """<svg:use height="100%" width="100%" x="0" y="0" xlink:href="#{id}" id="m{id}" transform="translate({offset_x} {offset_y}) scale({escala_x} {escala_y})" />""".format( id = id, offset_x = offset_xr, offset_y = offset_y , escala_x = -escala, escala_y = escala )
         resultado += nodo_svg.format( id = id, offset_x = offset_xr, offset_y = offset_y , escala_x = -escala, escala_y = escala, color = color ).replace('id="','id="m')
     return resultado
 
@@ -764,7 +750,6 @@ and exists (select 1 from PRENDA_GENERO b where b.ID_PRENDA = a.ID and b.ID_GENE
                     registro_genero['id_prenda'] = registro['id']
                     registro_genero['id_genero'] = generos[ lista_nombre[1] ]
                     PrendasGenero.insertar(con, registro_genero)
-                    print( grupo_id + ' ingresado' )
                 else:
                     # actualizando Parte
                     registro = registros_exitentes[0]
