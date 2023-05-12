@@ -10,7 +10,7 @@
     <script src="/static/js/comun.js"></script>
     <style>
         body{
-            background-color: #88cccc;
+            background-color: #88cccc; 
         }
     </style>
   </head>
