@@ -54,7 +54,7 @@ def definicionCampoModel(campo, modelo, dominio = 'models'):
 
     tipoCampo = tipo['tipo']
 
-    parametros = ''
+    parametros = []
 
     #Ajustes para campos que se convierten en Foreign key
     if tipoCampo == 'ForeignKey':
@@ -62,12 +62,12 @@ def definicionCampoModel(campo, modelo, dominio = 'models'):
             pass
             named_query = data_referencia[0][1]
             entidad_destino = [x for x in entidades if x['idObjeto'] == int( named_query['__atributos']['entidadFK'] ) ][0]['nombre']
-            parametros += "'{0}'".format( entidad_destino )
+            parametros.append( "'{0}'".format( entidad_destino ) )
         else:
-            parametros += "settings.AUTH_USER_MODEL"
-        parametros += ", on_delete = models.CASCADE"
+            parametros.append("settings.AUTH_USER_MODEL")
+        parametros.append("on_delete = models.CASCADE")
         if 'obligatorio' in campo['__atributos'] and campo['__atributos']['obligatorio'] == '0':
-            parametros += ", blank=True"
+            parametros.append("blank=True")
 
     #Ajuste de tipo cuando es incremental
     if 'incremental' in campo['__atributos'] and campo['__atributos']['incremental'] == '1':
@@ -77,38 +77,29 @@ def definicionCampoModel(campo, modelo, dominio = 'models'):
             tipoCampo = 'BigAutoField'
 
     if not ( 'req_max_length' in tipo and tipo['req_max_length'] == False):
-        parametros += 'max_length = {0}'.format( campo['__atributos']['tamano'] )
+        parametros.append('max_length = {0}'.format( campo['__atributos']['tamano'] ))
 
     if 'req_precision' in tipo and tipo['req_precision'] == True:
-        if parametros != '':
-            parametros += ', '
-        parametros += 'decimal_places = {0}'.format( campo['__atributos']['precision'] )
+        parametros.append('decimal_places = {0}'.format( campo['__atributos']['precision'] ))
 
     if 'pk' in campo['__atributos'] and campo['__atributos']['pk'] == '1':
-        if parametros != '':
-            parametros += ', '
-        parametros += 'primary_key=True'
+        parametros.append('primary_key=True')
 
     if 'obligatorio' in campo['__atributos'] and campo['__atributos']['obligatorio'] == '0':
-        if parametros != '':
-            parametros += ', '
-        parametros += 'null=True'
+        parametros.append('null=True')
 
     if 'catalogo' in campo['__atributos'] and not (campo['__atributos']['catalogo'] is None) and campo['__atributos']['catalogo'] != '':
         catalogos = modelo['__objetoRaiz']['__listas']['Catalogos']
         choices = [ x for x in catalogos if x['idObjeto'] == int( campo['__atributos']['catalogo'] ) ]
         if len(choices) == 1:
-            if parametros != '':
-                parametros += ', '
-            parametros += "choices = {0}".format(choices[0]['nombre'].upper())
+            parametros.append( "choices = {0}".format(choices[0]['nombre'].upper()))
 
     if campo['descripcion'] != '':
-        if parametros != '':
-            parametros += ', '
-        parametros += 'help_text="{0}"'.format( campo['descripcion'] )
+        parametros.append( 'help_text="{0}"'.format( campo['descripcion'] ))
+    
+    parametros.append( 'db_column="{0}"'.format( campo['__atributos']['nombreCampo'] ))
 
-
-    definicion = "{0}{1} = {2}.{3}({4})".format(ESPACIO, nombreCampo, dominio, tipoCampo, parametros )
+    definicion = "{0}{1} = {2}.{3}({4})".format(ESPACIO, nombreCampo, dominio, tipoCampo, ", ".join(parametros) )
     return definicion
 
 def declaracionIndice(indice, entidad):
@@ -164,7 +155,7 @@ def generarModelsPy(modelo):
         contenido += "{0}def get_absolute_url(self):\n{0}{0}return reverse('{1}', args=[str(self.{2})])\n".format( ESPACIO , nombreEntidad.lower(), campoId['nombre'] )
 
         #implementa class Meta
-        contenido += ESPACIO + "class Meta:\n{0}{0}verbose_name = '{1}'\n{0}{0}verbose_name_plural = '{1}s'\n".format( ESPACIO, nombreEntidad );
+        contenido += ESPACIO + "class Meta:\n{0}{0}db_table = '{2}'\n{0}{0}verbose_name = '{1}'\n{0}{0}verbose_name_plural = '{1}s'\n".format( ESPACIO, nombreEntidad, entidad['__atributos']['nombreTabla'] );
         if len(indices) > 0:
             declaracionesIndices = [ declaracionIndice(x, entidad) for x in indices ]
             contenido += ESPACIO * 2 + "indexes = [\n";
