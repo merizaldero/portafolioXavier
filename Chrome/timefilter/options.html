@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Time Filter - Opciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <script src="bootstrap.bundle.min.js"></script>
+  <style>
+    /* Estilos CSS para la página de opciones */
+  </style>
+</head>
+<body class="bg-light">
+  <h1><img src="icon128.png"> Time Filter - Opciones</h1>
+  <div id="message">
+
+  </div>  
+  <div class="container" id ="auth_form">
+
+    <label class = "form-label" for="password">Ingrese Contrase&nacute;a:</label>
+    <input class="form-control" type="password" id="password" name="password"><br>
+    
+    <button class="btn btn-primery active" id="submit-auth">Ingresar</button>
+  </div>
+
+  <div class="container" id="opciones-form" style="display:none; visibility: hidden;">
+    <label class = "form-label" for="admin-password">Contrase&ntilde;a de Administrador:</label>
+    <input class="form-control" type="text" id="admin-password" name="admin-password"><br>
+
+    <label class = "form-label" for="mod-password">Contrase&ntilde;a de Moderador:</label>
+    <input class="form-control" type="text" id="mod-password" name="mod-password"><br>
+
+    <label class = "form-label" for="initial-time">Tiempo de Uso Inicial por sitio:</label>
+    <input class="form-control" type="text" id="initial-time" name="initial-time" maxlength="5"><br>
+
+    <label class = "form-label" for="extended-time">Tiempo de Uso Extendido por sitio:</label>
+    <input class="form-control" type="text" id="extended-time" name="extended-time" maxlength="5"><br>
+
+    <label class="form-label" for="redirection-url">URL de redirecci&oacute;n:</label>
+    <input class="form-control" type="text" id="redirection-url" name="redirection-url"><br>
+
+    <label class="form-label" for="site-list">Listado de Sitios:</label>
+    <select class="form-control" id="site-list" name="site-list" size="5">
+    </select>
+    <br>
+
+    <button class="btn btn-primery active" id="save-options">Guardar</button>
+
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
