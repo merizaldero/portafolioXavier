@@ -10,10 +10,11 @@ key NPC = NULL_KEY;
 vector POS_NPC = <0 , 0, 1.0>;
 vector ROT_NPC = <0, 0, 210>;
 
-integer NUMERO_HITOS = 8;
-integer HITO_STEP = 1;
+integer NUMERO_HITOS = 4;
+integer HITO_STEP = 2;
 integer HITO_ACTUAL = 0;
 string PREFIJO_HITO = "Escuela Hito ";
+list HITOS = [];
 
 string elegir_notecard(){
     integer indice = (integer) llFrand( llGetListLength( NOTECARDS ) );    
@@ -33,35 +34,28 @@ secuencia_bucle(){
     } 
     string objetivo = PREFIJO_HITO + (string) HITO_ACTUAL;
     //llOwnerSay("Buscando " + objetivo);
-    
+    vector posicion = llList2Vector(HITOS, HITO_ACTUAL);
+    osNpcMoveToTarget(NPC, posicion + <0.0, 0.0, 1.0 >, OS_NPC_NO_FLY);
+    llSleep(1.5);    
     osNpcSetRot(NPC, llEuler2Rot( ROT_NPC * DEG_TO_RAD ) );
-    
-    llSensor( objetivo, NULL_KEY, PASSIVE | ACTIVE , 7.0, PI );
+        
     HITO_ACTUAL += HITO_STEP;
     if( HITO_ACTUAL >= NUMERO_HITOS ){
-        //HITO_STEP = -1;
-        //HITO_ACTUAL += HITO_STEP * 2;
-        HITO_ACTUAL = 0;
+        HITO_STEP = -1;
+        HITO_ACTUAL += HITO_STEP * 2;
+        //HITO_ACTUAL = 0;
     }else if( HITO_ACTUAL < 0 ){        
         HITO_STEP = 1;
         HITO_ACTUAL = 0;
     }
     if( HITO_ACTUAL == 0 && HITO_STEP == 1){
-        //osNpcLoadAppearance( NPC, elegir_notecard() );
+        osNpcLoadAppearance( NPC, elegir_notecard() );
     }
 }
 
 secuencia_listen(integer channel, string name, key id, string message){
     
 }
-
-secuencia_sensor(key detected){
-    vector posicion = llList2Vector(llGetObjectDetails(detected, [OBJECT_POS]), 0);
-    osNpcMoveToTarget(NPC, posicion + <0.0, 0.0, 1.0 >, OS_NPC_NO_FLY);
-    
-}
-
-
 
 secuencia_fin(){
     osNpcRemove(NPC);
@@ -82,6 +76,8 @@ default
     state_entry()
     {
         leer_listado_notecards();
+        // Identifica los Hitos en el alrededor
+        llSensor( "", NULL_KEY, PASSIVE | ACTIVE , 7.0, PI );
         CONTEO_VISITANTES = 0;
         INICIA_STATE = 0;
         LISTEN_HANDLE = llListen( LISTEN_CHANNEL, "", NULL_KEY, "");
@@ -124,7 +120,32 @@ default
             state visitado;
         }
     }
-    
+    sensor(integer detected){
+        // Identifica los Hitos en el alrededor
+        integer indice_detectado;
+        integer indice_hito;
+        integer hito_encontrado;        
+        string nombre_detectado;
+        string nombre_hito;
+        vector posicion;
+        HITOS = [];
+        llOwnerSay("buscando hitos entre "+ detected + " objetos cercanos");
+        for(indice_hito = 0; indice_hito < NUMERO_HITOS; indice_hito ++){
+            nombre_hito = PREFIJO_HITO + (string)indice_hito;
+            hito_encontrado = FALSE;
+            for(indice_detectado = 0; hito_encontrado == FALSE && indice_detectado < detected; indice_detectado++){
+                nombre_detectado = llDetectedName(indice_detectado);
+                //llOwnerSay("sera " + nombre_detectado + "?");
+                if(nombre_detectado == nombre_hito){
+                    llOwnerSay("encontrado" + nombre_detectado);
+                    posicion = llList2Vector( llGetObjectDetails( llDetectedKey( indice_detectado), [OBJECT_POS]), 0);
+                    HITOS += posicion;
+                    hito_encontrado = TRUE;
+                }
+            }            
+        }
+        llOwnerSay("Se ha cargado la posicion de "+ (string)llGetListLength(HITOS) + " hitos");        
+    }    
 }
 
 state visitado{
@@ -158,9 +179,6 @@ state visitado{
         if( CONTEO_VISITANTES <= 0){
             state default;
         }
-    }
-    sensor(integer detected){
-        secuencia_sensor(llDetectedKey(0));
     }
     
     collision_start(integer detected){
