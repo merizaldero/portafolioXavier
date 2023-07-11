@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1 class="center">Bienvenido a la Planificación Estratégica y de Negocios</h1>
+    <div class="d-flex flex-wrap justify-content-around">
+      <div class="card col-md-2 p-md-5 p-2 mt-3">
+        
+      </div>
+      <div class="card col-md-2 p-md-5 p-2 mt-3">
+        <p>Regístrate como usuario y lleva el seguimiento de tu planificación estratégica y tu plan de negocio.</p>
+      </div>
+      <div class="card col-md-2 p-md-5 p-2 mt-3">
+      </div>      
+    </div>
+    <div class="mt-5 d-flex justify-content-around">
+      <a class="btn btn-primary" href="{% url 'registrar_usuario' %}">Registrarse</a>
+      <a class="btn btn-primary" href="{% url 'iniciar_sesion' %}">Iniciar Sesi&oacute;n</a>
+    </div>
+  </div>
+{% endblock %}

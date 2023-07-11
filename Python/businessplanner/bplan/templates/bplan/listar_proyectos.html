@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1 class="text-end">Bienvenido, {{ user.first_name }} {{ user.last_name }}</h1>
+    <div class="mt-3 card">
+        <div class="card-header weight-bolder">
+            <div class="row">
+                <div class="col-6">
+                    Informaci&oacute;n General
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <a href="#">Editar</a>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-3">
+            <div class="row-md d-flex flex-wrap">
+                <div class="col-md-6 d-flex flex-wrap-sm">
+                    <b class="col-md p-1">Nombre de Usuario</b>
+                    <span class="col-md p-1">{{user.username}}</span>
+                </div>
+                <div class="col-md-6 d-flex flex-wrap">
+                    <b class="col-md p-1">E-mail</b>
+                    <span class="col-md p-1">{{user.email}}</span>
+                </div>
+            </div>            
+        </div>
+    </div>
+    <div class="mt-3 card">
+        <div class="card-header weight-bolder">
+            <div class="row">
+                <div class="col-6">
+                    Proyectos
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <a href="#">Crear Nuevo</a>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for proyecto in proyectos %}
+                  <a href="{{ proyecto.get_absolute_url }}" class="list-group-item list-group-item-action">
+                    {{ proyecto.nombreProyecto }}
+                  </a>
+                {% empty %}
+                  <p>No hay proyectos disponibles.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}

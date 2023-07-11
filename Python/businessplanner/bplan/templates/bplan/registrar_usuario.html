@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Registrar nuevo Usuario</h1>
+  <form method="POST" action="{% url 'registrar_usuario' %}">
+    {% csrf_token %}
+    {{ form.username.label_tag }}
+    {{ form.username }}
+
+    {{ form.first_name.label_tag }}
+    {{ form.first_name }}
+
+    {{ form.last_name.label_tag }}
+    {{ form.last_name }}
+
+    {{ form.email.label_tag }}
+    {{ form.email }}
+
+    {{ form.password1.label_tag }}
+    {{ form.password1 }}
+
+    {{ form.password2.label_tag }}
+    {{ form.password2 }}
+
+    <button type="submit" class="btn btn-primary">Registrarse</button>
+  </form>
+</div>
+{% endblock %}
