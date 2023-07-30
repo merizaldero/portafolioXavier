@@ -11,39 +11,43 @@
 </head>
 <body class="bg-light">
   <h1><img src="icon128.png"> Time Filter - Opciones</h1>
-  <div id="message">
-
+  <div id="mensaje" class="alert alert-success collapse">
+    <span>No deberia mostrar nada</span>    
+    <button class="btn-close" data-bs-toggle="collapse" data-bs-target="#mensaje"></button>
   </div>  
   <div class="container" id ="auth_form">
 
     <label class = "form-label" for="password">Ingrese Contrase&nacute;a:</label>
     <input class="form-control" type="password" id="password" name="password"><br>
     
-    <button class="btn btn-primery active" id="submit-auth">Ingresar</button>
+    <button class="btn btn-primary active" id="btn_login">Ingresar</button>
   </div>
 
   <div class="container" id="opciones-form" style="display:none; visibility: hidden;">
     <label class = "form-label" for="admin-password">Contrase&ntilde;a de Administrador:</label>
-    <input class="form-control" type="text" id="admin-password" name="admin-password"><br>
+    <input class="form-control" type="password" id="admin-password" name="admin-password"><br>
 
     <label class = "form-label" for="mod-password">Contrase&ntilde;a de Moderador:</label>
-    <input class="form-control" type="text" id="mod-password" name="mod-password"><br>
+    <input class="form-control" type="password" id="mod-password" name="mod-password"><br>
 
-    <label class = "form-label" for="initial-time">Tiempo de Uso Inicial por sitio:</label>
+    <label class = "form-label" for="initial-time">Tiempo de Uso Inicial por sitio: (HH:MM)</label>
     <input class="form-control" type="text" id="initial-time" name="initial-time" maxlength="5"><br>
 
-    <label class = "form-label" for="extended-time">Tiempo de Uso Extendido por sitio:</label>
+    <label class = "form-label" for="extended-time">Tiempo de Uso Extendido por sitio: (HH:MM)</label>
     <input class="form-control" type="text" id="extended-time" name="extended-time" maxlength="5"><br>
 
     <label class="form-label" for="redirection-url">URL de redirecci&oacute;n:</label>
     <input class="form-control" type="text" id="redirection-url" name="redirection-url"><br>
 
     <label class="form-label" for="site-list">Listado de Sitios:</label>
+    <button class="btn btn-secondary active" id="btn_add_filter">Agregar Sitio</button>
+    <button class="btn btn-secondary inactive" id="btn_remove_filter">Eliminar Seleccionados</button>
     <select class="form-control" id="site-list" name="site-list" size="5">
     </select>
     <br>
 
-    <button class="btn btn-primery active" id="save-options">Guardar</button>
+    <button class="btn btn-primary active" id="btn_guardar">Guardar</button>
+    <button class="btn btn-secondary active" id="btn_close_window">Cerrar</button>
 
   </div>
 
