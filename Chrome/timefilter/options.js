@@ -12,7 +12,8 @@ function saveOptions() {
         "xpdtf_duracion_inicial": document.getElementById("initial-time").value,
         "xpdtf_duracion_extendida": document.getElementById("extended-time").value,
         "xpdtf_redireccion": document.getElementById("redirection-url").value,
-        "xpdtf_sitios": JSON.stringify(sitios)
+        "xpdtf_sitios": JSON.stringify(sitios),
+        'xpdtf_tiempos': '{}'
     };
 
     chrome.storage.local.set( valores ).then(()=>{
@@ -126,10 +127,33 @@ function alertar(texto, modo="success"){
 function cerrarVentana(){
     window.close();
 }
-  
+
+
+async function consultarAccesos(){
+    const { xpdtf_tiempos } = await chrome.storage.local.get( [ 'xpdtf_tiempos' ] );
+    const obj_xpdtf_tiempos = JSON.parse(xpdtf_tiempos);
+    let tiempos = Object.keys(obj_xpdtf_tiempos).map( sitio => { 
+        return [ sitio, obj_xpdtf_tiempos[sitio].last_tic, obj_xpdtf_tiempos[sitio].tics ]; 
+    });
+    const tblAccesos = document.getElementById('tblAccesos');
+    tblAccesos.innerHTML = "";
+    tiempos.forEach( item=> {
+        let tr = document.createElement("tr");
+        item.forEach(campo =>{
+            let td = document.createElement("td");
+            td.appendChild(document.createTextNode( campo ));
+            tr.append(td)
+        });        
+        tblAccesos.appendChild(tr);
+    });
+    alert("listado actualizado");
+}
+
 document.getElementById("btn_guardar").addEventListener("click", saveOptions);
 document.getElementById("btn_login").addEventListener("click", autenticar);
 document.getElementById("btn_add_filter").addEventListener("click", agregarSitio);
 document.getElementById("btn_remove_filter").addEventListener("click", removerSitios);
 document.getElementById("btn_close_window").addEventListener("click", cerrarVentana);
 
+document.addEventListener("load", consultarAccesos);
+document.getElementById("btn_actualizar_accesos").addEventListener("click", consultarAccesos);

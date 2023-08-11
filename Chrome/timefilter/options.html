@@ -30,11 +30,11 @@
     <label class = "form-label" for="mod-password">Contrase&ntilde;a de Moderador:</label>
     <input class="form-control" type="password" id="mod-password" name="mod-password"><br>
 
-    <label class = "form-label" for="initial-time">Tiempo de Uso Inicial por sitio: (HH:MM)</label>
-    <input class="form-control" type="text" id="initial-time" name="initial-time" maxlength="5"><br>
+    <label class = "form-label" for="initial-time">Tiempo de Uso Inicial por sitio: (min)</label>
+    <input class="form-control" type="integer" id="initial-time" name="initial-time" maxlength="3"><br>
 
-    <label class = "form-label" for="extended-time">Tiempo de Uso Extendido por sitio: (HH:MM)</label>
-    <input class="form-control" type="text" id="extended-time" name="extended-time" maxlength="5"><br>
+    <label class = "form-label" for="extended-time">Tiempo de Uso Extendido por sitio: (min)</label>
+    <input class="form-control" type="integer" id="extended-time" name="extended-time" maxlength="3"><br>
 
     <label class="form-label" for="redirection-url">URL de redirecci&oacute;n:</label>
     <input class="form-control" type="text" id="redirection-url" name="redirection-url"><br>
@@ -49,6 +49,21 @@
     <button class="btn btn-primary active" id="btn_guardar">Guardar</button>
     <button class="btn btn-secondary active" id="btn_close_window">Cerrar</button>
 
+  </div>
+
+  <div id="divTbl">
+    <h1>Registro Accesos </h1>
+    <button id="btn_actualizar_accesos" class="btn btn-primary">Actualizar</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Sitio</th>
+          <th>Ultimo Acceso</th>
+          <th>Contador</th>
+        </tr>
+      </thead>
+      <tbody id="tblAccesos"></tbody>
+    </table>
   </div>
 
   <script src="options.js"></script>
