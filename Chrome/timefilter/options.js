@@ -146,14 +146,14 @@ async function consultarAccesos(){
         });        
         tblAccesos.appendChild(tr);
     });
-    alert("listado actualizado");
+    //alert("listado actualizado");
 }
 
 document.getElementById("btn_guardar").addEventListener("click", saveOptions);
 document.getElementById("btn_login").addEventListener("click", autenticar);
 document.getElementById("btn_add_filter").addEventListener("click", agregarSitio);
 document.getElementById("btn_remove_filter").addEventListener("click", removerSitios);
-document.getElementById("btn_close_window").addEventListener("click", cerrarVentana);
+// document.getElementById("btn_close_window").addEventListener("click", cerrarVentana);
 
 document.addEventListener("load", consultarAccesos);
 document.getElementById("btn_actualizar_accesos").addEventListener("click", consultarAccesos);

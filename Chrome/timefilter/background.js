@@ -81,12 +81,15 @@ async function isSiteInList(site) {
 }
 
 // Setea la variable SITIO_ACTUAL_KEY con el sitio actual
-async function procesarSitio(sitio){
+async function procesarSitio(sitio, frameId, tabId){
   if(sitio == null){
     await chrome.storage.local.remove( 'xpdtf_sitio_actual' );
   }else{
     await chrome.storage.local.set( { 'xpdtf_sitio_actual' : sitio });
-    await ejecutarTimer();
+    await chrome.storage.local.set( { 'xpdtf_frame_id' : frameId });
+    await chrome.storage.local.set( { 'xpdtf_tab_id' : tabId });
+    ejecutarTimer();
+    startTimer();
   }
   
   console.log(`Sitio ${sitio} procesado.`);
@@ -111,7 +114,8 @@ var TIMER_HANDLE = null;
 // Función que se ejecuta cada 60 segundos
 async function ejecutarTimer() {
   
-  const {xpdtf_sitio_actual, xpdtf_tiempos, xpdtf_duracion_inicial, xpdtf_redireccion} = await chrome.storage.local.get( ['xpdtf_sitio_actual', 'xpdtf_tiempos', 'xpdtf_duracion_inicial', 'xpdtf_redireccion'] );
+  const {xpdtf_sitio_actual, xpdtf_tiempos, xpdtf_duracion_inicial, xpdtf_redireccion, xpdtf_tab_id} = 
+    await chrome.storage.local.get( ['xpdtf_sitio_actual', 'xpdtf_tiempos', 'xpdtf_duracion_inicial', 'xpdtf_redireccion', 'xpdtf_tab_id'] );
   
   if( ! xpdtf_sitio_actual ){
     return;
@@ -137,7 +141,7 @@ async function ejecutarTimer() {
       tiempos_sitio['last_tic'] = fecha_actual;
     }else{
       // Redirecciona a sitio de Bloqueo
-      document.location.href = xpdtf_redireccion;
+      redirigir_tab( parseInt(xpdtf_tab_id, 10), xpdtf_redireccion);      
     }
 
   }
@@ -165,4 +169,29 @@ chrome.runtime.onStartup.addListener(async function() {
 chrome.windows.onCreated.addListener(function() {
   // Inicia el temporizador al abrir una nueva ventana
   startTimer();
+});
+
+// Redirige a un tab de id determinado
+function redirigir_tab(tabId, url) {
+  chrome.tabs.update(tabId, { url: url }, function(updatedTab) {
+    console.log(`Pestaña redirigida a ${url}`);
+  });
+}
+
+// Manejo del evento cuando el usuario cambia de pestaña
+chrome.tabs.onActivated.addListener( async function(activeInfo) {
+  const { tabId, windowId } = activeInfo;
+  const { url } = await chrome.tabs.get(tabId);
+  
+  const url_excentas = ['about:blank'];
+
+  if( url_excentas.indexOf(url) >= 0){
+    console.log('Ignorando ' + url);
+    return;
+  }else{
+    console.log("XPDTimeFilter analizando \'"+ url + "\'");
+    let sitio = await isSiteInList(url);
+    await procesarSitio(sitio, windowId, tabId);
+  }
+
 });

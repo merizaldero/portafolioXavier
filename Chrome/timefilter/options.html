@@ -10,60 +10,93 @@
   </style>
 </head>
 <body class="bg-light">
-  <h1><img src="icon128.png"> Time Filter - Opciones</h1>
+  
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container-fluid">
+      
+      <a id="btn_mostrar_dashboard" class="navbar-brand" data-bs-toggle="collapse" href=".seccion">
+        <img src="icon32.png"> Time Filter - Opciones
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a id="btn_prompt_password" class="nav-link" data-bs-toggle="collapse" href=".seccion" >Administrar</a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </nav>
+
   <div id="mensaje" class="alert alert-success collapse">
     <span>No deberia mostrar nada</span>    
     <button class="btn-close" data-bs-toggle="collapse" data-bs-target="#mensaje"></button>
-  </div>  
-  <div class="container" id ="auth_form">
+  </div>
 
-    <label class = "form-label" for="password">Ingrese Contrase&nacute;a:</label>
-    <input class="form-control" type="password" id="password" name="password"><br>
+  <div id="colapsador" class="container">
+    <div id="divAdministacion" class="collapse seccion" data-bs-parent="#colapsador">
+
+      <div class="container" id="auth_form">
+        <label class = "form-label" for="password">Ingrese Contrase&ntilde;a:</label>
+        <input class="form-control" type="password" id="password" name="password">
+        <button class="btn btn-primary active mt-2" id="btn_login">Ingresar</button>              
+      </div>
+
+      <div class="container" id="opciones-form" style="display:none; visibility: hidden;">
+        <label class = "form-label" for="admin-password">Contrase&ntilde;a de Administrador:</label>
+        <input class="form-control" type="password" id="admin-password" name="admin-password"><br>
     
-    <button class="btn btn-primary active" id="btn_login">Ingresar</button>
-  </div>
+        <label class = "form-label" for="mod-password">Contrase&ntilde;a de Moderador:</label>
+        <input class="form-control" type="password" id="mod-password" name="mod-password"><br>
+    
+        <label class = "form-label" for="initial-time">Tiempo de Uso Inicial por sitio: (min)</label>
+        <input class="form-control" type="integer" id="initial-time" name="initial-time" maxlength="3"><br>
+    
+        <label class = "form-label" for="extended-time">Tiempo de Uso Extendido por sitio: (min)</label>
+        <input class="form-control" type="integer" id="extended-time" name="extended-time" maxlength="3"><br>
+    
+        <label class="form-label" for="redirection-url">URL de redirecci&oacute;n:</label>
+        <input class="form-control" type="text" id="redirection-url" name="redirection-url"><br>
+    
+        <label class="form-label" for="site-list">Listado de Sitios:</label>
+        <button class="btn btn-secondary active" id="btn_add_filter">Agregar Sitio</button>
+        <button class="btn btn-secondary inactive" id="btn_remove_filter">Eliminar Seleccionados</button>
+        <select class="form-control" id="site-list" name="site-list" size="5">
+        </select>
+        <br>
+    
+        <button class="btn btn-primary active" id="btn_guardar">Guardar</button>
+        <button class="btn btn-secondary active" id="btn_close_window" data-bs-toggle="collapse" href=".seccion" >Cerrar</button>
+    
+      </div>
 
-  <div class="container" id="opciones-form" style="display:none; visibility: hidden;">
-    <label class = "form-label" for="admin-password">Contrase&ntilde;a de Administrador:</label>
-    <input class="form-control" type="password" id="admin-password" name="admin-password"><br>
+    </div>
 
-    <label class = "form-label" for="mod-password">Contrase&ntilde;a de Moderador:</label>
-    <input class="form-control" type="password" id="mod-password" name="mod-password"><br>
 
-    <label class = "form-label" for="initial-time">Tiempo de Uso Inicial por sitio: (min)</label>
-    <input class="form-control" type="integer" id="initial-time" name="initial-time" maxlength="3"><br>
+    </div>
+    <div id="divDashboard" class="collapse show seccion w-100" data-bs-parent="#colapsador">
 
-    <label class = "form-label" for="extended-time">Tiempo de Uso Extendido por sitio: (min)</label>
-    <input class="form-control" type="integer" id="extended-time" name="extended-time" maxlength="3"><br>
+      <div id="divTbl" class = "w-100 container">
+        <h3 class="w-100 text-center">Registro Accesos </h3>
+        <button id="btn_actualizar_accesos" class="btn btn-primary">Actualizar</button>
+        <table class="w-100 table table-stripped mt-2">
+          <thead class="table-primary">
+            <tr>
+              <th>Sitio</th>
+              <th>Ultimo Acceso</th>
+              <th>Contador</th>
+            </tr>
+          </thead>
+          <tbody id="tblAccesos"></tbody>
+        </table>
+      </div>
 
-    <label class="form-label" for="redirection-url">URL de redirecci&oacute;n:</label>
-    <input class="form-control" type="text" id="redirection-url" name="redirection-url"><br>
-
-    <label class="form-label" for="site-list">Listado de Sitios:</label>
-    <button class="btn btn-secondary active" id="btn_add_filter">Agregar Sitio</button>
-    <button class="btn btn-secondary inactive" id="btn_remove_filter">Eliminar Seleccionados</button>
-    <select class="form-control" id="site-list" name="site-list" size="5">
-    </select>
-    <br>
-
-    <button class="btn btn-primary active" id="btn_guardar">Guardar</button>
-    <button class="btn btn-secondary active" id="btn_close_window">Cerrar</button>
-
-  </div>
-
-  <div id="divTbl">
-    <h1>Registro Accesos </h1>
-    <button id="btn_actualizar_accesos" class="btn btn-primary">Actualizar</button>
-    <table>
-      <thead>
-        <tr>
-          <th>Sitio</th>
-          <th>Ultimo Acceso</th>
-          <th>Contador</th>
-        </tr>
-      </thead>
-      <tbody id="tblAccesos"></tbody>
-    </table>
+    </div>
   </div>
 
   <script src="options.js"></script>
