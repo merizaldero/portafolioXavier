@@ -81,12 +81,11 @@ async function isSiteInList(site) {
 }
 
 // Setea la variable SITIO_ACTUAL_KEY con el sitio actual
-async function procesarSitio(sitio, frameId, tabId){
+async function procesarSitio(sitio, tabId){
   if(sitio == null){
     await chrome.storage.local.remove( 'xpdtf_sitio_actual' );
   }else{
     await chrome.storage.local.set( { 'xpdtf_sitio_actual' : sitio });
-    await chrome.storage.local.set( { 'xpdtf_frame_id' : frameId });
     await chrome.storage.local.set( { 'xpdtf_tab_id' : tabId });
     ejecutarTimer();
     startTimer();
@@ -94,20 +93,6 @@ async function procesarSitio(sitio, frameId, tabId){
   
   console.log(`Sitio ${sitio} procesado.`);
 }
-
-// Event listener para detectar la navegación a una nueva página
-chrome.webNavigation.onCommitted.addListener(async (details) => {
-  const url_excentas = ['about:blank'];
-  const { url, frameId, tabId } = details;
-  if( url_excentas.indexOf(url) >= 0){
-    console.log('Ignorando ' + url);
-    return;
-  }else{
-    console.log("XPDTimeFilter analizando \'"+ url + "\'");
-    let sitio = await isSiteInList(url);
-    await procesarSitio(sitio);
-  }
-});
 
 var TIMER_HANDLE = null;
 
@@ -165,11 +150,13 @@ chrome.runtime.onStartup.addListener(async function() {
   startTimer();
 });
 
+/*
 // Evento que se activa cuando se crea una nueva ventana en el navegador
 chrome.windows.onCreated.addListener(function() {
   // Inicia el temporizador al abrir una nueva ventana
   startTimer();
 });
+*/
 
 // Redirige a un tab de id determinado
 function redirigir_tab(tabId, url) {
@@ -178,9 +165,25 @@ function redirigir_tab(tabId, url) {
   });
 }
 
+// Event listener para detectar la navegación a una nueva página
+chrome.webNavigation.onCommitted.addListener(async (details) => {
+  console.log( "chrome.webNavigation.onCommitted.addListener " + JSON.stringify(details) );
+  const url_excentas = ['about:blank'];
+  const { url, frameType, tabId, } = details;
+  if( frameType == "sub_frame" || url_excentas.indexOf(url) >= 0){
+    console.log('Ignorando ' + url);
+    return;
+  }else{
+    console.log("XPDTimeFilter analizando \'"+ url + "\'");
+    let sitio = await isSiteInList(url);
+    await procesarSitio(sitio, tabId);
+  }
+});
+
 // Manejo del evento cuando el usuario cambia de pestaña
 chrome.tabs.onActivated.addListener( async function(activeInfo) {
-  const { tabId, windowId } = activeInfo;
+  console.log( "chrome.tabs.onActivated.addListener " + JSON.stringify(activeInfo) );
+  const { tabId } = activeInfo;
   const { url } = await chrome.tabs.get(tabId);
   
   const url_excentas = ['about:blank'];
@@ -191,7 +194,7 @@ chrome.tabs.onActivated.addListener( async function(activeInfo) {
   }else{
     console.log("XPDTimeFilter analizando \'"+ url + "\'");
     let sitio = await isSiteInList(url);
-    await procesarSitio(sitio, windowId, tabId);
+    await procesarSitio(sitio, tabId);
   }
 
 });

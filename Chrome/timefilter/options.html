@@ -83,20 +83,49 @@
 
       <div id="divTbl" class = "w-100 container">
         <h3 class="w-100 text-center">Registro Accesos </h3>
-        <button id="btn_actualizar_accesos" class="btn btn-primary">Actualizar</button>
+        <button id="btn_actualizar_accesos" class="btn btn-primary">&#128260;</button>
         <table class="w-100 table table-stripped mt-2">
           <thead class="table-primary">
             <tr>
               <th>Sitio</th>
               <th>Ultimo Acceso</th>
               <th>Contador</th>
+              <th>&nbsp;</th>
             </tr>
           </thead>
           <tbody id="tblAccesos"></tbody>
         </table>
       </div>
-
+      
     </div>
+  </div>
+
+  <div class="modal" id="modal_extension" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        
+        <div class="modal-header">
+          <h4 class="modal-title">
+            <span class="nombre_sitio"></span> - Extensi&oacute;n Tiempo
+          </h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          
+        </div>
+
+        <div class="modal-body">
+          <div class="container">
+            <label class = "form-label" for="password_moderador">Ingrese Contrase&ntilde;a Moderador para extender tiempo para <span class="nombre_sitio"></span></label>
+            <input class="form-control" type="password" id="password_moderador" name="password_moderador">
+          </div>              
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="btn_exterder_tiempo">Aceptar</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+
+      </div>
+    </div>  
   </div>
 
   <script src="options.js"></script>

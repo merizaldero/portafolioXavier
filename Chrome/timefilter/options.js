@@ -143,10 +143,98 @@ async function consultarAccesos(){
             let td = document.createElement("td");
             td.appendChild(document.createTextNode( campo ));
             tr.append(td)
-        });        
+        });
+        let td1 = document.createElement("td");
+        if(item[ item.length -1 ] == 0){
+            let boton_extender = document.createElement("button");
+            boton_extender.dataset.sitio = item[0];
+            boton_extender.classList.add("btn");
+            boton_extender.classList.add("btn-secondary");
+            boton_extender.setAttribute('data-bs-toggle','modal');
+            boton_extender.setAttribute('data-bs-target','#modal_extension');
+            //boton_extender.setAttribute('data-bs-sitio',item[0]);
+            boton_extender.appendChild(document.createTextNode("Extender"));
+            td1.appendChild(boton_extender);
+        }
+        tr.append(td1)       
         tblAccesos.appendChild(tr);
+/*
+        // agrega eventos a los botones
+        const botones = document.getElementsByClassName("btn-extender");
+        for( let indice_boton = 0; indice_boton < botones.length; indice_boton++){
+            botones.item(indice_boton).addEventListener( "click", mostrar_dialogo_extension);
+        }
+*/        
     });
     //alert("listado actualizado");
+}
+/*
+function mostrar_dialogo_extension(evento){
+    const modal_extension = new boostrap.Modal(document.getElementById("modal_extension"));
+    const sitio = evento.target.dataset.sitio;
+    const spanes = document.getElementsByClassName("nombre_sitio");
+    const password_moderador = document.getElementById("password_moderador");
+    const btn_exterder_tiempo = document.getElementById("btn_exterder_tiempo");
+    for( let indice_span = 0; indice_span < spanes.length; indice_span++ ){
+        spanes.item(indice_span).innerText = sitio;
+    }
+    password_moderador.value = "";
+    btn_exterder_tiempo.dataset.sitio = sitio;
+    modal_extension.show();
+}
+*/
+
+function modalExtension_onShow(evento){
+    const target = evento.relatedTarget;
+    const sitio = target.dataset.sitio;
+    const spanes = document.getElementsByClassName("nombre_sitio");
+    const password_moderador = document.getElementById("password_moderador");
+    const btn_exterder_tiempo = document.getElementById("btn_exterder_tiempo");
+    for( let indice_span = 0; indice_span < spanes.length; indice_span++ ){
+        spanes.item(indice_span).innerText = sitio;
+    }
+    password_moderador.value = "";
+    btn_exterder_tiempo.dataset.sitio = sitio;
+    password_moderador.focus();
+}
+
+async function opciones_onLoad( evento){
+    await consultarAccesos();
+    setInterval(consultarAccesos ,60000);
+}
+
+async function btnExtender_onClick( evento ){
+    
+    const boton = evento.target;
+    const sitio = boton.dataset.sitio;
+    const password_moderador = document.getElementById("password_moderador");
+    const {xpdtf_moderador , xpdtf_duracion_extendida, xpdtf_tiempos} = await chrome.storage.local.get([ "xpdtf_moderador", "xpdtf_duracion_extendida", "xpdtf_tiempos"]);
+    const modal_extension = bootstrap.Modal.getInstance(document.getElementById("modal_extension"));
+    
+    console.log(`Extension tiempo para ${sitio} ; ${xpdtf_moderador} vs ${password_moderador.value} .`);
+
+    if( xpdtf_moderador != password_moderador.value ){
+        alertar("Clave de Moderador Incorrecta. " ,"danger");
+        modal_extension.hide();
+        return;
+    }
+
+    let tiempos = JSON.parse(xpdtf_tiempos);
+    if( ! (sitio in tiempos) ){
+        alertar("Error: No se tiene registro de sitio " + sitio,"danger");
+        modal_extension.hide();
+        return;
+    }
+
+    tiempos[sitio]['last_tic'] = new Date().toISOString();
+    tiempos[sitio]['tics'] += parseInt( xpdtf_duracion_extendida , 10 );
+
+    await chrome.storage.local.set( { 'xpdtf_tiempos': JSON.stringify(tiempos) } );
+    await consultarAccesos();
+    modal_extension.hide();
+    alertar("Tiempo excedido exitosamente para " + sitio );
+
+
 }
 
 document.getElementById("btn_guardar").addEventListener("click", saveOptions);
@@ -154,6 +242,9 @@ document.getElementById("btn_login").addEventListener("click", autenticar);
 document.getElementById("btn_add_filter").addEventListener("click", agregarSitio);
 document.getElementById("btn_remove_filter").addEventListener("click", removerSitios);
 // document.getElementById("btn_close_window").addEventListener("click", cerrarVentana);
-
-document.addEventListener("load", consultarAccesos);
 document.getElementById("btn_actualizar_accesos").addEventListener("click", consultarAccesos);
+document.getElementById("modal_extension").addEventListener( 'show.bs.modal', modalExtension_onShow);
+document.getElementById("btn_exterder_tiempo").addEventListener( 'click', btnExtender_onClick);
+
+// document.addEventListener("DOMContentLoaded", opciones_onLoad);
+opciones_onLoad(null);
