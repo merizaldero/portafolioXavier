@@ -100,7 +100,7 @@ async function ejecutarTimer() {
   
   if( ! xpdtf_sitio_actual ){
     return;
-  }
+  } 
 
   console.log('Procesando Timer con sitio ' + xpdtf_sitio_actual );
   let tiempos = JSON.parse(xpdtf_tiempos);
@@ -136,6 +136,7 @@ async function ejecutarTimer() {
 function startTimer() {
   if(TIMER_HANDLE == null){
     TIMER_HANDLE = setInterval(ejecutarTimer, 60000);
+    console.log("Timer Inicializado");
   }  
 }
 
