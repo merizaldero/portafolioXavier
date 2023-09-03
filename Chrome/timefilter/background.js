@@ -10,22 +10,18 @@ const SITIO_ACTUAL_KEY = 'xpdtf_sitio_actual';
 
 //Inicializa las variables del storage
 
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.storage.local.set( {
+chrome.runtime.onInstalled.addListener(async function() {
+  await chrome.storage.local.set( {
     "xpdtf_admin": "Administrador",
     "xpdtf_moderador": "Moderador",
-    'xpdtf_duracion_inicial': "3",
+    'xpdtf_duracion_inicial': "45",
     'xpdtf_duracion_extendida': "10",
-    'xpdtf_redireccion': "https://www.google.com/search?q=Sorry%2C+chicos%2C+se+ha+superado+el+limite+de+tiempo",
+    'xpdtf_redireccion': "extension://"+ chrome.runtime.id+"/options.html",
     'xpdtf_sitios': '["youtube.com"]',
     'xpdtf_tiempos': '{}'
-  }).then( ()=>{
-    console.log("Inicializacion Exitosa");
-    startTimer();
-  }).catch( err => {
-    console.log("Error Inicializacion " + err.toString());
   });
-  
+  startTimer();  
+  console.log("Inicializacion Exitosa");
 });
 
 // Función para validar la contraseña de moderador
@@ -143,21 +139,6 @@ function startTimer() {
   }  
 }
 
-// Evento que se activa cuando se inicia Chrome
-chrome.runtime.onStartup.addListener(async function() {
-  // Inicia el temporizador cuando se inicia Chrome
-  await chrome.storage.local.remove( 'xpdtf_sitio_actual' );
-  startTimer();
-});
-
-/*
-// Evento que se activa cuando se crea una nueva ventana en el navegador
-chrome.windows.onCreated.addListener(function() {
-  // Inicia el temporizador al abrir una nueva ventana
-  startTimer();
-});
-*/
-
 // Redirige a un tab de id determinado
 function redirigir_tab(tabId, url) {
   chrome.tabs.update(tabId, { url: url }, function(updatedTab) {
@@ -197,4 +178,17 @@ chrome.tabs.onActivated.addListener( async function(activeInfo) {
     await procesarSitio(sitio, tabId);
   }
 
+});
+
+// Evento que se activa cuando se inicia Chrome
+chrome.runtime.onStartup.addListener(async function() {
+  // Inicia el temporizador cuando se inicia Chrome
+  await chrome.storage.local.remove( 'xpdtf_sitio_actual' );
+  startTimer();
+});
+
+// Evento que se activa cuando se crea una nueva ventana en el navegador
+chrome.windows.onCreated.addListener(function() {
+  // Inicia el temporizador al abrir una nueva ventana
+  startTimer();
 });

@@ -137,6 +137,7 @@ async function consultarAccesos(){
     });
     const tblAccesos = document.getElementById('tblAccesos');
     tblAccesos.innerHTML = "";
+    let sitios_excedidos = 0;
     tiempos.forEach( item=> {
         let tr = document.createElement("tr");
         item.forEach(campo =>{
@@ -155,9 +156,20 @@ async function consultarAccesos(){
             //boton_extender.setAttribute('data-bs-sitio',item[0]);
             boton_extender.appendChild(document.createTextNode("Extender"));
             td1.appendChild(boton_extender);
+            sitios_excedidos ++;
         }
         tr.append(td1)       
         tblAccesos.appendChild(tr);
+
+        // muestra advertencia de tiempo excedido
+        const divAviso = document.getElementById("divAviso");        
+        if(sitios_excedidos == 0){
+            divAviso.style.display = "none";
+            divAviso.style.visibility = "hidden";
+        }else{
+            divAviso.style.display = "block";
+            divAviso.style.visibility = "visible";
+        }
 /*
         // agrega eventos a los botones
         const botones = document.getElementsByClassName("btn-extender");
@@ -200,7 +212,7 @@ function modalExtension_onShow(evento){
 
 async function opciones_onLoad( evento){
     await consultarAccesos();
-    setInterval(consultarAccesos ,60000);
+    //setInterval(consultarAccesos ,60000);
 }
 
 async function btnExtender_onClick( evento ){

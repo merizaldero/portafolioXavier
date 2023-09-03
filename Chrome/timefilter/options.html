@@ -25,7 +25,7 @@
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a id="btn_prompt_password" class="nav-link" data-bs-toggle="collapse" href=".seccion" >Administrar</a>
+            <a id="btn_prompt_password" class="nav-link display-2" data-bs-toggle="collapse" href=".seccion" >&#128295;</a>
           </li>
         </ul>
       </div>
@@ -79,9 +79,16 @@
 
 
     </div>
-    <div id="divDashboard" class="collapse show seccion w-100" data-bs-parent="#colapsador">
+    <div id="divDashboard" class="collapse show seccion w-100 d-flex flex-column" data-bs-parent="#colapsador">
+      
+      <div id="divAviso" class="mt-5 mb-5 w-50 container d-flex flex-column padding-5 align-items-center">
+        <h1>&#128584;</h1>
+        <h1>Lo Sentimos!</h1>
+        <p>Parece que has estado usando este sito por m&aacute;s tiempo que el permitido</p>
+        <p>Aprovecha tu tiempo y has algo diferente</p>
+      </div>
 
-      <div id="divTbl" class = "w-100 container">
+      <div id="divTbl" class = "w-50 container">
         <h3 class="w-100 text-center">Registro Accesos </h3>
         <button id="btn_actualizar_accesos" class="btn btn-primary">&#128260;</button>
         <table class="w-100 table table-stripped mt-2">
