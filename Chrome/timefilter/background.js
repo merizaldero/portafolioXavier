@@ -83,10 +83,8 @@ async function procesarSitio(sitio, tabId){
   }else{
     await chrome.storage.local.set( { 'xpdtf_sitio_actual' : sitio });
     await chrome.storage.local.set( { 'xpdtf_tab_id' : tabId });
-    ejecutarTimer();
-    startTimer();
+    ejecutarTimer();    
   }
-  
   console.log(`Sitio ${sitio} procesado.`);
 }
 
@@ -94,7 +92,7 @@ var TIMER_HANDLE = null;
 
 // Función que se ejecuta cada 60 segundos
 async function ejecutarTimer() {
-  
+  console.log("Tick de timer inicio");
   const {xpdtf_sitio_actual, xpdtf_tiempos, xpdtf_duracion_inicial, xpdtf_redireccion, xpdtf_tab_id} = 
     await chrome.storage.local.get( ['xpdtf_sitio_actual', 'xpdtf_tiempos', 'xpdtf_duracion_inicial', 'xpdtf_redireccion', 'xpdtf_tab_id'] );
   
@@ -178,6 +176,7 @@ chrome.tabs.onActivated.addListener( async function(activeInfo) {
     let sitio = await isSiteInList(url);
     await procesarSitio(sitio, tabId);
   }
+  startTimer();
 
 });
 
