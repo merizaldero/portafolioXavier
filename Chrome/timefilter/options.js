@@ -11,6 +11,7 @@ function saveOptions() {
         "xpdtf_moderador": document.getElementById("mod-password").value ,
         "xpdtf_duracion_inicial": document.getElementById("initial-time").value,
         "xpdtf_duracion_extendida": document.getElementById("extended-time").value,
+        "xpdtf_lock_time": document.getElementById("lock_time").value,
         "xpdtf_redireccion": document.getElementById("redirection-url").value,
         "xpdtf_sitios": JSON.stringify(sitios),
         'xpdtf_tiempos': '{}'
@@ -36,13 +37,14 @@ function loadOptions(){
     opciones_form.style.display="block";
     opciones_form.style.visibility="visible";
 
-    chrome.storage.local.get(["xpdtf_admin", "xpdtf_moderador", "xpdtf_duracion_inicial", "xpdtf_duracion_extendida", "xpdtf_redireccion", "xpdtf_sitios"]
+    chrome.storage.local.get(["xpdtf_admin", "xpdtf_moderador", "xpdtf_duracion_inicial", "xpdtf_duracion_extendida", "xpdtf_redireccion", "xpdtf_sitios", "xpdtf_lock_time"]
     ).then( miStorage =>{        
         document.getElementById("admin-password").value = miStorage.xpdtf_admin;
         document.getElementById("mod-password").value = miStorage.xpdtf_moderador;
         document.getElementById("initial-time").value = miStorage.xpdtf_duracion_inicial;
         document.getElementById("extended-time").value = miStorage.xpdtf_duracion_extendida;
         document.getElementById("redirection-url").value = miStorage.xpdtf_redireccion;
+        document.getElementById("lock_time").value = miStorage.xpdtf_lock_time;
         const sites = document.getElementById("site-list");
         sites.innerHTML = "";
 
@@ -128,13 +130,19 @@ function cerrarVentana(){
     window.close();
 }
 
+function getIsoDate(){
+    const ahorita = new Date();
+    const ahoritaAqui = new Date( ahorita.getTime() + ahorita.getTimezoneOffset() * 60000 );
+    return ahoritaAqui.toISOString().substring(0,16);
+  }  
 
 async function consultarAccesos(){
-    const { xpdtf_tiempos } = await chrome.storage.local.get( [ 'xpdtf_tiempos' ] );
+    const { xpdtf_tiempos, xpdtf_lock_time } = await chrome.storage.local.get( [ 'xpdtf_tiempos', 'xpdtf_lock_time' ] );
     const obj_xpdtf_tiempos = JSON.parse(xpdtf_tiempos);
     let tiempos = Object.keys(obj_xpdtf_tiempos).map( sitio => { 
         return [ sitio, obj_xpdtf_tiempos[sitio].last_tic, obj_xpdtf_tiempos[sitio].tics ]; 
     });
+    const hora = getIsoDate().substring(11);
     const tblAccesos = document.getElementById('tblAccesos');
     tblAccesos.innerHTML = "";
     let sitios_excedidos = 0;
@@ -146,7 +154,7 @@ async function consultarAccesos(){
             tr.append(td)
         });
         let td1 = document.createElement("td");
-        if(item[ item.length -1 ] == 0){
+        if(item[ item.length -1 ] == 0 && hora < xpdtf_lock_time ){
             let boton_extender = document.createElement("button");
             boton_extender.dataset.sitio = item[0];
             boton_extender.classList.add("btn");

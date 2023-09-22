@@ -4,6 +4,9 @@ const MODERATOR_PASSWORD_KEY = 'xpdtf_moderador';
 const INITIAL_DURATION_KEY = 'xpdtf_duracion_inicial';
 const EXTENDED_DURATION_KEY = 'xpdtf_duracion_extendida';
 const REDIRECT_URL_KEY = 'xpdtf_redireccion';
+
+const LOCK_TIME = 'xpdtf_lock_time';
+
 const SITES_LIST_KEY = 'xpdtf_sitios';
 const TIMES_KEY = 'xpdtf_tiempos';
 const SITIO_ACTUAL_KEY = 'xpdtf_sitio_actual';
@@ -11,18 +14,33 @@ const SITIO_ACTUAL_KEY = 'xpdtf_sitio_actual';
 //Inicializa las variables del storage
 
 chrome.runtime.onInstalled.addListener(async function() {
-  await chrome.storage.local.set( {
-    "xpdtf_admin": "Administrador",
-    "xpdtf_moderador": "Moderador",
-    'xpdtf_duracion_inicial': "45",
-    'xpdtf_duracion_extendida': "10",
-    'xpdtf_redireccion': "extension://"+ chrome.runtime.id+"/options.html",
-    'xpdtf_sitios': '["youtube.com"]',
-    'xpdtf_tiempos': '{}'
-  });
+  let {xpdtf_admin} = await chrome.storage.local.get(['xpdtf_admin']);
+  if(xpdtf_admin == null){
+    await chrome.storage.local.set( {
+      "xpdtf_admin": "Administrador",
+      "xpdtf_moderador": "Moderador",
+      'xpdtf_duracion_inicial': "45",
+      'xpdtf_duracion_extendida': "10",
+      'xpdtf_redireccion': "extension://"+ chrome.runtime.id+"/options.html",
+      'xpdtf_sitios': '["youtube.com"]',
+      'xpdtf_tiempos': '{}'
+    });
+  }
+  let {xpdtf_lock_time} = await chrome.storage.local.get(['xpdtf_lock_time']);
+  if(xpdtf_lock_time == null){
+    await chrome.storage.local.set( {
+      "xpdtf_lock_time": "21:30"
+    });
+  }
   startTimer();  
   console.log("Inicializacion Exitosa");
 });
+
+function getIsoDate(){
+  const ahorita = new Date();
+  const ahoritaAqui = new Date( ahorita.getTime() - ahorita.getTimezoneOffset() * 60000 );
+  return ahoritaAqui.toISOString().substring(0,16);
+}
 
 // Función para validar la contraseña de moderador
 async function validateModeratorPassword(password) {
@@ -52,7 +70,7 @@ async function getTximes(site) {
   const times_obj = JSON.parse(configuracion.xpdtf_tiempos);
   if(! site in times_obj){
     let minutos_total = parseInt(configuracion.xpdtf_duracion_inicial.substring(0,2) ,10) * 60 + parseInt(configuracion.xpdtf_duracion_inicial.substring(3) ,10) ;
-    return {'tics': minutos_total , 'last_tic': new Date().toISOString() };
+    return {'tics': minutos_total , 'last_tic': getIsoDate() };
   }
   return times_obj[site];
 }
@@ -93,8 +111,8 @@ var TIMER_HANDLE = null;
 // Función que se ejecuta cada 60 segundos
 async function ejecutarTimer() {
   console.log("Tick de timer inicio");
-  const {xpdtf_sitio_actual, xpdtf_tiempos, xpdtf_duracion_inicial, xpdtf_redireccion, xpdtf_tab_id} = 
-    await chrome.storage.local.get( ['xpdtf_sitio_actual', 'xpdtf_tiempos', 'xpdtf_duracion_inicial', 'xpdtf_redireccion', 'xpdtf_tab_id'] );
+  const {xpdtf_sitio_actual, xpdtf_tiempos, xpdtf_duracion_inicial, xpdtf_redireccion, xpdtf_tab_id, xpdtf_lock_time} = 
+    await chrome.storage.local.get( ['xpdtf_sitio_actual', 'xpdtf_tiempos', 'xpdtf_duracion_inicial', 'xpdtf_redireccion', 'xpdtf_tab_id', 'xpdtf_lock_time'] );
   
   if( ! xpdtf_sitio_actual ){
     return;
@@ -102,7 +120,7 @@ async function ejecutarTimer() {
 
   console.log('Procesando Timer con sitio ' + xpdtf_sitio_actual );
   let tiempos = JSON.parse(xpdtf_tiempos);
-  const fecha_actual = new Date().toISOString();
+  const fecha_actual = getIsoDate();
   let tiempos_sitio = { 'tics' : parseInt(xpdtf_duracion_inicial, 10), 'last_tic': fecha_actual };
   
   if( ! (xpdtf_sitio_actual in tiempos) ){
@@ -114,6 +132,12 @@ async function ejecutarTimer() {
   } else{
     tiempos_sitio = tiempos[ xpdtf_sitio_actual ];
     
+    // Si se supera la hora limite, se encera el contador y se provoca redireccionamiento
+    if( fecha_actual.substring(11) >= xpdtf_lock_time){
+      tiempos_sitio['tics'] = 0;
+      tiempos_sitio['last_tic'] = fecha_actual;
+    }
+
     if( tiempos_sitio['tics'] > 0){
       // Decrementa tics y almacena con marca de tiempo
       tiempos_sitio['tics'] --;
