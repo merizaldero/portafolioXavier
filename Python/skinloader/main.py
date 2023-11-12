@@ -137,7 +137,7 @@ def cargar_nuevo_skin():
 ######### WEBAPP ROUTERS ###############
 
 try:
-    server = MyWSGIRefServer(host="127.0.0.1", port="8080")
+    server = MyWSGIRefServer(host="0.0.0.0", port="8080")
     app.run(server=server,reloader=False)
 except Exception as ex:
     errs = "Exception: %s" % repr(ex)
