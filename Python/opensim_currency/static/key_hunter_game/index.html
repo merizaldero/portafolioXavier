@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Key Hunter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/key_hunter.css" rel="stylesheet">
+    <!-- Latest compiled JavaScript -->
+    <script src="/static/js/angular.min.js"></script>  
+</head>
+<body ng-app="keyhunter_app" ng-controller="keyhunter_controller" class="container w-100" data-bs-theme="dark">
+    <div class="row">
+        <h1 class = "col-12 text-center">Key Hunter</h1>
+    </div>
+    
+    <div class="row">
+
+        <div class="col-6">
+            <div id="carrusel_tienda" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button ng-repeat="(indice, personaje) in getPersonajes()" type="button" data-bs-target="#carrusel_tienda" data-bs-slide-to="{{indice}}" ng-class="defaultItemClass(indice)"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div ng-repeat="(indicex, personajex) in personajes" class="carousel-item mb-5 " ng-class="defaultItemClass(indicex)">
+                        <div class="align-center d-flex flex-column align-items-center w-75">
+                            <img src="{{personajex.img_personaje}}" alt="{{personajex.nombre}}" class="align-center" style="width:160px;height:320px;">
+                            <span>{{personajex.nombre}}</span>
+                            <button class="btn btn-primary align-center" ng-click="agregar_seleccionado(indicex)" ng-disabled="personajex.vendido">Comprar</button>
+                        </div>                            
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carrusel_tienda" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carrusel_tienda" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>  
+            </div>
+        </div>
+        
+
+        <div class = "col-6 ml-5 mr-5 d-flex flex-wrap border-solid border-light" style="background-color: gray;">
+            <div ng-repeat="(indicey, personajey) in personajes_seleccionados" class="">
+                <div class="align-center d-flex flex-column align-items-center w-75">
+                    <img src="{{personajey.img_personaje}}" alt="{{personajey.nombre}}" class="align-center" style="width:80px;height:160px;">
+                    <span>{{personajey.nombre}}</span>
+                    <span class="alert alert-success small" ng-if="seleccionado_con_llave(personajey.id) != null">{{seleccionado_con_llave(personajey.id)}} tiene mi llave</span>
+                    <span class="alert alert-danger small" ng-if="seleccionado_con_llave(personajey.id) == null">Nadie tiene mi llave</span>
+                </div>                            
+            </div>
+        </div>
+
+        <div class="modal fade" id = "modal_final">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">{{encabezado_modal}}</div>
+                    <div class="modal-body">{{mensaje_modal}}</div>
+                    <div class="modal-footer">
+                        <a href = "index.html"class="btn btn-primary">Jugar de Nuevo</a>
+                    </div>
+                </div>
+            </div>            
+        </div>
+    
+
+    </div>
+
+
+  <script src="js/key_hunter.js?16"></script>
+ <script src="/static/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

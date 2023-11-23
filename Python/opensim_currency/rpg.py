@@ -1,0 +1,196 @@
+import xpd_orm as orm
+
+PATH_BDD = dirname(abspath(__file__)) + "/data/rpg.db"
+PATH_INIT = dirname(abspath(__file__)) + "/data/rpg_init.sql"
+
+Niveles = orm.Entidad()
+Niveles.setMetamodelo({
+    "nombreTabla":"NIVEL",
+    "propiedades":[
+        {
+            "nombre":"id",
+            "nombreCampo":"ID",
+            "tipo":orm.XPDINTEGER,
+            "pk":True,
+            },
+        {
+            "nombre":"nombre",
+            "nombreCampo":"NOMBRE",
+            "tipo":orm.XPDSTRING,
+            "tamano":8,
+            },
+        {
+            "nombre":"max_salud",
+            "nombreCampo":"MAX_SALUD",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"max_ataque",
+            "nombreCampo":"MAX_ATAQUE",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"max_defensa",
+            "nombreCampo":"MAX_DEFENSA",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"max_experiencia",
+            "nombreCampo":"MAX_EXPERIENCIA",
+            "tipo":orm.XPDINTEGER,
+            },
+        ],
+    "namedQueries":[
+        {
+            "nombre":"findall",
+            "orderBy":["nombre",]
+            },
+        {
+            "nombre":"findById",
+            "whereClause":["id",]
+            }
+        ]
+    })
+
+Habilidades = orm.Entidad()
+Habilidades.setMetamodelo({
+    "nombreTabla":"HABILIDAD",
+    "propiedades":[
+        {
+            "nombre":"id",
+            "nombreCampo":"ID",
+            "tipo":orm.XPDSTRING,
+            "pk":True,
+            "tamano":8,
+            },
+        {
+            "nombre":"nombre",
+            "nombreCampo":"NOMBRE",
+            "tipo":orm.XPDSTRING,
+            "tamano":32,
+            },
+        {
+            "nombre":"min_EXPERIENCIA",
+            "nombreCampo":"MIN_EXPERIENCIA",
+            "tipo":orm.XPDINTEGER,
+            },
+        ],
+    "namedQueries":[
+        {
+            "nombre":"findall",
+            "orderBy":["nombre",]
+            },
+        {
+            "nombre":"findById",
+            "whereClause":["id",]
+            }
+        ]
+    })
+
+HabilidadesNivel = orm.Entidad()
+HabilidadesNivel.setMetamodelo({
+    "nombreTabla":"HABILIDAD_NIVEL",
+    "propiedades":[
+        {
+            "nombre":"id",
+            "nombreCampo":"ID",
+            "tipo":orm.XPDINTEGER,
+            "pk":True,
+            "incremental":True,
+            },
+        {
+            "nombre":"id_nivel",
+            "nombreCampo":"ID_NIVEL",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"id_habilidad",
+            "nombreCampo":"ID_HABILIDAD",
+            "tipo":orm.XPDSTRING,
+            "tamano":8,
+            },
+        {
+            "nombre":"min_EXPERIENCIA",
+            "nombreCampo":"MIN_EXPERIENCIA",
+            "tipo":orm.XPDINTEGER,
+            },
+        ],
+    "namedQueries":[
+        {
+            "nombre":"findall",
+            "orderBy":["nombre",]
+            },
+        {
+            "nombre":"findById",
+            "whereClause":["id",]
+            }
+        ]
+    })
+
+Personajes = orm.Entidad()
+Personajes.setMetamodelo({
+    "nombreTabla":"PERSONAJE",
+    "propiedades":[
+        {
+            "nombre":"id",
+            "nombreCampo":"ID",
+            "tipo":orm.XPDSTRING,
+            "pk":True,
+            "tamano":64,
+            },
+        {
+            "nombre":"nombre",
+            "nombreCampo":"NOMBRE",
+            "tipo":orm.XPDSTRING,
+            "tamano":32,
+            },
+        {
+            "nombre":"id_avatar",
+            "nombreCampo":"ID_AVATAR",
+            "tipo":orm.XPDSTRING,
+            "tamano":64,
+            },
+        {
+            "nombre":"dinero",
+            "nombreCampo":"DINERO",
+            "tipo":orm.XPDREAL,
+            "tamano": 7,
+            "precision": 2,
+            },
+        {
+            "nombre":"id_nivel",
+            "nombreCampo":"ID_NIVEL",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"salud",
+            "nombreCampo":"SALUD",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"ataque",
+            "nombreCampo":"ATAQUE",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"defensa",
+            "nombreCampo":"DEFENSA",
+            "tipo":orm.XPDINTEGER,
+            },
+        {
+            "nombre":"experiencia",
+            "nombreCampo":"EXPERIENCIA",
+            "tipo":orm.XPDINTEGER,
+            },
+        ],
+    "namedQueries":[
+        {
+            "nombre":"findall",
+            "orderBy":["nombre",]
+            },
+        {
+            "nombre":"findById",
+            "whereClause":["id",]
+            }
+        ]
+    })

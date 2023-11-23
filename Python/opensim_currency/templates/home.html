@@ -12,7 +12,20 @@
 
     </head>
 
-    <body class="container">
-      <div>Bienvenido, {{sesion['user_name']}}</div>      
+    <body class="container bg-light mh-100" style="height:100vh">
+
+      <div class="navbar navbar-expand-sm bg-primary text-white navbar-fixed-top">
+        <div class="container-fluid">
+          <h2 class="navbar-brand" href="#">&#x1F464; {{sesion['user_name']}}</h2>
+        </div>
+      </div>
+
+      <div class="bg-white w-100 d-flex flex-column justify-content-center align-items-center" style="height:80vh">
+        <h1>&#x1F4B0; {{cuenta['saldo']}}</h1>
+        <h2>SALDO</h2>
+      </div>
+      <script language="javascript">
+        document.height = 500;
+        </script>
     </body>
 </html>

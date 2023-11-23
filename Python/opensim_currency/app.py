@@ -5,6 +5,9 @@ from flask_xmlrpcre.xmlrpcre import XMLRPCHandler, Fault
 import currency
 import region_validator
 import xpd_os_session
+import urllib.request
+from eliza.eliza import eliza as Eliza
+import argparse
 
 # configuration
 
@@ -12,8 +15,6 @@ DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
-HOST = '0.0.0.0'
-PORT = 80
 
 ENCABEZADOS_INTERES = ["X-Forwarded-For", "X-SecondLife-Shard", "X-SecondLife-Region", "X-SecondLife-Owner-Name",
     "X-SecondLife-Owner-Key", "X-SecondLife-Object-Name","X-SecondLife-Object-Key","X-SecondLife-Local-Velocity",
@@ -74,8 +75,10 @@ def request_session():
 def home_user(request_id, session_id):
     try:
         sesion = xpd_os_session.validar_sesion(request_id, session_id)
-        return render_template('home.html', sesion = sesion)
+        cuenta = currency.obtener_cuenta( sesion['user_id'] )
+        return render_template('home.html', sesion = sesion, cuenta = cuenta )
     except Exception as ex:
+        print(repr(ex))
         return "No Autorizado", 401
     finally:
         pass
@@ -102,6 +105,71 @@ VIDEOS_EJERCICIO = [
 @app.route('/videosejercicio')
 def lista_videos_ejercicios():
    return render_template('videos.html', videos = VIDEOS_EJERCICIO )
+
+VIDEOS_JUSTDANCE = [
+    {'label':'Kulikitaka', 'url':'https://www.youtube.com/embed/-LS89QO3U28'},    
+    {'label':'Numb', 'url':'https://www.youtube.com/watch?v=rJt_aCgRhxs'},
+    {'label':'Final Countdown', 'url':'https://www.youtube.com/watch?v=hfY4yI1fMkY'},
+    {'label':'Rasputin', 'url':'https://www.youtube.com/watch?v=fCv5q2yoqAY'},    
+    {'label':'Get Lucky', 'url':'https://www.youtube.com/watch?v=3ySOvp42PwU'},
+    {'label':'Waka Waka', 'url':'https://www.youtube.com/watch?v=CyfM2o0d0IE'},
+    {'label':'Gangnam Style', 'url':'https://www.youtube.com/watch?v=3qOMafRtQZ0'},
+]
+
+@app.route('/videosjustdance')
+def lista_videos_justdance():
+   return render_template('videos.html', videos = VIDEOS_JUSTDANCE )
+
+VIDEOS_KARAOKE = [
+    {'label':'The Bangles - Eternal Flame', 'url':'https://www.youtube.com/watch?v=rV5NCv24FWI'},    
+    {'label':'Survivor - Eye Of The Tiger', 'url':'https://www.youtube.com/watch?v=_qDML_BCju8'},
+    {'label':'Green Day - Good Riddance (Time of Your Life) ', 'url':'https://www.youtube.com/watch?v=9S1QOK8zMuE'},
+    {'label':'a-ha - Take On Me', 'url':'https://www.youtube.com/watch?v=bC4ER15Hj10'},    
+    {'label':'The Weeknd - Blinding Lights', 'url':'https://www.youtube.com/watch?v=XwxLwG2_Sxk'},
+    {'label':'La pareja ideal | Marisela ft. Marco Antonio Solis', 'url':'https://www.youtube.com/watch?v=97CvIb_gyA8'},
+    {'label':'Tercer Cielo-El uno para el otro', 'url':'https://www.youtube.com/watch?v=-ryIsAWYWA0'},
+    {'label':'Como la Flor - Selena', 'url':'https://www.youtube.com/watch?v=qBNkPgsPB-4'},
+    {'label':'Coldplay - The Scientist', 'url':'https://www.youtube.com/watch?v=A6V5YPB7EsA'},
+    {'label':'Coldplay - Yellow', 'url':'https://www.youtube.com/watch?v=1Fv5IVf9KAc'},
+    {'label':'Coldplay - A Sky Full Of Stars', 'url':'https://www.youtube.com/watch?v=z1i1Qvy5u7w'},
+    {'label':'Viva La Vida - Coldplay', 'url':'https://www.youtube.com/watch?v=FSll_OC0L64'},
+    {'label':'R.E.M. - Losing My Religion', 'url':'https://www.youtube.com/watch?v=rN2Q76xR6eE'},
+    {'label':'The Cranberries - Zombie', 'url':'https://www.youtube.com/watch?v=m8CEEkqQiiY'},
+    {'label':'Just My Imagination - The Cranberries', 'url':'https://www.youtube.com/watch?v=ci2dyl48_JIY'},
+    {'label':'The Cranberries - Analyse', 'url':'https://www.youtube.com/watch?v=CxZK1eUJWW8'},
+    {'label':'The Cranberries - Stars', 'url':'https://www.youtube.com/watch?v=fVwMbXyInA8'},
+    {'label':'Chayanne - Y Tu Te Vas', 'url':'https://www.youtube.com/watch?v=IjOwgiUKXmg'},
+    {'label':'Chayanne Un Siglo Sin Ti', 'url':'https://www.youtube.com/watch?v=q1E1daK7Se4'},
+    {'label':'Chayanne - Completamente Enamorados', 'url':'https://www.youtube.com/watch?v=tpvh38Iqnk4'},
+    {'label':'Ricardo arjona Te conozco', 'url':'https://www.youtube.com/watch?v=bADzHzJYiu4'},
+    {'label':'Ricardo Arjona - Mujeres', 'url':'https://www.youtube.com/watch?v=TB5hV1lGhMU'},
+    {'label':'Ricardo Arjona - Jesus Verbo No Sustantivo', 'url':'https://www.youtube.com/watch?v=lhxgs8dUjiA'},
+    {'label':'Ricardo Arjona - Casa De Locos', 'url':'https://www.youtube.com/watch?v=76EdNUQmh5Q'},
+    {'label':'Capitán Memo Robot Festival De Robots', 'url':'https://www.youtube.com/watch?v=484rnWfx2Yg'},
+    {'label':'Capitan Memo El Galactico', 'url':'https://www.youtube.com/watch?v=T62WGopr3xc'},
+    {'label':'Inuyasha Opening 1 Change the world', 'url':'https://www.youtube.com/watch?v=f47gcDkYDkQ'},
+    {'label':'Inuyasha Opening 2 I am', 'url':'https://www.youtube.com/watch?v=79QLCBH94Sg'},
+    {'label':'Inuyasha Opening 5 One day, one dream', 'url':'https://www.youtube.com/watch?v=BneuSNir82w'},
+    {'label':'Digimon Adventure Tema: Brave Heart', 'url':'https://www.youtube.com/watch?v=7Kp_jfq2i3E'},
+    {'label':'Digimon Adventure 2 Break Up', 'url':'https://www.youtube.com/watch?v=yBhmxlbjRf0'},
+]
+
+@app.route('/karaoke')
+def lista_videos_karaoke():
+   return render_template('videos.html', videos = VIDEOS_KARAOKE )
+
+ELIZA = Eliza()
+
+@app.route('/eliza', methods = ['POST', 'GET'])
+def servir_eliza():
+    if request.method == 'POST':
+        usuario = request.form.get('usuario')
+        pregunta = request.form.get('pregunta')
+        respuesta = ELIZA.respond(pregunta, user = usuario)
+        resultado = { 'respuesta': respuesta }
+        return resultado
+    else:
+        return render_template('eliza.html')
 
 api = XMLRPCHandler('economy')
 api.connect(app, '/economy/currency.php')
@@ -287,5 +355,16 @@ def simulatorClaimUserRequest(req):
     print('simulatorClaimUserRequest ' + str(respuesta))
     return respuesta
 
+HOST = "0.0.0.0"
+PORT = 80
+
 if __name__ == '__main__':
-   app.run(host = HOST, port = PORT, debug = True)
+    parser = argparse.ArgumentParser(description='Sitio de Soporte al Simulator.')
+    parser.add_argument('host', default=HOST)
+    parser.add_argument('port', type=int, default=PORT)
+
+    args = parser.parse_args()
+    HOST = args.host
+    PORT = args.port
+    
+    app.run(host = HOST, port = PORT, debug = True)
