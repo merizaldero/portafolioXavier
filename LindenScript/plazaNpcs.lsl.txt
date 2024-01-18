@@ -1,11 +1,15 @@
 list SEGUIDORES = [];
 integer MAX_SEGUIDORES = 5;
-integer MAX_TICKS = 10;
+integer MAX_TICKS = 20;
 float GAP = 3.0;
 vector POSICION_RELATIVA = <1.5, -0.5, 0>;
 
 integer LISTEN_CHANNEL = 4;
 integer LISTEN_HANDLE;
+
+key NPC_MK = NULL_KEY;
+string NPC_ANIMACION = "";
+string MUSICA_LOOP = "1.mkloop";
 
 list obtener_posicion_ideal_npc(key seguido){
     list posicion_rotacion = llGetObjectDetails( seguido , [OBJECT_POS, OBJECT_ROT] );
@@ -144,4 +148,72 @@ default
         }
     }
     
+    touch_end(integer numero){
+        if(numero == 1 && llDetectedKey(0) == llGetOwner()){
+            state modo_mk;
+        }
+    }
+    
+}
+
+state modo_mk{
+    state_entry()
+    {
+        llSay(0, "MORTAL KOMBAT!!!");
+        llLoopSound(MUSICA_LOOP, 1.0);
+        string primer_notecard = llGetInventoryName(INVENTORY_NOTECARD, 0 );
+        NPC_ANIMACION = llGetInventoryName(INVENTORY_ANIMATION, 0 );
+        vector mi_pos = llGetPos();
+        vector mi_size = llGetScale();
+        vector mk_pos = mi_pos - mi_size /2 + <0, - 1.5, 1.5>;
+        NPC_MK = osNpcCreate( "Mortal" , "Kombat", mk_pos , primer_notecard);
+        osNpcSetRot(NPC_MK, llEuler2Rot(< 0, 0, 0>));    
+        osNpcPlayAnimation(NPC_MK,NPC_ANIMACION);
+        LISTEN_HANDLE = llListen( LISTEN_CHANNEL,"",NULL_KEY,"");        
+    }
+    state_exit(){
+        llStopSound();
+        osNpcRemove(NPC_MK);
+        llListenRemove(LISTEN_HANDLE);
+        LISTEN_HANDLE = 0;
+        NPC_MK = NULL_KEY;
+    }
+    
+    listen(integer channel, string name, key id, string msg)
+    {
+        if (msg == ""){
+            return;
+        } 
+
+        list commands = llParseString2List(msg, [ " " ], []);
+        string msg0 = llList2String(commands, 0);
+        string msg1 = llList2String(commands, 1);
+        string msg2 = llList2String(commands, 2);            
+        string msg3 = llList2String(commands, 3);
+        
+        if( msg0 == "clonar" && msg1 != ""){
+            crear_notecard( msg1, id );
+        }else if( msg0 == "crear" && msg1 != "" && msg2 != "" && msg3 != "" ){
+            string nombre = msg1 + " " + msg2;            
+            llSay(0, nombre + " !!");
+            osNpcLoadAppearance(NPC_MK, msg3);
+        }
+    }
+
+    touch_end(integer numero){
+        if(numero == 1 && llDetectedKey(0) == llGetOwner()){
+            state default;
+        }
+    }
+        
+    on_rez(integer start_param)
+    {
+        llResetScript(); 
+    }
+    
+    changed(integer change){
+        if( change & CHANGED_REGION_START){
+            llResetScript();
+        }
+    }    
 }
