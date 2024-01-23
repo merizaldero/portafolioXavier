@@ -1,0 +1,7 @@
+/NodeJS/
+/__pycache__/
+/.ipynb_checkpoints/
+/data/*.db
+/lotto_pics/
+/lotto_data.txt
+/salida.txt
