@@ -52,7 +52,32 @@ async function btnConsultar_click(event){
     seccion_resultado.classList.remove("collapse");
 }
 
-window.addEventListener("load", event => {
+function cargar_top(){
+    ['success','warning','danger'].forEach(async (ranking) =>{
+        const res = await fetch(`/ranking/${ranking}`,  {
+            method: "GET",
+        });
+        if(res.status!=200){
+            alert("No se pudo obtener top. error " + res.status);
+            return;
+        }
+        const obj_resultado = await res.json();
+        let divPadre, spanNumero;
+        obj_resultado.resultado.forEach(item => {
+            divPadre = document.getElementById(`${ranking}_pos_${item.posicion}`);
+            spanNumero = document.createElement("button");
+            spanNumero.innerText = item.digito;
+            spanNumero.classList.add("btn", `btn-${ranking}`);
+            // data-bs-toggle="tooltip" title="Hooray!"
+            spanNumero.setAttribute('data-bs-toggle','tooltip');
+            spanNumero.setAttribute('title',`${item.probabilidad}`);
+            divPadre.appendChild(spanNumero);
+        });    
+    });
+}
+
+window.addEventListener("load", (event) => {
+    cargar_top();
     //habilita botones como teclado
     const lista_botones = document.getElementsByClassName("teclado");
     for(let indice = 0; indice< lista_botones.length; indice++){

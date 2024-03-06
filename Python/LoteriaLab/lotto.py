@@ -1,6 +1,7 @@
 import xpd_orm as orm
 from os.path import abspath , dirname, exists
 from nltk.probability import FreqDist
+import numpy as np
 
 PATH_BDD = dirname(abspath(__file__)) + "/data/base.db"
 PATH_INIT = dirname(abspath(__file__)) + "/data/init.sql"
@@ -127,6 +128,11 @@ Probabilidades.setMetamodelo({
             "orderBy":["posicion","digito",]
             },
         {
+            "nombre":"findByRanking",
+            "whereClause":["ranking",],
+            "orderBy":["posicion","probabilidad"]
+            },
+        {
             "nombre":"findByPosicion",
             "whereClause":["posicion",],
             "orderBy":["digito",]
@@ -211,14 +217,17 @@ def calcular_probabilidades():
                 else:
                     probabilidad['probabilidad'] = 0.0
                 probabilidades_posicion_persistencia.append(probabilidad)
-            probabilidades_lst = list(set( [ x['probabilidad'] for x in probabilidades_posicion_persistencia ] ))
+            # probabilidades_lst = list(set( [ x['probabilidad'] for x in probabilidades_posicion_persistencia ] ))
+            probabilidades_lst = [ x['probabilidad'] for x in probabilidades_posicion_persistencia ]
             # crea ranking por posicion
-            min_probabilidad = min(probabilidades_lst)
-            max_probabilidad = max(probabilidades_lst)
-            min_green = min_probabilidad + ( max_probabilidad - min_probabilidad ) * 2 / 3
-            min_yellow = min_probabilidad + ( max_probabilidad - min_probabilidad ) * 2 / 3
+            avg_probabilidad = np.median(probabilidades_lst)
+            std_probabilidad = np.std(probabilidades_lst)
+            # min_green = min_probabilidad + ( max_probabilidad - min_probabilidad ) * 2 / 3
+            min_green = avg_probabilidad + std_probabilidad
+            # min_yellow = min_probabilidad + ( max_probabilidad - min_probabilidad ) * 2 / 3
+            min_yellow = avg_probabilidad - std_probabilidad
             rankings = {}
-            for probabilidad in probabilidades_lst:
+            for probabilidad in set(probabilidades_lst):
                 if probabilidad >= min_green:
                     rankings[probabilidad] = 'success'
                 elif probabilidad >= min_yellow:
@@ -249,3 +258,11 @@ def mostrar_probabilidad(numero):
     con.close()
     return [ x['ranking'] for x in resultado ]
 
+def findProbabilidadesByRanking(ranking):
+    sql = "SELECT id as id, posicion as posicion, digito as digito, probabilidad as probabilidad, ranking as ranking FROM PROBABILIDADES  WHERE RANKING = :ranking  ORDER BY POSICION, PROBABILIDAD DESC"
+    #print(Probabilidades.getNamedQuerySql("findByRanking"))
+    con = orm.Conexion(PATH_BDD)
+    # resultado = Probabilidades.getNamedQuery(con, "findByRanking", { 'ranking': ranking })
+    resultado = con.consultar(sql, { 'ranking': ranking }, ['id', 'posicion', 'digito', 'probabilidad', 'ranking'] )
+    con.close()
+    return resultado

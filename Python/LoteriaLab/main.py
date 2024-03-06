@@ -54,6 +54,16 @@ def evaluar():
     resultado = lotto.mostrar_probabilidad(numero)
     return {'resultado':resultado}
 
+@app.route('/ranking/<ranking>' , method = 'GET' )
+def findPByRanking(ranking):    
+    resultado = lotto.findProbabilidadesByRanking(ranking)
+    return {'resultado':resultado}
+
+@app.route('/recalcular' , method = 'GET' )
+def recalcular_ranking():    
+    lotto.calcular_probabilidades()
+    return "Ranking Recalculado"
+
 ######### WEBAPP ROUTERS ###############
 
 # app.route('/', method='GET')(home)
