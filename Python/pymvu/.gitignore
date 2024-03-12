@@ -1,0 +1,7 @@
+/__pycache__/
+/data/base.db
+/salas/*.blend*
+/salas/*.png
+/avatares/*.blend*
+/avatares/*.png
+/texturas/
