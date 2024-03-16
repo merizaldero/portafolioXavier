@@ -2,6 +2,9 @@
 /data/base.db
 /salas/*.blend*
 /salas/*.png
+/salas/*.dae
 /avatares/*.blend*
 /avatares/*.png
+/avatares/*.dae
+/avatares/textures
 /texturas/
