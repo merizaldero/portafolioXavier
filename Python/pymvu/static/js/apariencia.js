@@ -81,6 +81,8 @@ async function seleccionarApariencia(id_apariencia){
 
     cargarPrendasTipoAvatar();
 
+    previewModelos();
+
 }
 
 async function cargarPrendasTipoAvatar(){
@@ -119,10 +121,26 @@ async function cargarPrendasTipoAvatar(){
 
     div_lista_prendas.innerHTML = "";
 
+    // Agrega boton ninguna prenda
+    const button_prenda_ninguno = document.createElement('button');
+    button_prenda_ninguno.dataset.id_prenda = null;
+    button_prenda_ninguno.dataset.url = null;
+    button_prenda_ninguno.dataset.id_modelo = null;
+    button_prenda_ninguno.classList.add('btn', 'btn-sm', 'prenda');
+    button_prenda_ninguno.innerText = "-ninguno-";
+    if( prenda_apariencia.id_prenda == null ){
+        button_prenda_ninguno.classList.add('btn-outline-primary');
+    }else{
+        button_prenda_ninguno.classList.add('btn-outline-secondary');
+    }
+    div_lista_prendas.appendChild(button_prenda_ninguno);
+    button_prenda_ninguno.addEventListener('click',seleccionarPrenda);
+    
     json_respuesta.prendas.forEach( prenda => {
         const button_prenda = document.createElement('button');
         button_prenda.dataset.id_prenda = `${prenda.id}`;
         button_prenda.dataset.url = `${prenda.url}`;
+        button_prenda.dataset.id_modelo = `${prenda.id_modelo}`;
         button_prenda.classList.add('btn', 'btn-sm', 'prenda');
         button_prenda.innerText = prenda.nombre;
         if( prenda_apariencia && prenda_apariencia.id_prenda == prenda.id ){
@@ -181,6 +199,7 @@ async function seleccionarPrenda(event){
     }
     
     prenda_apariencia.id_prenda = btn_prenda.dataset.id_prenda
+    prenda_apariencia.id_modelo = btn_prenda.dataset.id_modelo
     prenda_apariencia.url = btn_prenda.dataset.url
     // TODO Gestionar nueva actualizacion de prenda apariencia
     const form = new FormData();
@@ -194,6 +213,7 @@ async function seleccionarPrenda(event){
         console.error('Actualizacion de prenda no ha sido exitosa');
     }
 
+    previewModelos();
 }
 
 async function seleccionarTipoPrenda(id_tipo_prenda){
@@ -434,6 +454,8 @@ let model, scene_mixer, clock;
 let animations, loader;
 let habilitado3d = false;
 let scene_actions;
+let skinnedmesh_referencia;
+const cache_modelos = [];
 
 function buscarNodosTipo(gltf, tipo){
 	const resultado = [];
@@ -553,6 +575,9 @@ function inicializarPreview(){
             const esqueleto = buscarNodosTipo(model, 'Bone')[0];
             scene.add( new THREE.SkeletonHelper( esqueleto.parent ) );
 
+            skinnedmesh_referencia = buscarNodosTipo(model, 'SkinnedMesh')[0];
+            skinnedmesh_referencia.visible = false;
+
             animations = gltf.animations;
             console.info(`Se reconoce ${animations.length} animaciones`);
 
@@ -571,6 +596,43 @@ function inicializarPreview(){
             animarPreview();
         });
     }    
+}
+
+async function cargarModelo(modelo){
+    await loader.load(modelo.url + '?1', gltf=>{
+        modelo.modelo = gltf.scene;
+        modelo.meshes = buscarNodosTipo(modelo.modelo, 'SkinnedMesh');
+        modelo.meshes.forEach(item=>{
+            item.skeleton = skinnedmesh_referencia.skeleton
+        });
+        scene.add(modelo.modelo);
+        cache_modelos.push(modelo);
+    });
+}
+
+async function previewModelos(){
+    if( !habilitado3d || prendas_apariencia == null ){
+        console.warn('No se procede con el preview');
+    }
+
+    const modelos1 = prendas_apariencia.filter( item => item.id_modelo != null ).map(item => {
+        return {id:item.id_modelo, url:item.url};
+    } );
+    
+    //oculta todos los modelos visibles
+    cache_modelos.filter(item => item.modelo.visible).forEach(item =>{
+        item.modelo.visible = false;
+    });
+
+    // separa los nuevos modelos
+    const nuevos_modelos = modelos1.filter(item => ! cache_modelos.some(item1 => item1.id == item.id)  );
+
+    await Promise.all(nuevos_modelos.map(cargarModelo));
+
+    cache_modelos.filter(item => modelos1.some(item1 => item1.id == item.id ) ).forEach(item =>{
+        item.modelo.visible = true;
+    });
+    
 }
 
 window.addEventListener("load", async (event)=>{

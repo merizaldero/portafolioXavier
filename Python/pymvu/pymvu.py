@@ -12,6 +12,7 @@ from uuid import uuid4
 
 PATH_BDD = dirname(abspath(__file__)) + "/data/base.db"
 PATH_INIT = dirname(abspath(__file__)) + "/data/init_pymvu.sql"
+PATH_DELTA = dirname(abspath(__file__)) + "/data/delta_pymvu.sql"
 
 RUTA_BASE = ""
 
@@ -285,13 +286,13 @@ def servir_api_get_prendas_apariencia(id_apariencia):
     if usuario is None:
         return error(401)
     sql = """
-select a.id as id, a.id_apariencia id_apariencia, a.id_tipo_prenda id_tipo_prenda, a.id_prenda id_prenda, b.nombre nombre, c.url url
+select a.id as id, a.id_apariencia id_apariencia, a.id_tipo_prenda id_tipo_prenda, a.id_prenda id_prenda, b.nombre nombre, c.url url, b.id_modelo id_modelo
 from PRENDA_APARIENCIA a left join PRENDA b on b.id = a.id_prenda and b.activo = :activo left join MODELO c on c.id = b.id_modelo
 where a.id_apariencia = :id_apariencia
 order by a.id_tipo_prenda
 """
     con = orm.Conexion(PATH_BDD)
-    lista = con.consultar(sql,{'id_apariencia':id_apariencia, 'activo':1 },['id', 'id_apariencia','id_tipo_prenda','id_prenda','nombre','url'])
+    lista = con.consultar(sql,{'id_apariencia':id_apariencia, 'activo':1 },['id', 'id_apariencia','id_tipo_prenda','id_prenda','nombre','url', 'id_modelo'])
     con.close()
     return {'prendas_apariencia' : lista}
     
@@ -300,12 +301,12 @@ def servir_api_get_prendas_tipo_avatar_tipo_prenda(id_tipo_avatar, id_tipo_prend
     if usuario is None:
         return error(401)
     sql = """
-select a.id id, a.nombre nombre, a.descripcion descripcion, b.url url, a.activo activo
+select a.id id, a.nombre nombre, a.descripcion descripcion, a.id_modelo id_modelo, b.url url, a.activo activo
 from PRENDA a left join MODELO b on b.id = a.id_modelo
 where a.id_tipo_avatar = :id_tipo_avatar and a.id_tipo_prenda = :id_tipo_prenda and a.activo = :activo  
 """
     con = orm.Conexion(PATH_BDD)
-    lista = con.consultar(sql,{'id_tipo_avatar':id_tipo_avatar, 'id_tipo_prenda': id_tipo_prenda, 'activo':1 },['id', 'nombre','descripcion','url','activo'])
+    lista = con.consultar(sql,{'id_tipo_avatar':id_tipo_avatar, 'id_tipo_prenda': id_tipo_prenda, 'activo':1 },['id', 'nombre','descripcion','id_modelo','url','activo'])
     con.close()    
     return {'prendas': lista}
 
@@ -361,12 +362,65 @@ def servir_api_post_prenda_apariencia(id_prenda_apariencia):
     
     return {'resultado':'ok'}
 
+# Caso uso script deltas:
+
+def ejecutar_delta(con, info):
+    if exists( PATH_DELTA ):
+        con.ejecutarFileScript( PATH_DELTA )
+        print("Delta ejecutado exitosamente")
+
+def servir_delta():
+    transaccionar(ejecutar_delta, {})
+    return "Delta ejecutado exitosamente"
+
+# Caso de Uso Listado de Salas
+
+def servir_get_listado_salas():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        redirect('/login')
+    sql = """
+select a.ID id, a.NOMBRE nombre, a.DESCRIPCION descripcion, a.ID_MODELO modelo, b.URL url, a.ID_USUARIO_PROPIETARIO id_usuario_propietario, c.USERNAME username_propietario, a.PRIVADO privado, a.ACTIVO activo
+from SALA a 
+left join MODELO b on b.ID = a.ID_MODELO
+left join USUARIOS c on c.ID = a.ID_USUARIO_PROPIETARIO
+where a.ACTIVO = 1
+and (a.PRIVADO = 0 or a.ID_USUARIO_PROPIETARIO = :id_usuario)
+order by a.PRIVADO, a.NOMBRE
+"""
+    con = orm.Conexion(PATH_BDD)
+    lista = con.consultar( sql, {'id_usuario':usuario['id'] }, ['id', 'nombre','descripcion','id_modelo','url', 'id_usuario_propietario', 'username_propietario', 'privado','activo'] )
+    con.close()
+    return template("salas", usuario = usuario, salas = lista )
+
+# Caso de Uso Despliegue de Sala 
+
+def servir_get_ingresar_sala(id_sala):
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        redirect('/login')
+    sql = """
+select a.ID id, a.NOMBRE nombre, a.DESCRIPCION descripcion, a.ID_MODELO modelo, b.URL url, a.ID_USUARIO_PROPIETARIO id_usuario_propietario, c.USERNAME username_propietario, a.PRIVADO privado, a.ACTIVO activo
+from SALA a 
+left join MODELO b on b.ID = a.ID_MODELO
+left join USUARIOS c on c.ID = a.ID_USUARIO_PROPIETARIO
+where a.ID = :id_sala
+"""
+    con = orm.Conexion(PATH_BDD)
+    lista = con.consultar( sql, {'id_sala':id_sala }, ['id', 'nombre','descripcion','id_modelo','url', 'id_usuario_propietario', 'username_propietario', 'privado','activo'] )
+    con.close()
+    if len(lista) == 0:
+        return error(404)
+        
+    return template("sala", usuario = usuario, sala = lista[0] )
+
 # Ruteos hacia Bottle
 def rutearModulo( app : Bottle, ruta_base : str ):
     # encapsula Session Middleware
     RUTA_BASE = ruta_base
     app.route( ruta_base + '/main' , method = ['GET'])(servir_main)
-    app.route( ruta_base + '/inicializar' , method = ['GET'])(servir_inicializar)
+    # app.route( ruta_base + '/inicializar' , method = ['GET'])(servir_inicializar)
+    app.route( ruta_base + '/delta' , method = ['GET'])(servir_delta)
 
     app.route( ruta_base + '/apariencia' , method = ['GET'])(servir_pag_apariencias)
     app.route( ruta_base + '/api/apariencias' , method = ['GET'])(servir_api_get_apariencias)
@@ -382,5 +436,6 @@ def rutearModulo( app : Bottle, ruta_base : str ):
     app.route( ruta_base + '/api/prenda_apariencia/<id_prenda_apariencia:int>' , method = ['POST'])(servir_api_post_prenda_apariencia)
     app.route( ruta_base + '/api/nueva_apariencia' , method = ['POST'])(servir_api_crear_apariencia)
 
-
+    app.route( ruta_base + '/chats' , method = ['GET'])(servir_get_listado_salas)
+    app.route( ruta_base + '/chat/<id_sala:int>' , method = ['GET'])(servir_get_ingresar_sala)
 

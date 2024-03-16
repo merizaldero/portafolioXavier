@@ -86,7 +86,7 @@ pymvu.rutearModulo(app, '/pymvu')
 
 try:
     BottleSessions(app)
-    server = MyWSGIRefServer(host="127.0.0.1", port="8080")
+    server = MyWSGIRefServer(host="0.0.0.0", port="8080")
     app.run(server=server,reloader=False)
     # app.run(host = '127.0.0.1', port = 8080, server = GeventWebSocketServer)
 except Exception as ex:

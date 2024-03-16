@@ -12,7 +12,7 @@
             <a class="nav-link" href="/social/shop">&#x1F6D2; <span class="d-xs-none d-none d-md-inline d-lg-inline d-xl-inline d-xxl-inline">&nbsp;MARKETPLACE</span></a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" href="/pymvu/chat">&#x1F5EB; <span class="d-xs-none d-none d-md-inline d-lg-inline d-xl-inline d-xxl-inline">&nbsp;CHAT</span></a>
+            <a class="nav-link" href="/pymvu/chats">&#x1F5EB; <span class="d-xs-none d-none d-md-inline d-lg-inline d-xl-inline d-xxl-inline">&nbsp;CHAT</span></a>
             </li>
         </ul>
     </nav>

@@ -1,0 +1,3 @@
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Bob.Hair.Female' , 'Peinado Bob Femenino', 'HAIR', '/avatares/Bob.Hair.Female.glb', 1 );
+
+insert into PRENDA ( NOMBRE, DESCRIPCION, ID_TIPO_AVATAR, ID_TIPO_PRENDA, ID_MODELO, DEFAULT_TIPO_PRENDA, ACTIVO ) select ID, DESCRIPCION, 'FEMALE', ID_TIPO_MODELO, ID, CASE WHEN ID like 'Default.%' THEN 1 ELSE 0 END , 1  FROM MODELO WHERE ID = 'Bob.Hair.Female';

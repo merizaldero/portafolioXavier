@@ -120,6 +120,7 @@ class Avatar{
 		this.root.rotation.y = seatNode.padre_armadura.rotation.y;
 		this.root.rotation.z = seatNode.padre_armadura.rotation.z;
 		// identifica la accion a ejecutar
+		
 		this.action_actual = this.actions.find(item => item.name == seatNode.padre_armadura.name);
 		if( !this.action_actual){
 			console.error(`No se encuantra accion ${seatNode.padre_armadura.name}`);
