@@ -281,10 +281,7 @@ def servir_api_get_tipos_avatar():
     lista = consultar(TiposAvatar, 'findByActivo', { 'activo' : 1})
     return { 'tipos_avatar': lista }
 
-def servir_api_get_prendas_apariencia(id_apariencia):
-    usuario = xpd_usr.getCurrentUser(request)
-    if usuario is None:
-        return error(401)
+def get_prendas_apariencia(id_apariencia):
     sql = """
 select a.id as id, a.id_apariencia id_apariencia, a.id_tipo_prenda id_tipo_prenda, a.id_prenda id_prenda, b.nombre nombre, c.url url, b.id_modelo id_modelo
 from PRENDA_APARIENCIA a left join PRENDA b on b.id = a.id_prenda and b.activo = :activo left join MODELO c on c.id = b.id_modelo
@@ -294,6 +291,13 @@ order by a.id_tipo_prenda
     con = orm.Conexion(PATH_BDD)
     lista = con.consultar(sql,{'id_apariencia':id_apariencia, 'activo':1 },['id', 'id_apariencia','id_tipo_prenda','id_prenda','nombre','url', 'id_modelo'])
     con.close()
+    return lista
+
+def servir_api_get_prendas_apariencia(id_apariencia):
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        return error(401)
+    lista = get_prendas_apariencia(id_apariencia)
     return {'prendas_apariencia' : lista}
     
 def servir_api_get_prendas_tipo_avatar_tipo_prenda(id_tipo_avatar, id_tipo_prenda):

@@ -3,15 +3,16 @@
 """
 This is a sample for qpython webapp
 """
+import socket
 from bottle import Bottle, ServerAdapter
 from bottle import run, debug, route, error, static_file, template, request, redirect, TEMPLATE_PATH
 from BottleSessions import BottleSessions
 
-# from bottle.ext.websocket import GeventWebSocketServer
-# from bottle.ext.websocket import websocket
+from bottle.ext.websocket import GeventWebSocketServer
 
 from os.path import abspath, dirname
 import pymvu
+import pymvu_websocket
 from random import randint
 
 import xpd_usr
@@ -78,6 +79,8 @@ xpd_usr.rutearModulo(app, '/security')
 
 pymvu.rutearModulo(app, '/pymvu')
 
+pymvu_websocket.rutearModulo(app, '/sockets')
+
 ######### WEBAPP ROUTERS ###############
 
 # app.route('/', method='GET')(home)
@@ -85,10 +88,22 @@ pymvu.rutearModulo(app, '/pymvu')
 # app.route('/assets/<filepath:path>', method='GET')(server_static)
 
 try:
-    BottleSessions(app)
-    server = MyWSGIRefServer(host="0.0.0.0", port="8080")
-    app.run(server=server,reloader=False)
-    # app.run(host = '127.0.0.1', port = 8080, server = GeventWebSocketServer)
+
+    hostname = socket.gethostname()
+    # Get the IP address of the hostname
+    direccion_ip = socket.gethostbyname(hostname)
+    puerto = 8080
+
+    backing_params = {
+        'cache_type': 'SimpleCache', 
+        #'host': direccion_ip,
+        #'password': None
+    }
+
+    BottleSessions(app, session_backing = backing_params, session_secure = False )
+    # server = MyWSGIRefServer(host="0.0.0.0", port="8080")
+    # app.run(server=server,reloader=False)
+    app.run(host = direccion_ip, port = puerto, reloader=False, server = GeventWebSocketServer)
 except Exception as ex:
     errs = "Exception: %s" % repr(ex)
     print(errs)

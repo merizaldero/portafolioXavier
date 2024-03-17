@@ -14,7 +14,7 @@
 
 <script type="module">
 
-import {SalaModule} from '/static/js/sala.js';
+import {SalaModule} from '/static/js/sala.js?1';
 
 window.addEventListener("load", async (event)=>{
     SalaModule( {{ sala['id'] }} , '{{sala['url']}}' , {{ usuario['id'] }}, '{{ usuario['username'] }}' , 'div_canvas' );

@@ -27,6 +27,8 @@ let canvas;
 let puntero;
 let raycaster;
 let current_avatar;
+let websocket;
+let websocket_conectado = false;
 
 function buscarNodosTipo(gltf, tipo){
 	const resultado = [];
@@ -105,8 +107,10 @@ async function cargarModelos(modelos){
 }
 
 class Avatar{
-	constructor(name, modelos, onload = (nuevoAvatar)=>{ } ){
-		this.name = name;
+	constructor(id, name, modelos, id_apariencia, onload = (nuevoAvatar)=>{ } ){
+		this.id = id;
+        this.id_apariencia = id_apariencia;
+        this.name = name;
         this.root = new THREE.Object3D();
         
         this.modelos = modelos;
@@ -192,6 +196,10 @@ class Avatar{
         });
 
 	}
+
+    removerDeEscena(){
+        // TODO
+    }
 }
 
 class Asiento{
@@ -285,8 +293,9 @@ function canvasOnClick(event){
 
     if(hotspots_selecciondos.length > 0 ){
         console.log(`Se selecciona hotspot ${hotspots_selecciondos[0].name}`);
-        if(current_avatar){
-            current_avatar.ocuparSeatNode(hotspots_selecciondos[0].name);
+        if(current_avatar && websocket_conectado){
+            //current_avatar.ocuparSeatNode(hotspots_selecciondos[0].name);
+            websocket.send( JSON.stringify({ accion:'solicitar_asiento', id_avatar:current_avatar.id, asiento: hotspots_selecciondos[0].name }) );
         }
     }
 
@@ -317,6 +326,68 @@ function cargarHotSpots(){
 
 }
 
+function websocketOnOpen(event){
+    console.info('Websocket conectado');
+    websocket_conectado = true;
+    websocket.send(JSON.stringify({ accion:'solicitar_sala', id_sala:SalaInfo.id, asientos: seatNodes.map(item => item.name) } ));
+}
+
+function websocketOnClose(event){
+    console.info('Websocket cerrado');
+    websocket_conectado = false;
+}
+
+function websocketOnMessage(event){
+    const data_text = event.data;
+    const data = JSON.parse(data_text);
+    console.info(`Procesa accion ${data.accion}`);
+    let avatar;
+    switch(data.accion){
+        case 'agregar_avatar':
+            const apariencia_default = apariencias.find(item => item.es_default == 1);
+            if( ! apariencia_default){
+                console.error('El avatar no tiene apariencia default');
+                return;
+            }
+            data.avatares.forEach(avatar => {
+                new Avatar(avatar.id, avatar.nombre, avatar.modelos, avatar.id_apariencia,(nuevo)=>{
+                    scene.add(nuevo.modelos[0].skeletonHelper);
+                    nuevo.ocuparSeatNode(avatar.asiento);
+                    nuevo.incluirEnEscena();
+                    if(nuevo.id_apariencia == apariencia_default.id){
+                        current_avatar = nuevo;
+                    }
+                });
+            });
+            break;
+        case 'asiento_avatar':
+            avatar = avatares.find(item => item.id == data.id_avatar);
+            if(avatar){
+                avatar.ocuparSeatNode(data.asiento);
+            }
+            break;
+        case 'eliminar_avatar':
+            avatar = avatares.find(item => item.id == data.id_avatar);
+            avatar.removerDeEscena();
+            avatares = avatares.splice( avatares.indexOf(avatar), 1 );
+            break;
+        default:
+    }
+}
+
+function websocketOnError(event){
+    
+}
+function abrirWebSocket(){
+    const uri = document.location.href;
+    const partes_uri = uri.split('/');
+    console.info(partes_uri[2]);
+    websocket = new window.WebSocket(`ws://${partes_uri[2]}/sockets/socket`);
+    websocket.onopen = websocketOnOpen;
+    websocket.onclose = websocketOnClose;
+    websocket.onmessage = websocketOnMessage;
+    websocket.onerror = websocketOnError;
+}
 
 async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
 
@@ -401,13 +472,16 @@ async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
             apariencias = respuesta_json.apariencias;
 
             // Escoge la apariencia default para desplegar
+            /*
             const apariencia_default = apariencias.find(item => item.es_default == 1);
             if( ! apariencia_default){
                 console.error('El avatar no tiene apariencia default');
                 return;
             }
+            */
 
             // obtiene prendas de apariencia default
+            /*
             respuesta = await fetch(`/pymvu/api/apariencia/${apariencia_default.id}/prendas_apariencia`, {method:'GET'})
             if( respuesta.status != 200){
                 console.error('No se puede obtener apariencias');
@@ -416,17 +490,15 @@ async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
             respuesta_json = await respuesta.json();
             let prendas_apariencia = respuesta_json.prendas_apariencia;
             prendas_apariencia = prendas_apariencia.filter(item => item.id_modelo != null && item.id_modelo != 'null')
+            */
 
             // Carga HotSpots
 
             cargarHotSpots();
 
-            // Carga un personaje
-            current_avatar = new Avatar(username, prendas_apariencia, (nuevo)=>{
-                scene.add(nuevo.modelos[0].skeletonHelper);
-                nuevo.ocuparSeatNode('Asiento01');
-                nuevo.incluirEnEscena();
-            });		
+            // establece conexion con websocket
+
+            abrirWebSocket();
     
             animate();
     
