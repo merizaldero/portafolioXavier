@@ -13,6 +13,8 @@ from bottle.ext.websocket import GeventWebSocketServer
 from os.path import abspath, dirname
 import pymvu
 import pymvu_websocket
+import bvh_viewer
+
 from random import randint
 
 import xpd_usr
@@ -81,6 +83,8 @@ pymvu.rutearModulo(app, '/pymvu')
 
 pymvu_websocket.rutearModulo(app, '/sockets')
 
+bvh_viewer.rutearModulo(app, '/bvh','C:\\Users\\XAVIER\\3D Objects')
+
 ######### WEBAPP ROUTERS ###############
 
 # app.route('/', method='GET')(home)
@@ -100,7 +104,7 @@ try:
         #'password': None
     }
 
-    BottleSessions(app, session_backing = backing_params, session_secure = False )
+    BottleSessions(app, session_backing = backing_params, session_secure = False, session_expire = 600 )
     # server = MyWSGIRefServer(host="0.0.0.0", port="8080")
     # app.run(server=server,reloader=False)
     app.run(host = direccion_ip, port = puerto, reloader=False, server = GeventWebSocketServer)

@@ -101,7 +101,7 @@ def servir_websocket(ws):
         avatares_quitar = [x for x in SALA[id_sala1]['avatares'] if x['id_usuario'] == usuario['id']]
         for avatar_quitar in avatares_quitar:
             for usuario_not in SALA[id_sala1]['usuarios']:
-                usuario_not['ws'].send( json.dumps({'accion':'eliminar_avatar', 'avatar_id':avatar_quitar['id'] }) )
+                usuario_not['ws'].send( json.dumps({'accion':'eliminar_avatar', 'id_avatar':avatar_quitar['id'] }) )
             SALA[id_sala1]['avatares'].remove(avatar_quitar)
         
     USUARIOS.remove( usuario['id'] )

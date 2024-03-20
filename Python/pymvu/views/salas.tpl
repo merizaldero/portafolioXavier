@@ -1,4 +1,4 @@
-% include('encabezado.tpl', titulo="Salas", usuario = usuario)
+% include('encabezado.tpl', titulo="Pymvu - Salas de Chat", usuario = usuario)
 <h1>Salas de Chat</h1>
 % for sala in salas :
 <div class="card mb-2">

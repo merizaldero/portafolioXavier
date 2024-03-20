@@ -124,8 +124,8 @@ class Avatar{
         cargarModelos(modelos).then( (r)=>{
             modelos.forEach( modelo =>{
                 const modelo1 = getModelo(modelo.id_modelo);
-                modelo.gltf = modelo1.gltf;
-                const huesos = buscarNodosTipo(modelo.gltf.scene, 'Bone');
+                modelo.modelo = SkeletonUtils.clone(modelo1.gltf.scene);
+                const huesos = buscarNodosTipo(modelo.modelo, 'Bone');
                 if(huesos.length == 0){
                     console.error(`Modelo ${modelo.id} no contiene huesos`);
                     throw new Exception(`Avatar ${modelo.id} no contiene huesos`);
@@ -133,9 +133,9 @@ class Avatar{
                 modelo.padre_armadura = huesos[0].parent;
                 modelo.skeletonHelper = new THREE.SkeletonHelper(modelo.padre_armadura);
                 this.meshes += modelo.meshes;
-                modelo.mixer = new THREE.AnimationMixer( modelo.gltf.scene )
+                modelo.mixer = new THREE.AnimationMixer( modelo.modelo )
                 modelo.actions = clipAnimations(modelo.mixer, true);
-                this.root.add(modelo.gltf.scene);
+                this.root.add(modelo.modelo);
             });
             this.action_actual = null;
             avatares.push(this);
@@ -188,7 +188,11 @@ class Avatar{
 		// activa la accion de cada modelo
         this.modelos.forEach(modelo =>{
             modelo.actions.filter(item => item.name == this.action_actual).forEach(accion=>{
+                const scene_action = scene_actions.find(item => item.name==accion.name);
                 accion.enabled = true;
+                if(scene_action){
+                    accion.time = scene_action.time;
+                }                
                 accion.setEffectiveTimeScale( 1 );
                 accion.setEffectiveWeight( 1.0 );
                 accion.play();
@@ -198,6 +202,14 @@ class Avatar{
 	}
 
     removerDeEscena(){
+        scene.remove(this.root);
+        scene.remove(this.modelos[0].skeletonHelper);
+        const cola_eliminacion = [this.root()]; 
+        while (cola_actividades.length > 0){
+            const eliminado = cola_actividades.pop();
+            eliminado.children.forEach(item=>{cola_actividades.push(item)});
+            eliminado.dispose();
+        }       
         // TODO
     }
 }

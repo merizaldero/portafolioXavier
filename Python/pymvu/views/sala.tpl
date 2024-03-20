@@ -1,4 +1,4 @@
-% include('encabezado.tpl', titulo="Principal", usuario = usuario)
+% include('encabezado.tpl', titulo = 'Pymvu - Salas - ' + sala['nombre'], usuario = usuario)
 
 <div id="div_canvas" class="w-100 h-100">
 </div>

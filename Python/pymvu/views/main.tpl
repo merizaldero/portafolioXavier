@@ -1,3 +1,3 @@
-% include('encabezado.tpl', titulo="Principal", usuario = usuario)
+% include('encabezado.tpl', titulo="Pymvu - Inicio", usuario = usuario)
 
 % include('pie.tpl', usuario = usuario)

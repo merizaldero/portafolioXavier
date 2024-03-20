@@ -1,6 +1,6 @@
     <div class="mt-3 mb-4">&nbsp;</div>
 </div>
-    <nav class="navbar navbar-expand bg-light fixed-bottom border-top w-100">
+    <nav class="navbar navbar-expand bg-light fixed-bottom border-top w-100 p-0">
         <ul class="navbar-nav justify-content-around justify-content-xs-around justify-content-sm-around w-100">
             <li class="nav-item">
             <a class="nav-link" href="/pymvu/main">&#x1F3E0; <span class="d-xs-none d-none d-md-inline d-lg-inline d-xl-inline d-xxl-inline">&nbsp;INICIO</span></a>

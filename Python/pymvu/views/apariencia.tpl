@@ -1,6 +1,6 @@
-% include('encabezado.tpl', titulo="Principal", usuario = usuario)
+% include('encabezado.tpl', titulo="Pymvu - Apariencias", usuario = usuario)
 
-<ul class="nav mb-4" id="ul_apariencias">
+<ul class="nav mb-4 w-100" id="ul_apariencias">
 </ul>
 
 <div class="row">
@@ -48,7 +48,7 @@
     }
 </script>
 
-<script type="module" src="/static/js/apariencia.js?2">
+<script type="module" src="/static/js/apariencia.js?3">
 </script>
 
 % include('pie.tpl', usuario = usuario)

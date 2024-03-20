@@ -288,7 +288,7 @@ async function cargarApariencias(){
     apariencia_actual = `${apariencias}`;
     apariencias.forEach( (apariencia, indice) => {
         const tab_apariencia = document.createElement('li');
-        tab_apariencia.classList.add("nav_item",'mr-1','p-1','border-dark');
+        tab_apariencia.classList.add("nav_item",'mr-1','p-1','border-dark', 'flex-fill', 'text-center');
         const link_apariencia = document.createElement('a');
         link_apariencia.innerHTML = apariencia.nombre;
         link_apariencia.dataset.id_apariencia = `${apariencia.id}`;
