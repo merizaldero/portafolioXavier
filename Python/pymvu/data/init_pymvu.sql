@@ -32,6 +32,7 @@ insert into TIPO_PRENDA_TIPO_AVATAR ( ID_TIPO_AVATAR, ID_TIPO_PRENDA, ACTIVO ) v
 insert into TIPO_PRENDA_TIPO_AVATAR ( ID_TIPO_AVATAR, ID_TIPO_PRENDA, ACTIVO ) values ('FEMALE','LOWER_CLOTH', 1);
 
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'isla_desierta' , 'Isla Desierta', 'SALA', '/salas/isla_desierta.glb', 1 );
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'inferno' , 'Inferno', 'SALA', '/salas/inferno.glb', 1 );
 
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Default.Body.Male' , 'Default Cuerpo Masculino', 'BODY', '/avatares/Default.Body.Male.glb', 1 );
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Default.Hair.Male' , 'Default Cabello Masculino', 'HAIR', '/avatares/Default.Hair.Male.glb', 1 );
@@ -50,6 +51,13 @@ insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Def
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Default.Top.Female' , 'Default Camisa Femenino', 'UPPER_CLOTH', '/avatares/Default.Top.Female.glb', 1 );
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Gotika.Top.Female' , 'Camisa Femenino Gotika', 'UPPER_CLOTH', '/avatares/Gotika.Top.Female.glb', 1 );
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Gotika.Pants.Female' , 'Pantalon Femenino Gotika', 'LOWER_CLOTH', '/avatares/Gotika.Pants.Female.glb', 1 );
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'LongBob.Hair.Female' , 'Long Bob Femenino', 'HAIR', '/avatares/LongBob.Hair.Female.glb', 1 );
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Lentes.Accesorios.Female' , 'Lentes Marco Negro', 'ACCESORIO', '/avatares/Lentes.Accesorios.Female.glb', 1 );
+
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'BlusaRosa.Top.Female' , 'Blusa Rosa', 'UPPER_CLOTH', '/avatares/BlusaRosa.Top.Female.glb', 1 );
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'PescadorBlanco.Pants.Female' , 'Pescador Blanco', 'LOWER_CLOTH', '/avatares/PescadorBlanco.Pants.Female.glb', 1 );
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'ZapatosNegros.Shoes.Female' , 'Zapatos Negros', 'SHOES', '/avatares/ZapatosNegros.Shoes.Female.glb', 1 );
+
 
 insert into SALA ( NOMBRE, DESCRIPCION, ID_USUARIO_PROPIETARIO, ID_MODELO, PRIVADO, ACTIVO ) select ID, DESCRIPCION, NULL, ID, 0, 1 from MODELO where ID_TIPO_MODELO = 'SALA';
 
