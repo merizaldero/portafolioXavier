@@ -23,9 +23,17 @@
     <div class="container">
         <div class="mt-3 mb-4">&nbsp;</div>
         <div class="w-100 d-flex flex-wrap">
+
+        <div class="row">
+            <div class="col-md-6 h-sm-25 h-25-sm bg-light justify-content-center" id="div_canvas"></div>
+            <div class="col-md-6">
+
 % for item in lista :
             <a class="btn btn-outline-primary bvh" data-directorio="{{item['directorio']}}" href="{{item['path']}}" >{{item['nombre']}}</a>
 % end
+            </div>
+        </div>
+        
         </div>
 <script type="importmap">
     {

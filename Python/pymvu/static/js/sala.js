@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
-let scene, renderer, camera;
+let scene, renderer, camera, controls;
 let model, scene_mixer, clock;
 let animations;
 let scene_actions;
@@ -132,6 +132,7 @@ class Avatar{
                 }
                 modelo.padre_armadura = huesos[0].parent;
                 modelo.skeletonHelper = new THREE.SkeletonHelper(modelo.padre_armadura);
+                modelo.skeletonHelper.visible = false;
                 this.meshes += modelo.meshes;
                 modelo.mixer = new THREE.AnimationMixer( modelo.modelo )
                 modelo.actions = clipAnimations(modelo.mixer, true);
@@ -158,7 +159,7 @@ class Avatar{
 		}
 		if(this.action_actual){
             this.modelos.forEach(modelo =>{
-                modelo.actions.filter(item => item.name == this.action_actual).forEach(accion=>{
+                modelo.actions.filter(item => item.name == this.action_actual ).forEach(accion=>{
                     accion.stop();
                     accion.enabled = false;
                 });
@@ -186,9 +187,9 @@ class Avatar{
 		}
 
 		// activa la accion de cada modelo
+        const scene_action = scene_actions.find(item => item.name == this.action_actual );
         this.modelos.forEach(modelo =>{
-            modelo.actions.filter(item => item.name == this.action_actual).forEach(accion=>{
-                const scene_action = scene_actions.find(item => item.name==accion.name);
+            modelo.actions.filter(item => item.name == this.action_actual ).forEach(accion=>{
                 accion.enabled = true;
                 if(scene_action){
                     accion.time = scene_action.time;
@@ -198,6 +199,13 @@ class Avatar{
                 accion.play();
             });
         });
+
+        camera.position.x = this.root.position.x;
+        camera.position.y = this.root.position.y + 3;
+        camera.position.z = this.root.position.z + 3;
+
+        controls.target.set( this.root.position.x , this.root.position.y + 1, this.root.position.z );
+        controls.update();
 
 	}
 
@@ -342,6 +350,7 @@ function websocketOnOpen(event){
     console.info('Websocket conectado');
     websocket_conectado = true;
     websocket.send(JSON.stringify({ accion:'solicitar_sala', id_sala:SalaInfo.id, asientos: seatNodes.map(item => item.name) } ));
+    activar_chat();
 }
 
 function websocketOnClose(event){
@@ -363,7 +372,7 @@ function websocketOnMessage(event){
             }
             data.avatares.forEach(avatar => {
                 new Avatar(avatar.id, avatar.nombre, avatar.modelos, avatar.id_apariencia,(nuevo)=>{
-                    scene.add(nuevo.modelos[0].skeletonHelper);
+                    scene.add(nuevo.modelos[0].skeletonHelper);                    
                     nuevo.ocuparSeatNode(avatar.asiento);
                     nuevo.incluirEnEscena();
                     if(nuevo.id_apariencia == apariencia_default.id){
@@ -383,6 +392,25 @@ function websocketOnMessage(event){
             avatar.removerDeEscena();
             avatares = avatares.splice( avatares.indexOf(avatar), 1 );
             break;
+        case 'mensaje':
+            const div_chat = document.getElementById('div_chat');
+            const span_usuario = document.createElement('span');
+            span_usuario.classList.add('small');            
+            span_usuario.innerText = data.username_sender + ":";            
+            const span_mensaje = document.createElement('span');
+            span_mensaje.classList.add('small', 'border', 'rounded-bottom','p-1');            
+            span_mensaje.style.color = "#000000";
+            span_mensaje.style.backgroundColor = "rgba(255,255,255,0.5)";
+            span_mensaje.innerText = data.mensaje;
+            if(data.id_usuario_sender == SalaInfo.id_usuario){
+                span_mensaje.classList.add('rounded-start');
+                span_usuario.classList.add('align-self-end');
+            }else{
+                span_mensaje.classList.add('rounded-end');
+            }
+            div_chat.appendChild(span_usuario);
+            div_chat.appendChild(span_mensaje);
+            break;
         default:
     }
 }
@@ -401,9 +429,32 @@ function abrirWebSocket(){
     websocket.onerror = websocketOnError;
 }
 
+function enviar_mensaje_chat(){
+    const txt_mensaje = document.getElementById('txt_mensaje');
+    if(txt_mensaje.value != ''){
+        websocket.send(JSON.stringify({ accion:'decir_sala', mensaje: txt_mensaje.value } ));
+        txt_mensaje.value = "";
+        txt_mensaje.focus();
+    }
+    
+}
+
+function activar_chat(){
+    const div_sidebar = document.getElementById('div_sidebar');
+    div_sidebar.classList.remove('collapse');
+    const btn_enviar_mensaje = document.getElementById('btn_enviar_mensaje');
+    btn_enviar_mensaje.addEventListener("click", enviar_mensaje_chat);
+    const txt_mensaje = document.getElementById('txt_mensaje');
+    txt_mensaje.addEventListener("keyup", (event) => {
+        if( event.code =='Enter' || event.keyCode == 13){
+            enviar_mensaje_chat();
+        }
+    } );
+}
+
 async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
 
-    SalaInfo = {id:id_sala, url: sala_url};
+    SalaInfo = {id:id_sala, url: sala_url, id_usuario: id_usuario, username: username};
 
     if ( WebGL.isWebGLAvailable() ) {
 
@@ -413,7 +464,7 @@ async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
         clock = new THREE.Clock();
     
         renderer = new THREE.WebGLRenderer();
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setSize( window.innerWidth, window.innerHeight - 90 );
         canvas = renderer.domElement;
         document.getElementById(divname).appendChild( canvas );
         
@@ -423,7 +474,7 @@ async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
         hemiLight.position.set( 0, 20, 0 );
         scene.add( hemiLight );
         
-        const controls = new OrbitControls( camera, renderer.domElement );
+        controls = new OrbitControls( camera, renderer.domElement );
         //controls.enablePan = false;
         //controls.enableZoom = false;
         controls.target.set( 0, 1, 0 );

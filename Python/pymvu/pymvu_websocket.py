@@ -81,6 +81,23 @@ def servir_websocket(ws):
                 avatares[0]['asiento'] = asiento
                 for usuario_info in SALA[id_sala]['usuarios']:
                     usuario_info['ws'].send( json.dumps({'accion':'asiento_avatar', 'id_avatar':id_avatar, 'asiento' : asiento }) )
+            elif comando['accion'] == 'decir_sala':
+                if id_sala is None:
+                    break
+                mensaje = comando['mensaje']
+                for usuario_info in SALA[id_sala]['usuarios']:
+                    usuario_info['ws'].send( json.dumps({ 'accion':'mensaje' , 'id_usuario_sender':usuario['id'] , 'username_sender':usuario['username'] , 'id_usuario_target':usuario_info['id'] , 'id_username_target':usuario_info['username'] , 'mensaje':mensaje , 'privado':False }) )
+            elif comando['accion'] == 'decir_privado':
+                if id_sala is None:
+                    break
+                mensaje = comando['mensaje']
+                username_target = comando['username']
+                usuarios = [ x for x in SALA[id_sala]['usuarios'] if x['username'] == username_target  ]
+                if len(usuarios) > 0 :
+                    break
+                usuario_info = usuarios[0]
+                usuario_info['ws'].send( json.dumps({ 'accion':'mensaje' , 'id_usuario_sender':usuario['id'] , 'username_sender':usuario['username'] , 'id_usuario_target':usuario_info['id'] , 'id_username_target':usuario_info['username'] , 'mensaje':mensaje , 'privado':True }) )
+                ws.send( json.dumps({ 'accion':'mensaje' , 'id_usuario_sender':usuario['id'] , 'username_sender':usuario['username'] , 'id_usuario_target':usuario_info['id'] , 'id_username_target':usuario_info['username'] , 'mensaje':mensaje , 'privado':True }) )
             elif comando['accion'] == 'cambiar_apariencia':
                 pass
             elif comando['accion'] == 'solicitar_npc':

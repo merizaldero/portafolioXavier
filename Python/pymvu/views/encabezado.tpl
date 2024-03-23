@@ -25,5 +25,5 @@
         
 
     </nav>
-    <div class="container">
+    <div class="container-fluid">
         <div class="mt-3 mb-4">&nbsp;</div>
