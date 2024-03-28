@@ -19,11 +19,11 @@ async function seleccionarApariencia(id_apariencia){
     for( let indice = 0; indice < a_apariencias.length; indice ++ ){
         a_apariencia = a_apariencias[indice];
         if( a_apariencia.dataset.id_apariencia == apariencia_actual ){
-            a_apariencia.parentNode.classList.add('border','border-bottom-0');
-            a_apariencia.parentNode.classList.remove('border-bottom');
+            a_apariencia.classList.add('btn-primary');
+            a_apariencia.classList.remove('btn-secondary');
         }else{
-            a_apariencia.parentNode.classList.add('border-bottom');
-            a_apariencia.parentNode.classList.remove('border','border-bottom-0');
+            a_apariencia.classList.add('btn-secondary');
+            a_apariencia.classList.remove('btn-primary');
         }
     }
 
@@ -287,34 +287,30 @@ async function cargarApariencias(){
     apariencias = (await resultado.json()).apariencias;
     apariencia_actual = `${apariencias}`;
     apariencias.forEach( (apariencia, indice) => {
-        const tab_apariencia = document.createElement('li');
-        tab_apariencia.classList.add("nav_item",'mr-1','p-1','border-dark', 'flex-fill', 'text-center');
-        const link_apariencia = document.createElement('a');
-        link_apariencia.innerHTML = apariencia.nombre;
-        link_apariencia.dataset.id_apariencia = `${apariencia.id}`;
-        link_apariencia.classList.add('apariencia','text-decoration-none');
-        link_apariencia.href = "#"
+        const btn_apariencia = document.createElement('button');
+        btn_apariencia.classList.add("btn",'mr-1','p-1', 'flex-fill', 'text-center');
+        btn_apariencia.innerHTML = apariencia.nombre;
+        btn_apariencia.dataset.id_apariencia = `${apariencia.id}`;
+        btn_apariencia.classList.add('apariencia');
 
-        tab_apariencia.classList.add('border-bottom');
+        btn_apariencia.classList.add('btn-secondary');
 
         if( apariencia.es_default == 1 ){
             apariencia_actual = apariencia.id;       
-            tab_apariencia.classList.add('border','border-bottom-0');
+            btn_apariencia.classList.add('btn-primary');
+            btn_apariencia.classList.remove('btn-secondary');
         }else{
             
         }
-        tab_apariencia.appendChild(link_apariencia);
-        ul_apariencias.appendChild(tab_apariencia);
-        link_apariencia.addEventListener('click', event => {
+        ul_apariencias.appendChild(btn_apariencia);
+        btn_apariencia.addEventListener('click', event => {
             seleccionarApariencia (event.target.dataset.id_apariencia);
         } );
     });
-    const tab_nuevo = document.createElement('li');
-    tab_nuevo.classList.add("nav_item",'mr-1','p-1','text-decoration-none','border-bottom', 'border-dark');
+    const tab_nuevo = document.createElement('button');
+    tab_nuevo.classList.add("btn",'btn-dark','mr-1','p-1');
     const link_nuevo = document.createElement('a');
-    link_nuevo.innerHTML = "+ Crear";
-    link_nuevo.classList.add('nav_link','text-decoration-none');
-    link_nuevo.href = "#"
+    tab_nuevo.innerHTML = "+ Crear";
     tab_nuevo.appendChild(link_nuevo);
     ul_apariencias.appendChild(tab_nuevo);
     link_nuevo.addEventListener("click", crearApariencia);
@@ -599,7 +595,7 @@ function inicializarPreview(){
 }
 
 async function cargarModelo(modelo){
-    await loader.load(modelo.url + '?1', gltf=>{
+    await loader.load(modelo.url + '?' + (new Date().getTime()), gltf=>{
         modelo.modelo = gltf.scene;
         modelo.meshes = buscarNodosTipo(modelo.modelo, 'SkinnedMesh');
         modelo.meshes.forEach(item=>{

@@ -1,10 +1,10 @@
 % include('encabezado.tpl', titulo="Pymvu - Apariencias", usuario = usuario)
 
-<ul class="nav mb-4 w-100" id="ul_apariencias">
-</ul>
+<div class="w-100 p-0 d-flex flex-row" id="ul_apariencias">
+</div>
 
-<div class="row">
-    <div class="col-md-6 h-sm-25 h-25-sm bg-light justify-content-center" id="div_canvas"></div>
+<div class="row border p-3">
+    <div class="col-md-6 h-sm-25 h-25-sm justify-content-center" id="div_canvas"></div>
     <div class="col-md-6">
 
         <div class="mb-1 mt-3 small">
@@ -30,9 +30,9 @@
             <div id="div_es_default" class="alert alert-success">Esta es la Apariencia Por Defecto</div>
 
         </div>
-        <ul class="nav nav-pills border-bottom border-top" id="ul_tipos_prenda">
+        <ul class="nav nav-pills " id="ul_tipos_prenda">
         </ul>
-        <div id="div_lista_prendas" class="w-100 p-1 d-flex flex-row flex-wrap">
+        <div id="div_lista_prendas" class="w-100 p-3 d-flex flex-row flex-wrap border rounded-bottom ">
         </div>
 
 
@@ -48,7 +48,7 @@
     }
 </script>
 
-<script type="module" src="/static/js/apariencia.js?3">
+<script type="module" src="/static/js/apariencia.js?4">
 </script>
 
 % include('pie.tpl', usuario = usuario)

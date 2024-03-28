@@ -1,18 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pymbu</title>
+    <title>Login</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <style>
-body {
-    background-color: #f5f5f5;
-}
 
 .card {
     margin-top: 20px;
 }
+
     </style>
 </head>
 <body>
@@ -34,11 +32,11 @@ body {
                             <div class="form-group">
                                 <label for="username">Usuario</label>
 
-<input type="text" class="form-control" id="username" name="username" value="{{username}}" placeholder="Ingrese su correo electrónico">
+<input type="text" class="form-control" id="username" name="username" value="{{username}}" placeholder="Nombre de Usuario">
 
                             </div>
                             <div class="form-group">
-                                <label for="password">Contrase&nacute;a</label>
+                                <label for="password">Contrase&ntilde;a</label>
                                 <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese su contraseña">
                             </div>
                             <button type="submit" class="mt-3 btn btn-primary">Iniciar Sesi&oacute;n</button>

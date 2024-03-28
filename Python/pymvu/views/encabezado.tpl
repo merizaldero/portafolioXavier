@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
     <script src="/static/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand bg-light fixed-top border-bottom justify-content-between w-100 p-0">
+    <nav class="navbar navbar-expand bg-dark fixed-top border-bottom justify-content-between w-100 p-0">
         <a class="navbar-brand ml-5" href="/">{{titulo}}</a>
         <div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
             <ul class="navbar-nav">

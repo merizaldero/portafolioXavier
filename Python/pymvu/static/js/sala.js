@@ -77,7 +77,7 @@ function clipAnimations(mixer, depurar_huesos = false){
 
 function cargarModelo(modelo){
     return new Promise((aceptar, rechazar) => {
-        loader.load( modelo.url, async (gltf) => {
+        loader.load( modelo.url + '?' + (new Date().getTime()) , async (gltf) => {
             modelo.gltf = gltf;
             modelo.modelo = gltf.scene;
             modelo.meshes = buscarNodosTipo(modelo.modelo, 'SkinnedMesh');
@@ -421,8 +421,10 @@ function websocketOnError(event){
 function abrirWebSocket(){
     const uri = document.location.href;
     const partes_uri = uri.split('/');
-    console.info(partes_uri[2]);
-    websocket = new window.WebSocket(`ws://${partes_uri[2]}/sockets/socket`);
+    const protocolo = partes_uri[0] == "https:"?"wss":"ws";
+    console.info(`invocado ${uri}`);  
+    console.info(`invocndo ${protocolo}://${partes_uri[2]}/sockets/socket`);    
+    websocket = new window.WebSocket(`${protocolo}://${partes_uri[2]}/sockets/socket`);
     websocket.onopen = websocketOnOpen;
     websocket.onclose = websocketOnClose;
     websocket.onmessage = websocketOnMessage;
@@ -484,7 +486,7 @@ async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
     
         //loader.load( '/static/mono.glb?1', ( gltf ) => {
         
-        loader.load( SalaInfo.url , async ( gltf ) => {
+        loader.load( SalaInfo.url + '?' + (new Date().getTime()) , async ( gltf ) => {
             model = gltf.scene;
             scene.add( model );
             console.info("Carga exitosa");

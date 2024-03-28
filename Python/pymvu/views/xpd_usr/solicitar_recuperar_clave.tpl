@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperar Contrase&nacute;a</title>
+    <title>Recuperar Contrase&ntilde;a</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>

@@ -33,6 +33,7 @@ insert into TIPO_PRENDA_TIPO_AVATAR ( ID_TIPO_AVATAR, ID_TIPO_PRENDA, ACTIVO ) v
 
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'isla_desierta' , 'Isla Desierta', 'SALA', '/salas/isla_desierta.glb', 1 );
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'inferno' , 'Inferno', 'SALA', '/salas/inferno.glb', 1 );
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'VillaRomana' , 'Villa Romana', 'SALA', '/salas/VillaRomana.glb', 1 );
 
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Default.Body.Male' , 'Default Cuerpo Masculino', 'BODY', '/avatares/Default.Body.Male.glb', 1 );
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Default.Hair.Male' , 'Default Cabello Masculino', 'HAIR', '/avatares/Default.Hair.Male.glb', 1 );

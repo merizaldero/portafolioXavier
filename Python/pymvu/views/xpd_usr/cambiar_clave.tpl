@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro</title>
+    <title>Cambiar Contrase&ntilde;a</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -24,15 +24,15 @@
                     <div class="card-body">
                         <form action="/cambiar_clave" method="post">
                             <div class="form-group">
-                                <label for="password_actual">Nueva Contrase&nacute;a</label>
+                                <label for="password_actual">Nueva Contrase&ntilde;a</label>
                                 <input type="password" class="form-control" id="password_actual" name="password_actual" placeholder="Ingrese contraseña Actual" required>
                             </div>
                             <div class="form-group">
-                                <label for="password">Nueva Contrase&nacute;a</label>
+                                <label for="password">Nueva Contrase&ntilde;a</label>
                                 <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese Nueva contraseña" required>
                             </div>
                             <div class="form-group">
-                                <label for="password1">Confirmar contrase&nacute;a</label>
+                                <label for="password1">Confirmar contrase&ntilde;a</label>
                                 <input type="password" class="form-control" id="password1" name="password1" placeholder="Confirme su contraseña" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Actualizar</button>

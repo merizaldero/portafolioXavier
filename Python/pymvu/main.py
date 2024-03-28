@@ -93,9 +93,8 @@ bvh_viewer.rutearModulo(app, '/bvh','C:\\Users\\XAVIER\\3D Objects')
 
 try:
 
-    hostname = socket.gethostname()
     # Get the IP address of the hostname
-    direccion_ip = socket.gethostbyname(hostname)
+    direccion_ip = "127.0.0.1"
     puerto = 8080
 
     backing_params = {

@@ -2,7 +2,7 @@
 <h1>Salas de Chat</h1>
 % for sala in salas :
 <div class="card mb-2">
-    <div class="card-header">
+    <div class="card-header text-bg-success">
         {{sala['nombre']}}
     </div>
     <div class="card-body">
@@ -20,10 +20,8 @@
                 Propietario: {{sala['username_propietario']}}
             </li>        
 % end
-        </ul>        
-    </div>
-    <div class="card-footer justify-content-end">
-        <a class="btn btn-primary btn-sm" href ="/pymvu/chat/{{sala['id']}}">Ingresar &gt;&gt;</a>
+        </ul>
+        <a class="btn btn-primary btn-sm self-align-end" href ="/pymvu/chat/{{sala['id']}}">Ingresar &gt;&gt;</a>        
     </div>
 </div>
 % end
