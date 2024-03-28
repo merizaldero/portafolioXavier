@@ -59,6 +59,8 @@ insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Blu
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'PescadorBlanco.Pants.Female' , 'Pescador Blanco', 'LOWER_CLOTH', '/avatares/PescadorBlanco.Pants.Female.glb', 1 );
 insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'ZapatosNegros.Shoes.Female' , 'Zapatos Negros', 'SHOES', '/avatares/ZapatosNegros.Shoes.Female.glb', 1 );
 
+insert into MODELO ( ID, DESCRIPCION, ID_TIPO_MODELO, URL, ACTIVO) values ( 'Plain.Hair.Male' , 'Corte Masculino', 'HAIR', '/avatares/Plain.Hair.Male.glb', 1 );
+
 
 insert into SALA ( NOMBRE, DESCRIPCION, ID_USUARIO_PROPIETARIO, ID_MODELO, PRIVADO, ACTIVO ) select ID, DESCRIPCION, NULL, ID, 0, 1 from MODELO where ID_TIPO_MODELO = 'SALA';
 

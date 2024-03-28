@@ -8,7 +8,6 @@ let apariencias;
 let apariencia_actual = null;
 let prendas_apariencia;
 let tipo_avatar_actual;
-console.info("Hola");
 
 async function seleccionarApariencia(id_apariencia){
     apariencia_actual = id_apariencia;
