@@ -16,17 +16,7 @@ USUARIOS = []
 SALA = {}
 
 def servir_websocket(ws):
-    usuario = xpd_usr.getCurrentUser(request)
-    if usuario is None:
-        print('No se pudo identificar usuario para websocket')
-        return
-    
-    if usuario['id'] in USUARIOS:
-        print('Usuario ya tiene abierto websocket')
-        return
-    
-    USUARIOS.append( usuario['id'] )
-    
+    usuario = None
     id_sala = None
 
     while True:
@@ -36,9 +26,21 @@ def servir_websocket(ws):
         print('procesando ' + msg)
         try:
             comando = json.loads(msg)
-            if comando['accion'] == 'solicitar_sala':
+            if comando['accion'] == 'solicitar_sala':                
                 if id_sala is not None:
-                    break                    
+                    print('usuario ${0} intenta repetir ingreso a sala'.format(usuario['username']))
+                    break
+                usuario = xpd_usr.getUserByToken( comando['sessiontoken'] ) 
+                if usuario is None:
+                    print('No se pudo identificar usuario para websocket')
+                    break
+                
+                if usuario['id'] in USUARIOS:
+                    print('Usuario ya tiene abierto websocket')
+                    break
+                
+                USUARIOS.append( usuario['id'] )
+
                 id_sala = comando['id_sala']
                 if id_sala not in SALA.keys():
                     SALA[id_sala] = { 'usuarios':[], 'avatares':[]}
@@ -57,7 +59,7 @@ def servir_websocket(ws):
                 prendas_apariencia = pymvu.get_prendas_apariencia(apariencias[0]['id'])
                 prendas_apariencia = [x for x in prendas_apariencia if x['id_modelo'] is not None]
                 usuario_info = {'id':usuario['id'], 'username':usuario['username'], 'ws': ws }
-                avatar_info = { 'id': str(uuid4()), 'nombre': usuario['username'] , 'id_usuario':usuario['id'] ,'id_apariencia': apariencias[0]['id'], 'modelos':prendas_apariencia, 'asiento':asientos_disponibles[0] }
+                avatar_info = { 'id': str(uuid4()), 'nombre': usuario['username'] , 'id_usuario':usuario['id'], 'username':usuario['username'] ,'id_apariencia': apariencias[0]['id'], 'modelos':prendas_apariencia, 'asiento':asientos_disponibles[0] }
                 SALA[id_sala]['usuarios'].append( usuario_info )
                 SALA[id_sala]['avatares'].append( avatar_info )
                 for usuario_info in SALA[id_sala]['usuarios']:

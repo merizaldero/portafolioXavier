@@ -349,13 +349,14 @@ function cargarHotSpots(){
 function websocketOnOpen(event){
     console.info('Websocket conectado');
     websocket_conectado = true;
-    websocket.send(JSON.stringify({ accion:'solicitar_sala', id_sala:SalaInfo.id, asientos: seatNodes.map(item => item.name) } ));
+    websocket.send(JSON.stringify({ accion:'solicitar_sala', id_sala:SalaInfo.id, sessiontoken: SalaInfo.token , asientos: seatNodes.map(item => item.name) } ));
     activar_chat();
 }
 
 function websocketOnClose(event){
     console.info('Websocket cerrado');
     websocket_conectado = false;
+    console.error(JSON.stringify(event) );
 }
 
 function websocketOnMessage(event){
@@ -371,6 +372,10 @@ function websocketOnMessage(event){
                 return;
             }
             data.avatares.forEach(avatar => {
+                if( avatar.username == SalaInfo.username && ! SalaInfo.id_usuario){
+                    SalaInfo.id_usuario = avatar.id_usuario;
+                }
+                
                 new Avatar(avatar.id, avatar.nombre, avatar.modelos, avatar.id_apariencia,(nuevo)=>{
                     scene.add(nuevo.modelos[0].skeletonHelper);                    
                     nuevo.ocuparSeatNode(avatar.asiento);
@@ -416,7 +421,7 @@ function websocketOnMessage(event){
 }
 
 function websocketOnError(event){
-    
+    console.error("Se ha producido un error en la comunicacion \n" + JSON.stringify(event) );
 }
 function abrirWebSocket(){
     const uri = document.location.href;
@@ -454,9 +459,9 @@ function activar_chat(){
     } );
 }
 
-async function SalaModule(id_sala, sala_url, id_usuario, username, divname){
+async function SalaModule(id_sala, sala_url, username, token, divname){
 
-    SalaInfo = {id:id_sala, url: sala_url, id_usuario: id_usuario, username: username};
+    SalaInfo = {id:id_sala, url: sala_url, username: username, token: token};
 
     if ( WebGL.isWebGLAvailable() ) {
 

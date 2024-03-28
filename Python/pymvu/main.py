@@ -8,11 +8,8 @@ from bottle import Bottle, ServerAdapter
 from bottle import run, debug, route, error, static_file, template, request, redirect, TEMPLATE_PATH
 from BottleSessions import BottleSessions
 
-from bottle.ext.websocket import GeventWebSocketServer
-
 from os.path import abspath, dirname
 import pymvu
-import pymvu_websocket
 import bvh_viewer
 
 from random import randint
@@ -81,8 +78,6 @@ xpd_usr.rutearModulo(app, '/security')
 
 pymvu.rutearModulo(app, '/pymvu')
 
-pymvu_websocket.rutearModulo(app, '/sockets')
-
 bvh_viewer.rutearModulo(app, '/bvh','C:\\Users\\XAVIER\\3D Objects')
 
 ######### WEBAPP ROUTERS ###############
@@ -104,9 +99,8 @@ try:
     }
 
     BottleSessions(app, session_backing = backing_params, session_secure = False, session_expire = 600 )
-    # server = MyWSGIRefServer(host="0.0.0.0", port="8080")
-    # app.run(server=server,reloader=False)
-    app.run(host = direccion_ip, port = puerto, reloader=False, server = GeventWebSocketServer)
+    server = MyWSGIRefServer(host=direccion_ip, port=puerto)
+    app.run(server=server,reloader=False)
 except Exception as ex:
     errs = "Exception: %s" % repr(ex)
     print(errs)

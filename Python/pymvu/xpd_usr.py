@@ -286,6 +286,9 @@ def getCurrentUser(request1):
     sessiontoken = request1.session.get('sessiontoken', None)
     if sessiontoken is None or sessiontoken == '':
         return None
+    return getUserByToken(sessiontoken)
+
+def getUserByToken(sessiontoken):
     con = orm.Conexion(PATH_BDD)
     usuarios = Usuarios.getNamedQuery(con, 'findBySessiontoken', {'sessiontoken': sessiontoken})
     if len(usuarios) == 0:
