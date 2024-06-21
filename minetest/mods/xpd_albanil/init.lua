@@ -32,24 +32,30 @@ local function xpdegg_on_receive_fields(pos, formname, fields, player)
 
     minetest.chat_send_player( player:get_player_name() , "Typed: " .. mi_url)
 
-    request_api.fetch({ url = mi_url, timeout = 10 }, function(respuesta)
+    request_api.fetch({ url = mi_url, timeout = 30 }, function(respuesta)
         -- minetest.chat_send_player( player:get_player_name() , "Respuesta: " .. json.encode(respuesta) )
         if not respuesta.succeeded then
             minetest.chat_send_player( player:get_player_name() , "Peticion no exitosa" )
             return
         elseif respuesta.code ~= 200 then
-            minetest.chat_send_player( player:get_player_name() , "Respuesta HTTP " .. to_string(respuesta.code) )
+            minetest.chat_send_player( player:get_player_name() , string.format("Respuesta HTTP %d Obtenida", respuesta.code) )
             return
         end
-        local data = json.decode(respuesta.data)
+
+        local data = nil
+        pcall( function() 
+            data = json.decode(respuesta.data)
+        end)
+
         if data == nil or data.bloques == nil then
-            minetest.chat_send_player( player:get_player_name() , "Respuesta de sitio no cumple con el formato" )
+            minetest.chat_send_player( player:get_player_name() , "Respuesta de sitio es incompatible" )
             return
         end
+
         minetest.chat_send_player( player:get_player_name() , "Inicia construccion de modelo: " .. data.nombre )
         for indice, bloque in pairs(data.bloques) do
             minetest.chat_send_player( player:get_player_name() , "Procesando bloque " .. json.encode(bloque) )
-            local pos_bloque = { x = pos.x + bloque.x, y = pos.y + bloque.y, z = pos.z + bloque.z}
+            local pos_bloque = { x = pos.x + bloque.x, y = pos.y + bloque.y, z = pos.z - bloque.z}
             local info_bloque = { name = bloque.tipo_bloque }
             minetest.set_node(pos_bloque, info_bloque)
         end
