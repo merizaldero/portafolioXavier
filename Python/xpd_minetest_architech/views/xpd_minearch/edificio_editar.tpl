@@ -57,9 +57,15 @@ const BUILDING_BLOCKS = [
   ,{id:'default:silver_sandstone_brick',nombre:'Silver Sandstone Brick',path:'/textures/default_silver_sandstone_brick.png'}
   ,{id:'default:stone_block',nombre:'Stone Block',path:'/textures/default_stone_block.png'}
   ,{id:'default:stonebrick',nombre:'Stone Brick',path:'/textures/default_stone_brick.png'}
-  // ,{id:'farming:straw',nombre:'Straw',path:'/textures/farming_straw.png'}
   ,{id:'default:steelblock',nombre:'Steel Block',path:'/textures/default_steel_block.png'}
   ,{id:'default:tinblock',nombre:'Tin Block',path:'/textures/default_tin_block.png'}
+
+  ,{id:'default:dirt',nombre:'Dirt',path:'/textures/default_dirt.png'}
+  ,{id:'default:dirt_with_grass',nombre:'Dirt with Grass',path:'/textures/default_grass_side.png'}
+  ,{id:'default:dirt_with_snow',nombre:'Dirt wih Snow',path:'/textures/default_snow_side.png'}
+  ,{id:'default:dirt_with_dry_grass',nombre:'Dirt with dry Grass',path:'/textures/default_dry_grass_side.png'}
+  ,{id:'default:ice',nombre:'Ice',path:'/textures/default_ice.png'}
+  ,{id:'default:snowblock',nombre:'Snow Block',path:'/textures/default_snow.png'}
 
   ,{id:'default:water_source',nombre:'Water',path:'/textures/default_water.png'}
 ];
@@ -170,10 +176,29 @@ const crear_panel = ()=>{
   const modelo_bloques = {};
   BUILDING_BLOCKS.forEach(bloque => {
     modelo_bloques[bloque.id] = bloque_handler(botones_bloques, bloque.id);
-    botones_bloques.push( pnl_bloques.add(modelo_bloques, bloque.id) );
+    const div_boton = pnl_bloques.add(modelo_bloques, bloque.id);
+    
+    /*
+    let button_boton = div_boton.domElement.getElementsByClassName('name');
+    if( button_boton.length > 0){
+      button_boton = button_boton[0];
+    */
+      const img = document.createElement('img');
+      img.src = bloque.path;
+      img.style.display="inline";
+      img.style.marginLeft="5px";
+      img.style.marginRight="5px";
+    /*
+      button_boton.insertBefore(img, button_boton.children[0]);
+    }
+    */
+    div_boton.name(img.outerHTML + bloque.nombre);
+
+    botones_bloques.push( div_boton );
+
   });  
   CURRENT_BLOCK = BUILDING_BLOCKS[0];
-
+  botones_bloques[0].disable();
 % end
 
   const pnl_navegacion = panel.addFolder( '    Navegación' );
