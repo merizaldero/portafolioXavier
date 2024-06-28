@@ -29,4 +29,4 @@ xpd_npc = {S = S}
 
 -- NPCs
 dofile(path .. "simio.lua") -- TenPlus1
-
+dofile(path .. "waifu.lua") -- TenPlus1
