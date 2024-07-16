@@ -6,20 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Cache-control" content="no-cache"/>
     <meta http-equiv="EXPIRES" content="0">
-    <!--
-    <link rel="stylesheet"href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
-    -->
-    
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/bootstrap.min.js"></script>    
+    <script src="js/angular.min.js"></script>
 
   </head>
   <body class="bg-light" style="height:100%" ng-app="modeladorApp" ng-controller="modeladorController">
@@ -49,6 +39,11 @@
               &#9881; Mantenimiento
               </div>
           </div>
+          <a id="aMantenimiento" class="card flex-fill mr-2 my-2 text-decoration-none" href="/logout" >
+                <div class="card-body">
+                &#10060; Cerrar Sesi&oacute;n
+                </div>
+          </a>           
         </div>
       </div>
             
@@ -129,10 +124,10 @@
 		        </div>
             
                 <div class="navbar navbar-default pb-1"> 
-                    <span class="navbar-brand">&#128196; {{objetoModelo.idTipoMetamodelo}}</span>
+                    <span class="navbar-brand text-white">&#128196; {{objetoModelo.idTipoMetamodelo}}</span>
                     <span class="navbar-nav">
                         <span class="navbar-item form-group">
-                            <input type="text" ng-model="objetoModelo.nombre" class="form-control-lg" ng-change="onCambiarCampo()" >
+                            <input type="text" ng-model="objetoModelo.nombre" class="form-control form-control-sm" ng-change="onCambiarCampo()" >
                         </span>
                     </span>
                 </div>
@@ -140,29 +135,26 @@
             
             <div class="card-body">
             	
-            	<div class="mt-3 mb-3">  
+            	<div class="mt-4 mb-5">  
             	&nbsp;                  
                 </div>
-            	<div class="mt-4 mb-4">  
-            	&nbsp;                  
-                </div>
-            	
+                    
                 <div class="form-group-lg">
-                    <label for="objetoModeloDescripcion" class="col-sm-4">Descripci&oacute;n</label>
+                    <label for="objetoModeloDescripcion" class="col-sm-4 form-label form-label-sm">Descripci&oacute;n</label>
                     <span class="col-sm-8">
-                        <textarea ng-model="objetoModelo.descripcion" rows="2" class="form-control" ng-change="onCambiarCampo()"></textarea>
+                        <textarea ng-model="objetoModelo.descripcion" rows="2" class="form-control form-control-sm" ng-change="onCambiarCampo()"></textarea>
                     </span>
                 </div>
                 
                 <div class="form-group" ng-repeat="(indice,atributo) in atributos">
-                    <label class="col-lg-4">{{atributo.idAtributoMetamodelo}}
+                    <label class="col-lg-4 form-label form-label-sm">{{atributo.idAtributoMetamodelo}}
                         <span ng-show=" atributo.esObligatorio == '1' ">(*)</span>
                     :</label>
                     <span ng-show="atributo.idCatalogo == null &amp;&amp; atributo.idTipoMetamodeloRef == null" class="col-lg-8">
-                        <input ng-model="atributo.valor" ng-maxlength="obtenerMaxLength(atributo)" class="form-control-lg" ng-change="onCambiarCampo()">
+                        <input ng-model="atributo.valor" ng-maxlength="obtenerMaxLength(atributo)" class="form-control form-control-sm" ng-change="onCambiarCampo()">
                     </span>
                     <span ng-show="atributo.idCatalogo != null" class="col-lg-8">
-                        <select ng-model="atributo.valor" ng-change="onCambiarCampo()" class="form-control-lg">
+                        <select ng-model="atributo.valor" ng-change="onCambiarCampo()" class="form-control form-control-lg">
                             <option value="">-Seleccionar-</option>
                             <option ng-repeat="valorCatalogo in catalogos[atributo.idCatalogo]" value="{{valorCatalogo.clave}}" ng-selected="atributo.valor == catalogoValor.clave">
                                 {{valorCatalogo.etiqueta}}

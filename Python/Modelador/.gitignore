@@ -1,2 +1,7 @@
-/modelador.bat
-__pycache__/
+/__pycache__/
+/.ipynb_checkpoints/
+/data/*.db
+/inicializador.ipynb
+/xpd_orm.py
+/xpd_usr.py
+/views/xpd_usr/
