@@ -1,7 +1,8 @@
 vector POS_SIT = <0,-0.175,0.4>;
 vector ROT_SIT = <0,0,-90>;
-string ANIMACION_JINETE =  "battlecat_montura";
-string ANIMACION_CORRE = "battlecat_corre";
+string ANIMACION_DETENIDO =  "stand_1";
+string ANIMACION_JINETE =  "sit";
+string ANIMACION_CORRE = "avatar_walk";
 integer CONTADOR_CORRER = 0;
 integer CONTADOR_CORRER_MAX = 1;
 
@@ -19,8 +20,8 @@ float turning_ratio = 4.0;
 vector CAMARA_POS = < -5, -2, 2>;
 vector CAMARA_OBJETIVO = < 2, 0, 0>;
 
-vector POS_INICIAL = <115, 35.50, 22.28535>;
-vector ORIENTACION_INICIAL = <0,0,180>;
+vector POS_INICIAL = <111.00000, 41.00000, 22.79752>;
+vector ORIENTACION_INICIAL = <0,0,0>;
 vector IMPULSO_RETORNO = <0,0,5>;
 float MIN_DIST_RETORNO = 5.0;
 
@@ -45,8 +46,8 @@ inicializar_sittarget(){
 }
 
 inicializar_vehiculo(){
-    llSetCameraEyeOffset( CAMARA_POS );
-    llSetCameraAtOffset( CAMARA_OBJETIVO );
+    //llSetCameraEyeOffset( CAMARA_POS );
+    //llSetCameraAtOffset( CAMARA_OBJETIVO );
 
     llSetVehicleType(VEHICLE_TYPE_CAR);
     llSetVehicleFloatParam(VEHICLE_ANGULAR_DEFLECTION_EFFICIENCY, 0.2);
@@ -126,6 +127,8 @@ default
         llSay(0, "Inicializado");
         llSetPos(POS_INICIAL);
         llSetRot( llEuler2Rot(ORIENTACION_INICIAL*DEG_TO_RAD) );
+        llStartObjectAnimation(ANIMACION_DETENIDO);
+        
     }
     changed(integer change){
         PILOTO = llAvatarOnSitTarget();
@@ -145,6 +148,7 @@ default
 
 state corriendo{
     state_entry(){
+        llStopObjectAnimation(ANIMACION_DETENIDO);
         inicializar_vehiculo();
         CONTADOR_CORRER = 0;
         LISTEN_HANDLE = llListen(INPUT_CHANNEL, "", NULL_KEY, "");

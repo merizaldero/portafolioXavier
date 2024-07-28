@@ -2,8 +2,8 @@ key npc;
 integer listenChannel = 17;
 string victima_wedgie = "";
 key npc_wedgie; 
-vector POS_WEDGIE = <1, -0.75, 1.0>;
-vector ANGULO_WEDGIE = <0, 45, 0>;
+vector POS_WEDGIE = <0.75, -0.75, 0.50>;
+vector ANGULO_WEDGIE = <0, 0, 0>;
 string ANIMACION_SOSTENER_WEDGIE = "bob_wedgie";
 string ANIMACION_BOB = "bob_saluda";
 string COMANDO_ACTUAL = "";
@@ -34,7 +34,7 @@ default
         //llStopObjectAnimation(ANIMACION_BOB);
         llStartObjectAnimation(ANIMACION_BOB);
         llListen(listenChannel,"",NULL_KEY,"");
-        llSetText("Escuchando canal " + listenChannel, <0, 255, 0>, 1);
+        llSetText("", <0, 255, 0>, 0.0);
         llOwnerSay("Say /" + (string)listenChannel + " help for commands");
     }
     
@@ -116,7 +116,7 @@ state calzon_chino{
         osNpcSit(npc_wedgie, llGetKey(), OS_NPC_SIT_NOW);
         llStartObjectAnimation(ANIMACION_SOSTENER_WEDGIE);
         llSleep(0.5);
-        osAvatarStopAnimation(npc, "sit");
+        osAvatarStopAnimation(npc_wedgie, "sit");
         osAvatarPlayAnimation(npc_wedgie, "falldown");
         llListen(listenChannel,"",NULL_KEY,"");
     }

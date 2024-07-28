@@ -7,8 +7,7 @@ default
 {
     state_entry()
     {
-
-        llOwnerSay("Script running");
+        llSay(0, "Script running");
     }
     touch_end(integer tocados){
         if( tocados>1 || llGetLinkName( llDetectedLinkNumber(0) ) != NOMBRE_PRIM ){
@@ -41,4 +40,3 @@ state abierto{
         state default;
     }
 }
-

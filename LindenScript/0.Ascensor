@@ -1,0 +1,57 @@
+integer LISTEN_HANDLE = -1;
+integer LISTEN_CHANNEL = 53;
+vector POS_OFFSET = <0.75 , -0.75 , 0>;
+vector VISTA_OFFSET = <-1, 1, 0>;
+vector POS_PENDIENTE = ZERO_VECTOR;
+key AVATAR_TELEPORT;
+
+cerrar_listen_handle(){
+    if(LISTEN_HANDLE != -1){
+        llListenRemove(LISTEN_HANDLE);
+        LISTEN_HANDLE = -1;
+    }
+}
+
+default
+{
+    state_entry()
+    {
+        llSay(0, "Script running");
+    }
+    touch_end(integer num_agentes){
+        if(num_agentes > 1 ){
+            return;
+        }
+        integer indice;
+        list pisos = [];
+        for(indice = 1; indice <= llGetNumberOfPrims(); indice++){
+            if( indice != llDetectedLinkNumber(0)){
+                pisos += ((string)indice + ". " +llGetLinkName( indice ));
+            }
+        }
+        if(llGetListLength(pisos) == 0){
+            return;
+        }
+        cerrar_listen_handle();
+        LISTEN_HANDLE = llListen(LISTEN_CHANNEL, "", llDetectedKey(0), "");
+        llDialog( llDetectedKey(0), "Elegir Piso", pisos, LISTEN_CHANNEL);
+    }
+    
+    listen(integer channel, string name, key avatar, string msg){
+        cerrar_listen_handle();
+        if(msg == ""){
+            return;
+        }
+        list msg_array = llParseString2List(msg, [ "." ], []);
+        integer indice_link = (integer)llList2String(msg_array, 0);
+        AVATAR_TELEPORT = avatar;
+        POS_PENDIENTE = llList2Vector(llGetLinkPrimitiveParams( indice_link, [PRIM_POSITION] ), 0) + POS_OFFSET;
+        llRequestPermissions( AVATAR_TELEPORT, PERMISSION_TELEPORT );
+    }
+    
+    run_time_permissions(integer perm){
+        if( perm & PERMISSION_TELEPORT ){
+            llTeleportAgent(llGetPermissionsKey() , "", POS_PENDIENTE, POS_PENDIENTE + VISTA_OFFSET );
+        }
+    }
+}
