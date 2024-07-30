@@ -42,6 +42,69 @@ xpd_eliminar_npcs(){
     debug("Todos los NPCs fueron eliminados");
 }
 
+float MENU_TIMEOUT = 60.0;
+integer TAMANO_PAGINA_MENU = 9;
+key AVATAR_MENU = NULL_KEY;
+list LISTA_SCRIPT_NOTECARDS = [];
+integer PAGINA_MENU_ACTUAL = 0;
+integer MENU_LISTEN_HANDLE = 0;
+integer MENU_CHANNEL = 78;
+string MENU_SCRIPT_PROMPT = "Elija la presentación que desea ver";
+
+xpd_inicializar_lista_menus(){
+    integer numero_notecards = llGetInventoryNumber(INVENTORY_NOTECARD);
+    integer indice;
+    string nombre;
+    LISTA_SCRIPT_NOTECARDS = [];
+    for(indice = 0; indice < numero_notecards; indice++){
+        nombre = llGetInventoryName( INVENTORY_NOTECARD, indice);
+        if( llGetSubString(nombre, 0, 1) == "- "){
+            LISTA_SCRIPT_NOTECARDS += llGetSubString(nombre, 2, -1);
+        }
+    }
+}
+
+xpd_desplegar_menu(list lista, integer pagina, string prompt){
+    list lista_menu = [];
+    integer offset_inicial = pagina * TAMANO_PAGINA_MENU;
+    integer offset_final = (pagina + 1) * TAMANO_PAGINA_MENU;
+    if(pagina == 0){
+        lista_menu += "-";
+    }else{
+        lista_menu += "<<";
+    }
+    lista_menu += "CANCELAR";
+    if(offset_final < llGetListLength(lista) - 1 ){
+        lista_menu += ">>";
+    }else{
+        lista_menu += "-";
+        offset_final = llGetListLength(lista) -1 ;
+    }
+    lista_menu += llList2List(lista, offset_inicial, offset_final);
+    if(MENU_LISTEN_HANDLE != 0){
+        llListenRemove(MENU_LISTEN_HANDLE);
+    }
+    PAGINA_MENU_ACTUAL = pagina;
+    MENU_LISTEN_HANDLE = llListen(MENU_CHANNEL, "", AVATAR_MENU, "");
+    llDialog( AVATAR_MENU, prompt, lista_menu, MENU_CHANNEL);
+}
+
+xpd_escuchar_menu(string mensaje){
+    if(mensaje == "CANCELAR" || mensaje =="-"){
+        state default;
+    }else if(mensaje == "<<"){
+        if(PAGINA_MENU_ACTUAL <= 0){
+            PAGINA_MENU_ACTUAL = 1;
+        }
+        xpd_desplegar_menu(LISTA_SCRIPT_NOTECARDS, PAGINA_MENU_ACTUAL - 1, MENU_SCRIPT_PROMPT);
+    }else if(mensaje == ">>"){
+        xpd_desplegar_menu(LISTA_SCRIPT_NOTECARDS, PAGINA_MENU_ACTUAL + 1, MENU_SCRIPT_PROMPT);
+    }else{
+        config = "- " + mensaje;
+        state Presentacion;
+    }
+}
+
 list SECUENCIA = [];
 
 debug(string str)
@@ -126,7 +189,7 @@ init_labels()
     integer i=0;    
     string templine;
     for(i = 0; i< llGetListLength(SECUENCIA); i++) {
-        templine= llList2String(SECUENCIA, i);
+        templine= llStringTrim(llList2String(SECUENCIA, i),STRING_TRIM_HEAD);
         debug("Reading line: " + templine);
         list templist = llParseString2List(templine,["|"],[]);
         string tempcommand = llToLower(llList2String(templist,0));
@@ -360,6 +423,13 @@ processConfiguration(string data)
                     if(npc1 != NULL_KEY){
                         npc = npc1;
                         debug("Cambiado NPC Activo a " + value);
+                    }
+                }
+                else if(command == "npcloadappearance")
+                {
+                    if(npc != NULL_KEY && CardExists(value)){
+                        osNpcLoadAppearance(npc, value);
+                        debug("Se cambia apariencia de " + llKey2Name(npc) + " por " + value);
                     }
                 }
                 else if(command == "end")
@@ -804,9 +874,11 @@ default
     {
         if(change & CHANGED_INVENTORY) 
         {
+            /*
             NpcDelete();
             llSleep(3); 
             ResetScript();
+            */
         }
         else if(change & CHANGED_OWNER) 
         {
@@ -826,33 +898,14 @@ default
         anim = FALSE;
         debug("RUNNING");
         
-        // Inicia lectura de archivo de secuencia
-        SECUENCIA = [];
-        line = 0;
-        readLineId = llGetNotecardLine(config, line++);
-    }
-     
-    dataserver(key request_id, string data)
-    {
-        if(request_id == readLineId)
-        {
-               // if we are at the end of the file
-            if(data == EOF){
-                // notify the owner
-                debug("We are done reading the configuration");
-                init_labels();
-                // reset
-                line=0;
-            }else{
-                //processConfiguration(data);
-                SECUENCIA += data;
-                readLineId = llGetNotecardLine(config, line++);
-            }
-        }
     }
     
     touch_end(integer num_agentes){
-        state Presentacion;
+        if(num_agentes > 1){
+            return;
+        }
+        AVATAR_MENU = llDetectedKey(0);
+        state DesplegarMenu;
     }
         
     /*
@@ -972,25 +1025,84 @@ state DetectAgent
 }
 */
 
+state DesplegarMenu{
+    state_entry(){
+        xpd_inicializar_lista_menus();
+        xpd_desplegar_menu(LISTA_SCRIPT_NOTECARDS, 0, MENU_SCRIPT_PROMPT);
+        llSetTimerEvent(MENU_TIMEOUT);
+    }
+    touch_end(integer num_agentes){
+        integer indice;
+        for(indice = 0; indice < num_agentes; indice ++){
+            if(llDetectedKey(indice) == AVATAR_MENU){
+                xpd_desplegar_menu(LISTA_SCRIPT_NOTECARDS, 0, MENU_SCRIPT_PROMPT);
+            }else{
+                llInstantMessage(llDetectedKey(indice),"Lo sentimos, al momento el sistema se encuentra ocupado. Favor intentar más tarde");
+            }
+        }
+    }
+    timer(){
+        state default;
+    }
+    listen(integer channel, string name, key id, string message){
+        xpd_escuchar_menu( message);
+    }
+    state_exit(){
+        if(MENU_LISTEN_HANDLE != 0){
+            llListenRemove(MENU_LISTEN_HANDLE);
+        }
+        llSetTimerEvent(0);
+        AVATAR_MENU = NULL_KEY;
+    }
+}
+
 state Presentacion{
     state_entry(){
         xpd_eliminar_npcs();
         npc = NULL_KEY;
+        SECUENCIA = [];
         line = 0;
-        llSetTimerEvent(delay);
+        readLineId = llGetNotecardLine(config, line ++);
     }
+    
+    dataserver(key request_id, string data)
+    {
+        if(request_id == readLineId)
+        {
+               // if we are at the end of the file
+            if(data == EOF){
+                // notify the owner
+                debug("We are done reading the configuration");
+                init_labels();
+                // Inicializa 
+                line=0;
+                llSetTimerEvent(delay);
+            }else{
+                //processConfiguration(data);
+                SECUENCIA += data;
+                readLineId = llGetNotecardLine(config, line ++);
+            }
+        }
+    }    
+    
     touch_end(integer num_agentes){
         state default;
     }
+    
     timer(){
-        string comando_actual = llList2String(SECUENCIA,line);
-        if( llGetSubString(comando_actual, 0, 0) != "#" ){
-            processConfiguration(comando_actual);
+        if(line >= llGetListLength(SECUENCIA)){
+            state default;
+        }else{
+            string comando_actual = llStringTrim(llList2String(SECUENCIA,line), STRING_TRIM_HEAD);
+            if( llGetSubString(comando_actual, 0, 0) != "#" ){
+                processConfiguration(comando_actual);
+            }        
+            line ++;
         }        
-        line ++;
     }
     state_exit(){
-        llSetTimerEvent(0);        
+        llSetTimerEvent(0);
+        xpd_eliminar_npcs();        
         npc = NULL_KEY;  
     }
 }

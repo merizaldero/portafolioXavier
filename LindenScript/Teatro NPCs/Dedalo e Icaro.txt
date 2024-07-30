@@ -1,0 +1,156 @@
+NpcCreate|Rey Minos|<2.25,5,0>|#|
+    Wait|3|#
+    NpcPlayAnimation|2.declamando|#
+NpcSay|Soy el Rey Minos de Creta, y es mi voluntad construir el Laberinto más Grande|#|
+    Wait|3|#
+NpcSay|Esta tarea la encomendaré al mejor Ingeniero del Mundo Conocido, Dédalo|#|
+    Wait|3|#
+    NpcStopAnimation|2.declamando|#
+    NpcPlayAnimation|clap|#
+NpcCreate|Dedalo SinAlas|<2.25,7,0>|#|
+    Wait|5|#
+    NpcSetRot|-90|#
+SetNpc|Rey Minos|#|
+    NpcStopAnimation|clap|#
+    NpcSetRot|90|#
+    NpcPlayAnimation|2.manos_discurso|#
+NpcSay|Lo Dejo en sus manos, Ingeniero.|#|
+    Wait|3|#
+    NpcStopAnimation|2.manos_discurso|#
+SetNPC|Dedalo SinAlas|#|
+    NpcPlayAnimation|courtbow|#|
+    NpcSay|Será todo un Honor para mí, Oh, Rey!|#|
+    Wait|3|#
+NpcStopAnimation|courtbow|#|
+    SetNPC|Rey Minos|#|
+    NpcMoveTo|<2.25,1,0>|#|
+    Wait|3|#
+NpcDelete|#|#|
+SetNPC|Dedalo SinAlas|#|
+    NpcSetRot|1|#
+    NpcPlayAnimation|2.declamando|#
+NpcSay|Icaro! Hijo mío! Ven aquí!|#|
+    Wait|3|#
+    NpcStopAnimation|2.declamando|#
+NpcCreate|Icaro SinAlas|<2.25,5,0>|#|
+    NpcSetRot|90|#
+    NpcPlayAnimation|2.manos_discurso|#
+NpcSay|Aquí estoy, Padre.|#|
+    Wait|3|#
+    NpcStopAnimation|2.manos_discurso|#
+SetNPC|Dedalo SinAlas|#|
+    NpcSetRot|-90|#
+    NpcPlayAnimation|2.manos_discurso|#
+NpcSay|Hijo, se nos ha encomendado diseñar y construir el mayor Laberinto de la Historia.|#|
+    Wait|3|#
+    NpcStopAnimation|2.manos_discurso|#
+SetNPC|Icaro SinAlas|#|
+    NpcPlayAnimation|2.manos_discurso|#
+NpcSay|Excelente, Padre! Póngamonos a trabajar entonces.|#|
+    Wait|3|#
+    NpcStopAnimation|2.manos_discurso|#
+    NpcMoveTo|<0,5,0>|#|
+SetNPC|Dedalo SinAlas|#|
+    NpcMoveTo|<0,7,0>|#|
+    Wait|3|#
+    NpcPlayAnimation|type|#|
+SetNPC|Icaro SinAlas|#|
+    NpcPlayAnimation|type|#|
+    Wait|3|#
+    NpcStopAnimation|type|#|
+SetNPC|Dedalo SinAlas|#|
+    NpcStopAnimation|type|#|
+    NpcMoveTo|<2.25,7,0>|#|
+SetNPC|Icaro SinAlas|#|
+    NpcMoveTo|<1.25,7,0>|#|
+    Wait|2|#
+    NpcSetRot|-45|#
+NpcCreate|Rey Minos|<2.25,5,0>|#|
+    Wait|3|#|
+SetNPC|Dedalo SinAlas|#|
+    NpcPlayAnimation|2.declamando|#
+NpcSay|Poderoso Rey! Hemos culminado la obra. Contempladla, por favor!|#|
+    Wait|3|#
+    NpcStopAnimation|2.declamando|#
+SetNPC|Rey Minos|#|
+    NpcPlayAnimation|2.declamando|#
+NpcSay|Ciertamente, es un excelente trabajo! El Mejor Laberinto del Mundo|#|
+    Wait|3|#
+NpcSay|Nadie que ingrese a este Laberinto podrá salir ...|#|
+    Wait|2|#
+    NpcStopAnimation|2.declamando|#
+    NpcPlayAnimation|express_frown|#
+NpcSay|... excepto sus constructores!|#|
+    Wait|3|#
+    NpcStopAnimation|express_frown|#
+    NpcPlayAnimation|2.epic_pointing_left|#
+NpcSay|Guardias! Arrojen al Constructor y a su Hijo al Laberinto, para que no puedan salir de allí!|#|
+    Wait|3|#
+    NpcStopAnimation|2.epic_pointing_left|#
+NpcCreate|Soldado Griego1|<1.25,6,0>|#|
+    NpcPlayAnimation|2.soldado_armado|#
+NpcCreate|Soldado Griego2|<2.25,8,0|#|
+    NpcPlayAnimation|2.soldado_armado|#
+SetNPC|Dedalo SinAlas|#|
+    NpcPlayAnimation|express_cry|#
+SetNPC|Icaro SinAlas|#|
+    NpcPlayAnimation|express_cry|#
+SetNPC|Rey Minos|#|
+    NpcPlayAnimation|express_laugh|#
+SetNPC|Icaro SinAlas|#|
+    NpcDelete|#|
+SetNPC|Dedalo SinAlas|#|
+    NpcDelete|#|
+SetNPC|Soldado Griego1|#|
+    NpcDelete|#|
+SetNPC|Soldado Griego2|#|
+    NpcDelete|#|
+SetNPC|Rey Minos|#|
+    NpcDelete|#|
+    Wait|5|#|
+Label|Acto_2|#
+NpcCreate|Dedalo SinAlas|<2.25,7,0>|#|
+    NpcSetRot|-90|#
+NpcCreate|Icaro SinAlas|<2.25,5,0>|#|
+    NpcSetRot|90|#
+    NpcPlayAnimation|2.manos_discurso|#
+NpcSay|Padre! que haremos ahora?|#|
+    Wait|3|#
+NpcSay|En este Laberinto, moriremos de hambre ...|#|
+    Wait|3|#
+NpcSay|... si antes no nos encuentra el Minotauro!|#|
+    NpcStopAnimation|2.manos_discurso|#
+SetNpc|Dedalo SinAlas|#|
+    NpcPlayAnimation|2.manos_discurso|#
+NpcSay|Calma, hijo mío! Creo que hay una solución.|#|
+    Wait|2|#
+NpcSay|Mira a tu alrededor, hay plumas de las aves que sobrevuelan el Laberinto.|#|
+    Wait|2|#
+NpcSay|Hay pedazos de madera que no se utilizaron en la construcción.|#|
+    Wait|2|#
+NpcSay|Y cerca hay un panal de abejas, de donde podemos obtener cera ...|#|
+    Wait|2|#
+    NpcStopAnimation|2.manos_discurso|#
+    NpcPlayAnimation|2.idea_vn|#
+NpcSay|Creo que tengo una idea!|#|
+NpcSay|A trabajar!|#|
+    Wait|2|#
+    NpcStopAnimation|2.idea_vn|#
+    NpcMoveTo|<0.25,7,0>|#|
+    NpcPlayAnimation|type|#
+    Wait|3|#
+    NpcStopAnimation|type|#
+NpcSay|Está listo!|#|
+    npcLoadAppearance|Dedalo_ConAlas|#|
+    NpcFlyTo|<2.25,7,2.0>|#|
+    NpcFlyTo|<2.25,7,1.0>|#|
+    Wait|2|#
+Label|final|#
+#setNPC|Rey Minos|#|
+#    NpcPlayAnimation|courtbow|#|
+#SetNpc|Dedalo SinAlas|#|
+#    NpcPlayAnimation|courtbow|#|
+#SetNpc|Icaro SinAlas|#|
+#    NpcPlayAnimation|courtbow|#|
+#    Wait|3|#
+End|#|#|
