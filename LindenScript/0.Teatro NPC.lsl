@@ -8,6 +8,22 @@ http://opensimulator.org/wiki/NPC_Automator_2.0
 */
 integer debugger= FALSE; 
 
+integer HABILITAR_SPEECH = TRUE;
+string URL_SPEECH = "http://xpidersim/hablar";
+
+xpd_hablar(string mensaje, string voz){
+    if(HABILITAR_SPEECH){
+        llHTTPRequest(
+            URL_SPEECH,
+            [
+                HTTP_METHOD, "POST", 
+                HTTP_MIMETYPE, "application/x-www-form-urlencoded"
+            ], 
+            "mensaje="+llEscapeURL(mensaje)
+        );
+    }    
+}
+
 list NPCS = [];
 key xpd_buscar_npc(string nombre){
     integer indice = xpd_indice_npc(nombre);
@@ -106,6 +122,17 @@ xpd_escuchar_menu(string mensaje){
 }
 
 list SECUENCIA = [];
+
+xpd_cargar_secuencia(){
+    SECUENCIA = [];
+    integer numero_lineas = osGetNumberOfNotecardLines(config);
+    integer indice;
+    for(indice = 0; indice < numero_lineas; indice++){
+        SECUENCIA += llStringTrim(osGetNotecardLine(config, indice), STRING_TRIM_HEAD);
+    }
+    debug("We are done reading the configuration");
+    init_labels();
+}
 
 debug(string str)
 {
@@ -1059,12 +1086,11 @@ state DesplegarMenu{
 state Presentacion{
     state_entry(){
         xpd_eliminar_npcs();
-        npc = NULL_KEY;
-        SECUENCIA = [];
-        line = 0;
-        readLineId = llGetNotecardLine(config, line ++);
+        npc = NULL_KEY; 
+        xpd_cargar_secuencia();
+        llSetTimerEvent(delay);
     }
-    
+    /*
     dataserver(key request_id, string data)
     {
         if(request_id == readLineId)
@@ -1084,7 +1110,7 @@ state Presentacion{
             }
         }
     }    
-    
+    */
     touch_end(integer num_agentes){
         state default;
     }

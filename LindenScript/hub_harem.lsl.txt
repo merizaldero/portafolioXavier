@@ -32,7 +32,7 @@ integer LINK_ASIENTO_F4;
 list ASIENTOS_INICIALIZAR = ["AsientoM", "AsientoF", "AsientoF1", "AsientoF2", "AsientoF3", "AsientoF4"];
 
 list SIT_TARGETS_POS_INICIALIZAR = [<0,0, -0.1>,
-<0,0, -0.1>, <0.2,-0.4, 0.3>, <0.4,0.2, 0.3>, <0.2,-0.4, 0.3>, <0.4,0.2, 0.3>
+<0,0, -0.1>, <0.0,0.0,-0.1>, <0.0,0.0,-0.1>, <0.0,0.0,-0.1>, <0.0,0.0,-0.1>
     ];
     
 list SIT_TARGETS_ROT_INICIALIZAR = [<0, 0, 0>,
@@ -137,12 +137,16 @@ invocar_npcs(){
         llSleep(2.0);
         osNpcStopMoveToTarget(npc);
         osNpcSit(npc, asiento, 0);
-        //osNpcStopAnimation(npc, "sit");
+        osNpcStopAnimation(npc, "sit");
+        llOwnerSay("Se detiene SIT para " + llKey2Name(npc) + " desde invocar_npcs");
+        
         if(indice<2){
             osNpcPlayAnimation(npc, ANIM_ASIENTO_F1);
         }else{
             osNpcPlayAnimation(npc, ANIM_ASIENTO_F2);
         }
+        
+        //llRequestPermissions(npc, PERMISSION_TRIGGER_ANIMATION);
     }
 }
 
@@ -251,6 +255,7 @@ seleccionar_npc(integer indice){
     osNpcStand(npc);
     osNpcSit(npc, KEY_ASIENTO_F, 0);
     osNpcStopAnimation(npc, "sit");
+    llOwnerSay("Se detiene SIT para " + llKey2Name(npc) + " desde seleccionar_npc");
     osNpcPlayAnimation(npc, ANIM_ASIENTO_F);
 
     llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
@@ -346,23 +351,21 @@ quitar_seleccionada(){
         asiento = KEY_ASIENTO_F4;    
     }
     
-    // llLinkSitTarget( LINK_ASIENTO_M, llList2Vector(SIT_TARGETS_POS_INICIALIZAR, 0), llEuler2Rot(llList2Vector(SIT_TARGETS_POS_INICIALIZAR, 0)*DEG_TO_RAD) );
-    // llLinkSitTarget( LINK_ASIENTO_F, llList2Vector(SIT_TARGETS_POS_INICIALIZAR, 1), llEuler2Rot(llList2Vector(SIT_TARGETS_POS_INICIALIZAR, 1)*DEG_TO_RAD) ); 
-    
     npc = llList2Key(NPCs, INDICE_NPC_ACTIVO);
-    
-    osNpcStopAnimation(npc, ANIM_ASIENTO_F);
+        
     osNpcStand(npc);
     
-    osNpcSit(npc, asiento, 0);
-    //osNpcPlayAnimation(npc, "sit");
+    osNpcSit(npc, asiento, OS_NPC_SIT_NOW);
+    osNpcStopAnimation(npc, ANIM_ASIENTO_F + " + sit");
+
+    osNpcStopAnimation(npc, "sit");
+    llOwnerSay("Se detiene SIT para " + llKey2Name(npc) + " desde quitar_seleccionada");
     if(INDICE_NPC_ACTIVO < 2){
         osNpcPlayAnimation(npc, ANIM_ASIENTO_F1);
     }else{
         osNpcPlayAnimation(npc, ANIM_ASIENTO_F2);
     }
-    //llSleep(0.2);
-    //osNpcStopAnimation(npc, "sit");
+    osNpcStopAnimation(npc, ANIM_ASIENTO_F);
     
     INDICE_NPC_ACTIVO = -1;
     llStopAnimation(ANIM_ASIENTO_M);
@@ -563,23 +566,47 @@ state activado{
         }
         
     }
+    /*
+    timer(){
+        llSetTimerEvent(0.0);
+        list link_asientos = [LINK_ASIENTO_F1, LINK_ASIENTO_F2, LINK_ASIENTO_F3, LINK_ASIENTO_F4];
+        integer indice;
+        integer link_asiento;
+        key avatar;
+        for(indice = 0; indice < llGetListLength(link_asientos); indice++ ){
+            link_asiento = llList2Integer(link_asientos, indice);
+            avatar = llAvatarOnLinkSitTarget(link_asiento);
+            if(avatar != NULL_KEY){
+                osNpcStopAnimation(avatar, "sit");
+                llOwnerSay("Se detiene SIT para " + llKey2Name(avatar) + " desde timer()");
+            }
+        }                
+    }
+    */ 
         
     changed(integer change){
         if(change & CHANGED_LINK){ 
             key avatar = llAvatarOnLinkSitTarget(LINK_ASIENTO_M);
-            if( avatar != llGetOwner()){
+            if( avatar == NULL_KEY){
                 state default;
-            }            
+            }
         }
     }
     
     run_time_permissions(integer perm){
         if (perm & PERMISSION_TRIGGER_ANIMATION){
             llStopAnimation("sit");
-            if(ANIM_ASIENTO_M_ANTERIOR != ""){
-                llStopAnimation(ANIM_ASIENTO_M_ANTERIOR);
+            key avatar = llGetPermissionsKey();
+            if(avatar == llAvatarOnLinkSitTarget(LINK_ASIENTO_M)){
+                if(ANIM_ASIENTO_M_ANTERIOR != ""){
+                    llStopAnimation(ANIM_ASIENTO_M_ANTERIOR);
+                }
+                llStartAnimation(ANIM_ASIENTO_M);
+            }else if(avatar == llAvatarOnLinkSitTarget(LINK_ASIENTO_F1) || avatar == llAvatarOnLinkSitTarget(LINK_ASIENTO_F2)){
+                llStartAnimation(ANIM_ASIENTO_F1);
+            }else if(avatar == llAvatarOnLinkSitTarget(LINK_ASIENTO_F3) || avatar == llAvatarOnLinkSitTarget(LINK_ASIENTO_F4)){
+                llStartAnimation(ANIM_ASIENTO_F2);
             }
-            llStartAnimation(ANIM_ASIENTO_M);
         }
     }
     

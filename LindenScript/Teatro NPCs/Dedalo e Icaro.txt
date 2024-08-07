@@ -1,3 +1,25 @@
+NpcCreate|Yo Steampunk|<2.25,6,0>|#|
+    NpcPlayAnimation|2.manos_discurso|#
+NpcSay|Damas y Caballeros, Bienvenidos|#|
+    Wait|3|#
+NpcSay|Esta es la primera presentación de lo que en adelante conoceremos como|#|
+    Wait|3|#
+NpcSay|El Teatro de los NPCs|#|
+    Wait|3|#
+NpcSay|En este espacio podremos apreciar NPCs (Non-Playable-Characters),|#|
+    Wait|3|#
+NpcSay|Ejecutando un guión dado dentro de una región de Opensimulator.|#|
+    Wait|3|#
+NpcSay|Para nuestra primera presentación, hemos elegido una historia del Mitología Griega.|#|
+    Wait|3|#
+NpcSay|Con una importante enseñanza.|#|
+    Wait|3|#
+    NpcStopAnimation|2.manos_discurso|#
+    NpcPlayAnimation|2.will_smith_left|#
+NpcSay|Con Ustedes, la historia de Dédalo e Icaro!|#|
+    Wait|3|#
+    NpcDelete|#|#
+Label|Acto_1|#
 NpcCreate|Rey Minos|<2.25,5,0>|#|
     Wait|3|#
     NpcPlayAnimation|2.declamando|#
@@ -142,15 +164,101 @@ NpcSay|A trabajar!|#|
     NpcStopAnimation|type|#
 NpcSay|Está listo!|#|
     npcLoadAppearance|Dedalo_ConAlas|#|
-    NpcFlyTo|<2.25,7,2.0>|#|
-    NpcFlyTo|<2.25,7,1.0>|#|
+    NpcMoveTo|<2.25,7,0>|#|
+#    NpcFlyTo|<2.25,7,2.0>|#|
     Wait|2|#
+    NpcPlayAnimation|musclebeach|#|
+NpcSay|Con estas alas que armé con plumas, ramas y cera de abaja podremos escapar del Laberinto.|#|
+    Wait|3|#
+    NpcStopAnimation|musclebeach|#|
+    Wait|1|#
+SetNpc|Icaro SinAlas|#|
+    npcLoadAppearance|Icaro_ConAlas|#|
+SetNpc|Dedalo SinAlas|#|
+    NpcFlyTo|<2.25,7,2.0>|#|
+SetNpc|Icaro SinAlas|#|
+    npcFlyTo|<2.25,5,2>|#|
+SetNpc|Dedalo SinAlas|#|
+NpcSay|Recuerda, hijo, procura volar a mi lado|#|
+    Wait|3|#
+NpcSay|No te eleves más alto, o desciendas más bajo de lo que yo vuele.|#|
+    Wait|2|#
+    NpcFlyTo|<2.25,10,2.0>|#|
+SetNpc|Icaro SinAlas|#|
+    NpcFlyTo|<2.25,10,2.0>|#|
+    NpcDelete|#|#|
+SetNpc|Dedalo SinAlas|#|
+    NpcDelete|#|#|
+Label|Acto_3|#
+NpcCreate|Icaro ConAlas|<0,1,0>|#|
+    NpcFlyTo|<2.25,8,2>
+NpcCreate|Dedalo ConAlas|<0,1,0>|#|
+    NpcFlyTo|<2.25,5,2>
+setNPC|Icaro ConAlas|#|
+NpcSay|Esto de volar es divertido. Siento que volar a donde quiera|#|
+    Wait|2|#
+NpcSay|Me pregunto que tan alto podré llegar|#|
+NpcSay|Veamos si puedo llegar hasta el Sol!|#|
+    NpcFlyTo|<2.25,10,4>
+    NpcDelete|#|#|
+SetNpc|Dedalo ConAlas|#|
+    NpcSay|Icaro, a donde vas?|#|
+    Wait|2|#
+    NpcSay|Nooooooo!!!|#|
+    NpcDelete|#|#|
+NpcCreate|Icaro ConAlas|<0,1,0>|#|
+    NpcFlyTo|<2.25,8,2>
+    NpcPlayAnimation|hover_up|#|
+NpcSay|Qué divertido! Siento que el aire está muy caliente!|#|
+NpcSay|El Sol está cerca!|#|
+    NpcStopAnimation|hover_up|#|
+    npcLoadAppearance|Icaro_SinAlas|#|
+NpcSay|Un momento. Qué pasa!|#|
+    NpcPlayAnimation|falldown|#|
+NpcSay|Aaaaaahh! Estoy Cayendo!|#|
+    NpcMoveTo|<2.25,8,0>|#|
+    NpcStopAnimation|falldown|#|
+    NpcPlayAnimation|dead|#|
+    Wait|3|#
+NpcCreate|Dedalo SinAlas|<1,1,0>|#|
+    NpcMoveTo|<2.25,5,0>|#|
+    Wait|3|#
+    NpcPlayAnimation|express_cry|#|
+NpcSay|Hijo mío! Por qué no me escuchaste!|#|
+    Wait|3|#
+    NpcStopAnimation|express_cry|#|
+    NpcPlayAnimation|express_cry|#|
+NpcSay|Te acercaste tanto al Sol que el calor derritió la cera que mantenia pegadas tus alas!|#|
+    Wait|3|#
+    NpcStopAnimation|express_cry|#|
+    NpcPlayAnimation|express_cry|#|
+NpcSay|Aunque lo hubiera deseado, yo no habría podido detener tu caida hasta la muerte...|#|
+    Wait|3|#
+    NpcStopAnimation|express_cry|#|
+    NpcPlayAnimation|express_cry|#|
+NpcSay|Si solo me hubieras escuchado!|#|
+    Wait|2|#
+    NpcStopAnimation|express_cry|#|
+    NpcPlayAnimation|express_cry|#|
+NpcSay|Por esta razón los hijos deben ser obedientes con sus padres y escuchar sus consejos siempre!|#|
+    Wait|2|#
+    NpcStopAnimation|express_cry|#|
+    NpcDelete|#|#|
+setNPC|Icaro ConAlas
+    NpcDelete|#|#|
+    Wait|4|#
 Label|final|#
-#setNPC|Rey Minos|#|
-#    NpcPlayAnimation|courtbow|#|
-#SetNpc|Dedalo SinAlas|#|
-#    NpcPlayAnimation|courtbow|#|
-#SetNpc|Icaro SinAlas|#|
-#    NpcPlayAnimation|courtbow|#|
-#    Wait|3|#
+NpcCreate|Rey Minos|<2.25,5,0>|#|
+NpcCreate|Icaro SinAlas|<2.25,6,0>|#|
+NpcCreate|Dedalo SinAlas|<2.25,7,0>|#|
+setNPC|Rey Minos|#|
+    NpcPlayAnimation|courtbow|#|
+    NpcSay|Querido Público, Agradecemos su presencia.|#|
+SetNpc|Dedalo SinAlas|#|
+    NpcPlayAnimation|courtbow|#|
+    NpcSay|No olviden darnos Like y Suscribirse a nuestro Canal.|#|
+SetNpc|Icaro SinAlas|#|
+    NpcPlayAnimation|courtbow|#|
+    NpcSay|Gracias Totales!!.|#|
+    Wait|3|#
 End|#|#|
