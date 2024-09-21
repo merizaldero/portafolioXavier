@@ -7,6 +7,7 @@ $xpdjv_public_pages = [
         'path' => 'xpd_juego_vida.html',
         'title' => 'Juego de la Vida',
         'js' => [
+            [ 'handle'=>'xpdjv_bootstrap_js', 'src'=>'js/bootstrap.bundle.min.js', 'dependencias'=>['jquery'] ], 
             [ 'handle'=>'xpdjv_juego_vida_js', 'src'=>'js/xpdjv_juego_vida.js', 'dependencias'=>['jquery'] ] 
             ],
         'css' => [
