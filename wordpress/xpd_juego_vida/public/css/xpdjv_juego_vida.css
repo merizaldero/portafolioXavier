@@ -1,0 +1,81 @@
+/*
+body {
+      
+    position: absolute;
+    
+    overflow: hidden;
+    
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    
+    padding: 0px;
+    border: 0 none;
+    background-color: #000000;
+    margin:0px;
+   }
+ */  
+   #xpdjv_tablero {
+    /*
+    position:fixed;
+    top: 0px;
+    left: 0px;
+    */    
+     border-color: #000000;
+     width: 600px;
+     height: 600px;
+     
+   }
+   
+   #xpdjv_tableroPatron {
+     border-color: #000000;
+     width: 100px;
+     height: 100px;
+   }
+      
+   .xpdjv_tablero {
+     background-color: #000000;
+     display: table;
+     border: 1px solid #000000;
+   }
+   .xpdjv_fila{
+     display: table-row;
+   }
+   
+   .xpdjv_celda {
+     display: table-cell;
+     background-color: #000000;
+     border-top: none;
+     border-left: none;
+     border-right: none;
+     border-bottom: none;
+     margin: 1px;
+   }
+   
+   .xpdjv_vive1{
+     background-color: #999900;
+     border: 1px solid #9999ff;
+     border-radius: 0% 25% 25% 25%;
+   }
+   .xpdjv_vive2{
+     background-color: #bbbb00;
+     border: 1px solid #bbbbff;
+     border-radius: 25% 0% 25% 25%;
+   }
+   .xpdjv_vive3{
+     background-color: #dddd00;
+     border: 1px solid #ddddff;
+     border-radius: 25% 25% 0% 25%;
+   }
+   .xpdjv_vive4{
+   background-color: #ffff00;
+   border: 1px solid #ffffff;
+   border-radius: 25% 25% 25% 0%;
+   }
+   
+   .xpdjv_celdaTrue {
+     background-color: #bbbb00;
+   }
+
+   
