@@ -11,10 +11,30 @@ const SITES_LIST_KEY = 'xpdtf_sitios';
 const TIMES_KEY = 'xpdtf_tiempos';
 const SITIO_ACTUAL_KEY = 'xpdtf_sitio_actual';
 
+const LOG_ENABLED = false;
+
+function loguear(tipo, texto){
+  if(!LOG_ENABLED){
+    return;
+  }
+    const formdata = new FormData();
+    formdata.append('tipo', tipo);
+    formdata.append('texto', texto);
+    fetch("http://localhost:8080/xpd_logger/registrar_log",{method:"POST",body:formdata , mode: 'no-cors'});
+}
+
+function console_log(texto){
+  loguear("DEBUG", texto);
+}
+
+function console_error(texto){
+  loguear("ERROR", texto);
+}
+
 //Inicializa las variables del storage
 
 chrome.runtime.onInstalled.addListener(async function() {
-  console.log(getIsoDate() + " chrome.runtime.onInstalled.addListener" );
+  console_log(getIsoDate() + " chrome.runtime.onInstalled.addListener" );
   
   let {xpdtf_admin} = await chrome.storage.local.get(['xpdtf_admin']);
   if(xpdtf_admin == null){
@@ -24,7 +44,7 @@ chrome.runtime.onInstalled.addListener(async function() {
       'xpdtf_duracion_inicial': "45",
       'xpdtf_duracion_extendida': "10",
       'xpdtf_redireccion': "extension://"+ chrome.runtime.id + "/options.html",
-      'xpdtf_sitios': '["youtube.com","youtubekids.com"]',
+      'xpdtf_sitios': '["youtube.com","youtubekids.com","cartoonnetwork.com"]',
       'xpdtf_tiempos': '{}'
     });
   }
@@ -35,7 +55,7 @@ chrome.runtime.onInstalled.addListener(async function() {
     });
   }
   //startTimer();  
-  console.log(getIsoDate() + " Inicializacion Exitosa");
+  console_log(getIsoDate() + " Inicializacion Exitosa");
 });
 
 function calcular_diferencia_minutos(timestamp1, timestamp2) {
@@ -63,7 +83,7 @@ function es_hora_iso_valida(timestamp) {
     /^(\d{4})-(\d{01,2})-(\d{01,2})T(\d{01,2}):(\d{01,2}):(\d{01,2}).(\d{01,3})Z$/;
   const resultado = regex.test(timestamp)
   if(! resultado){
-    console.error(`"${timestamp}" no es valido`);
+    console_error(`"${timestamp}" no es valido`);
   }
   return resultado;
 }
@@ -99,15 +119,15 @@ async function retroalimentar_tiempo(fecha_actual){
     return;
   }
 
-  console.log(getIsoDate() + 'Actualizando Balance de tiempo para sitio' + xpdtf_sitio_actual );
+  console_log(getIsoDate() + 'Actualizando Balance de tiempo para sitio' + xpdtf_sitio_actual );
   const tiempos = JSON.parse(xpdtf_tiempos);
   let tiempos_sitio = { 'tics' : parseInt(xpdtf_duracion_inicial, 10), 'last_tic': fecha_actual };
   
   if( ! (xpdtf_sitio_actual in tiempos) ){
-    console.log(getIsoDate() + " Creando conteo para sitio " + xpdtf_sitio_actual);
+    console_log(getIsoDate() + " Creando conteo para sitio " + xpdtf_sitio_actual);
     tiempos[xpdtf_sitio_actual] = tiempos_sitio;
   } else if( tiempos[ xpdtf_sitio_actual ]['last_tic'].substring(0,10) != fecha_actual.substring(0,10) ){
-    console.log(getIsoDate() + " Reseteando conteo para sitio " + xpdtf_sitio_actual + " antes " + tiempos[ xpdtf_sitio_actual ]['last_tic'].substring(0,10) + " ahora " + fecha_actual.substring(0,10) );
+    console_log(getIsoDate() + " Reseteando conteo para sitio " + xpdtf_sitio_actual + " antes " + tiempos[ xpdtf_sitio_actual ]['last_tic'].substring(0,10) + " ahora " + fecha_actual.substring(0,10) );
     tiempos[xpdtf_sitio_actual] = tiempos_sitio;
   } else{
     
@@ -124,7 +144,7 @@ async function retroalimentar_tiempo(fecha_actual){
       const diferencia_tiempo = calcular_diferencia_minutos( xpdtf_marca_tiempo_inicial, fecha_actual );
       tiempos_sitio['tics'] -= diferencia_tiempo;
       tiempos_sitio['last_tic'] = fecha_actual;
-      console.info(`SITIO ${xpdtf_sitio_actual} : aplicado diferencia ${diferencia_tiempo} ; saldo ${ tiempos_sitio['tics'] }`);
+      console_log(`SITIO ${xpdtf_sitio_actual} : aplicado diferencia ${diferencia_tiempo} ; saldo ${ tiempos_sitio['tics'] }`);
     }
 
   }
@@ -134,8 +154,12 @@ async function retroalimentar_tiempo(fecha_actual){
   chrome.storage.local.remove(['xpdtf_sitio_actual','xpdtf_marca_tiempo_inicial']);
 }
 
+function abrir_pestana_control(){
+  //chrome.navigator
+}
+
 async function iniciar_control(url, tab_id, fecha_actual){
-  
+  console_log(`${fecha_actual} - iniciar_control ${tab_id} | ${url}`);
   let xpdtf_sitio_actual = await isSiteInList(url);
   if(! xpdtf_sitio_actual){
     return;
@@ -148,17 +172,19 @@ async function iniciar_control(url, tab_id, fecha_actual){
   let tiempos_sitio = { 'tics' : parseInt(xpdtf_duracion_inicial, 10), 'last_tic': fecha_actual };
 
   if( ! (xpdtf_sitio_actual in tiempos) ){
-    console.log(getIsoDate() + " Creando conteo para sitio " + xpdtf_sitio_actual);
+    console_log(getIsoDate() + " Creando conteo para sitio " + xpdtf_sitio_actual);
     tiempos[xpdtf_sitio_actual] = tiempos_sitio;
     await chrome.storage.local.set({
       "xpdtf_tiempos": JSON.stringify(tiempos)
     });
+    abrir_pestana_control();
   } else if( tiempos[ xpdtf_sitio_actual ]['last_tic'].substring(0,10) != fecha_actual.substring(0,10) ){
-    console.log(getIsoDate() + " Reseteando conteo para sitio " + xpdtf_sitio_actual + " antes " + tiempos[ xpdtf_sitio_actual ]['last_tic'].substring(0,10) + " ahora " + fecha_actual.substring(0,10) );
+    console_log(getIsoDate() + " Reseteando conteo para sitio " + xpdtf_sitio_actual + " antes " + tiempos[ xpdtf_sitio_actual ]['last_tic'].substring(0,10) + " ahora " + fecha_actual.substring(0,10) );
     tiempos[xpdtf_sitio_actual] = tiempos_sitio;
     await chrome.storage.local.set({
       "xpdtf_tiempos": JSON.stringify(tiempos)
     });
+    abrir_pestana_control();
   }else{
     tiempos_sitio = tiempos[xpdtf_sitio_actual];
   }
@@ -169,7 +195,15 @@ async function iniciar_control(url, tab_id, fecha_actual){
       "xpdtf_marca_tiempo_inicial": fecha_actual,
       "xpdtf_tab_id": tab_id,
     });
-    setTimeout(intervalo_automata, 60000);
+    let segundos_siguiente_chequeo = 60;
+    if(tiempos_sitio['tics'] < 1.0){
+      segundos_siguiente_chequeo = Math.ceil(tiempos_sitio['tics'] * 60) % 60 ;
+      if(segundos_siguiente_chequeo <= 1){
+        segundos_siguiente_chequeo = 2;
+      }
+    }
+    setTimeout(intervalo_automata, segundos_siguiente_chequeo * 1000);
+    console_log(`Programado siguiente chequeo en ${segundos_siguiente_chequeo} seg`);
   }else{
     redirigir_tab( parseInt(tab_id, 10), xpdtf_redireccion);
   }
@@ -179,17 +213,20 @@ async function iniciar_control(url, tab_id, fecha_actual){
 // Redirige a un tab de id determinado
 function redirigir_tab(tab_id, url) {
   chrome.tabs.update(tab_id, { url: url }, function(updatedTab) {
-    console.log(getIsoDate() + ` Pestaña redirigida a ${url}`);
+    console_log(getIsoDate() + ` Pestaña redirigida a ${url}`);
   });
 }
 
 async function intervalo_automata(){
   const fecha_actual = getIsoDate();
-  console.log(fecha_actual + " intervalo_automata" );
-  const {xpdtf_sitio_actual , xpdtf_tab_id} = await chrome.storage.local.get(['xpdtf_sitio_actual' , 'xpdtf_tab_id']);
+  console_log(fecha_actual + " intervalo_automata" );
+  const info_antes = await chrome.storage.local.get(['xpdtf_sitio_actual' , 'xpdtf_tab_id']);
   await retroalimentar_tiempo(fecha_actual);
-  if( xpdtf_sitio_actual ){
-    iniciar_control(xpdtf_sitio_actual, xpdtf_tab_id, fecha_actual);
+  const info_despues = await chrome.storage.local.get(['xpdtf_sitio_actual' , 'xpdtf_tab_id']);
+  if( info_antes.xpdtf_sitio_actual ){
+    await iniciar_control(info_antes.xpdtf_sitio_actual, info_antes.xpdtf_tab_id, fecha_actual);
+  } else if(info_despues.xpdtf_sitio_actual){
+    await iniciar_control(info_despues.xpdtf_sitio_actual, info_despues.xpdtf_tab_id, fecha_actual);
   }
 }
 
@@ -197,17 +234,17 @@ async function intervalo_automata(){
 chrome.webNavigation.onCommitted.addListener(async (details) => {
   
   const fecha_actual = getIsoDate();
-  console.log(fecha_actual + " chrome.webNavigation.onCommitted.addListener " + JSON.stringify(details) );
+  console_log(fecha_actual + " chrome.webNavigation.onCommitted.addListener " + JSON.stringify(details) );
 
   const url_excentas = ['about:blank'];
   const { url, frameType, tabId, } = details;
   if( frameType == "sub_frame" || url_excentas.indexOf(url) >= 0){
-    console.log(getIsoDate() + ' Ignorando ' + url);
+    console_log(getIsoDate() + ' Ignorando ' + url);
     return;
   }else{
-    console.log(getIsoDate() + " XPDTimeFilter analizando \'"+ url + "\'");
-    retroalimentar_tiempo(fecha_actual);
-    iniciar_control(url, tabId, fecha_actual);
+    console_log(getIsoDate() + " XPDTimeFilter analizando \'"+ url + "\'");
+    await retroalimentar_tiempo(fecha_actual);
+    await iniciar_control(url, tabId, fecha_actual);
   }
 });
 
@@ -215,7 +252,7 @@ chrome.webNavigation.onCommitted.addListener(async (details) => {
 chrome.tabs.onActivated.addListener( async function(activeInfo) {
   
   const fecha_actual = getIsoDate();
-  console.log(fecha_actual + " chrome.tabs.onActivated.addListener " + JSON.stringify(activeInfo) );
+  console_log(fecha_actual + " chrome.tabs.onActivated.addListener " + JSON.stringify(activeInfo) );
     
   const { tabId } = activeInfo;
   const { url } = await chrome.tabs.get(tabId);
@@ -223,22 +260,22 @@ chrome.tabs.onActivated.addListener( async function(activeInfo) {
   const url_excentas = ['about:blank'];
 
   if( url_excentas.indexOf(url) >= 0){
-    console.log(getIsoDate() + ' Ignorando ' + url);
+    console_log(getIsoDate() + ' Ignorando ' + url);
     return;
   }else{
-    console.log(getIsoDate() + " XPDTimeFilter analizando \'"+ url + "\'");
-    retroalimentar_tiempo(fecha_actual);
-    iniciar_control(url, tabId, fecha_actual);
+    console_log(getIsoDate() + " XPDTimeFilter analizando \'"+ url + "\'");
+    await retroalimentar_tiempo(fecha_actual);
+    await iniciar_control(url, tabId, fecha_actual);
   }
 
 });
 
 // Evento que se activa cuando se inicia Chrome
 chrome.runtime.onStartup.addListener(async function() {
-  console.log(getIsoDate() + " chrome.runtime.onStartup.addListener" );
+  console_log(getIsoDate() + " chrome.runtime.onStartup.addListener" );
 });
 
 // Evento que se activa cuando se crea una nueva ventana en el navegador
 chrome.windows.onCreated.addListener(function() {
-  console.log(getIsoDate() + " chrome.windows.onCreated.addListener" );  
+  console_log(getIsoDate() + " chrome.windows.onCreated.addListener" );  
 });

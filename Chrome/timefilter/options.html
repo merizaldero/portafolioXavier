@@ -10,7 +10,8 @@
   </style>
 </head>
 <body class="bg-light">
-  
+
+<div class="fixed-top">
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
       
@@ -37,6 +38,10 @@
     <span>No deberia mostrar nada</span>    
     <button class="btn-close" data-bs-toggle="collapse" data-bs-target="#mensaje"></button>
   </div>
+
+</div>
+
+<div class="my-5">&nbsp;</div>
 
   <div id="colapsador" class="container">
     <div id="divAdministacion" class="collapse seccion" data-bs-parent="#colapsador">
@@ -72,23 +77,26 @@
         <select class="form-control" id="site-list" name="site-list" size="5">
         </select>
         <br>
-    
-        <button class="btn btn-primary active" id="btn_guardar">Guardar</button>
-        <button class="btn btn-secondary active" id="btn_close_window" data-bs-toggle="collapse" href=".seccion" >Cerrar</button>
-    
+        <div class="fixed-bottom bg-light border-top">
+          <button class="btn btn-primary active" id="btn_guardar">Guardar</button>
+          <button class="btn btn-secondary active" id="btn_close_window" data-bs-toggle="collapse" href=".seccion" >Cerrar</button>  
+        </div>
+            
       </div>
+      <div class="my-5">&nbsp;</div>
 
     </div>
 
 
     </div>
-    <div id="divDashboard" class="collapse show seccion w-100 d-flex flex-column" data-bs-parent="#colapsador">
-      
-      <div id="divAviso" class="mt-5 mb-5 w-50 container d-flex flex-column padding-5 align-items-center">
-        <h1>&#128584;</h1>
-        <h1>Lo Sentimos!</h1>
-        <p>Parece que has estado usando este sito por m&aacute;s tiempo que el permitido</p>
-        <p>Aprovecha tu tiempo y has algo diferente</p>
+    <div id="divDashboard" class="collapse show seccion w-100 d-flex flex-column" data-bs-parent="#colapsador">      
+      <div id="divAviso" class="container padding-5 collapse">
+        <div class="mt-5 mb-5 w-100 d-flex flex-column align-items-center">
+          <h1>&#128584;</h1>
+          <h1>Lo Sentimos!</h1>
+          <p>Parece que has estado usando este sito por m&aacute;s tiempo que el permitido</p>
+          <p>Aprovecha tu tiempo y has algo diferente</p>
+        </div>
       </div>
 
       <div id="divTbl" class = "w-50 container">
@@ -103,7 +111,8 @@
               <th>&nbsp;</th>
             </tr>
           </thead>
-          <tbody id="tblAccesos"></tbody>
+          <tbody id="tblAccesos">
+          </tbody>
         </table>
       </div>
       

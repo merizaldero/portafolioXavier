@@ -147,6 +147,7 @@ async function consultarAccesos(){
     tblAccesos.innerHTML = "";
     let sitios_excedidos = 0;
     tiempos.forEach( item=> {
+        item[ item.length -1 ] *= 60;
         let tr = document.createElement("tr");
         item.forEach(campo =>{
             let td = document.createElement("td");
@@ -154,7 +155,7 @@ async function consultarAccesos(){
             tr.append(td)
         });
         let td1 = document.createElement("td");
-        if(item[ item.length -1 ] == 0 && hora < xpdtf_lock_time ){
+        if(item[ item.length -1 ] <= 0 && hora < xpdtf_lock_time ){
             let boton_extender = document.createElement("button");
             boton_extender.dataset.sitio = item[0];
             boton_extender.classList.add("btn");
@@ -170,14 +171,6 @@ async function consultarAccesos(){
         tblAccesos.appendChild(tr);
 
         // muestra advertencia de tiempo excedido
-        const divAviso = document.getElementById("divAviso");        
-        if(sitios_excedidos == 0){
-            divAviso.style.display = "none";
-            divAviso.style.visibility = "hidden";
-        }else{
-            divAviso.style.display = "block";
-            divAviso.style.visibility = "visible";
-        }
 /*
         // agrega eventos a los botones
         const botones = document.getElementsByClassName("btn-extender");
@@ -186,6 +179,24 @@ async function consultarAccesos(){
         }
 */        
     });
+
+    if(tiempos.length == 0){
+        let tr = document.createElement("tr");
+        let td = document.createElement("td");
+        td.colSpan = 4;
+        td.classList.add("text-center");
+        td.innerText = "No se ha registrado actividad";
+        tr.appendChild(td);
+        tblAccesos.appendChild(tr);
+    }
+
+    const divAviso = document.getElementById("divAviso");        
+    if(sitios_excedidos == 0){
+        divAviso.classList.add("collapse");
+    }else{
+        divAviso.classList.remove("collapse");
+    }
+
     //alert("listado actualizado");
 }
 /*
