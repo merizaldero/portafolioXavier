@@ -1,5 +1,5 @@
 <!DOCUMENT html>
-<html langcard="es">
+<html lang="es">
   <head>
   	<title>XPD Modelador</title>
     <meta charset="utf-8"/>
@@ -39,11 +39,6 @@
               &#9881; Mantenimiento
               </div>
           </div>
-          <a id="aMantenimiento" class="card flex-fill mr-2 my-2 text-decoration-none" href="/logout" >
-                <div class="card-body">
-                &#10060; Cerrar Sesi&oacute;n
-                </div>
-          </a>           
         </div>
       </div>
             
@@ -91,91 +86,75 @@
     
     <div id="divModelView" ng-show="objetoModelo != null &amp;&amp; currentScreen == '#divModelView'">
 
-        
-        <div class="card">
-            
-            <div class="card-header bg-dark text-white fixed-top pt-1 pb-1">
-            
-		        <div class="nav justify-content-between">
-		        	
-		            <ul class="nav">
-		                <li class="nav-item" ng-repeat="(indice,objetoPila) in pilaObjetosModelo">
-		                    <a class='btn btn-secondary' ng-click="mostrarObjetoModeloPila(indice)" >&#128196; {{objetoPila.nombre}}</a>
-		                </li>
-		            </ul>
-		            <ul class="nav">
-		                <li class="nav-item" ng-show="objetoModelo.idObjeto != modelo.idObjetoRaiz">
-		                    <a class='btn btn-danger' ng-click="eliminarObjetoModelo()" >&#128465; Eliminar</a>
-		                </li>
-		                <li class="nav-item">
-		                    <a class="btn btn-primary" ng-click="exportarModelo()">&#128229; Descargar Modelo</a>
-		                </li>
-		                <li class="nav-item">
-		                    <a class="btn btn-primary" ng-show="cambiado" ng-click="guardarObjetoModelo()">&#128190; Guardar</a>
-		                </li>
-		                <li class="nav-item">
-		                    <a class='btn btn-secondary' ng-click="validarModelo()" > &#128203; Validar</a>
-		                </li>
-		                <li class="nav-item">
-		                    <a class='btn btn-secondary' ng-click="irAInicio()" > &#10006; Cerrar</a>
-		                </li>
-		            </ul>
-		            
-		        </div>
-            
-                <div class="navbar navbar-default pb-1"> 
-                    <span class="navbar-brand text-white">&#128196; {{objetoModelo.idTipoMetamodelo}}</span>
-                    <span class="navbar-nav">
-                        <span class="navbar-item form-group">
-                            <input type="text" ng-model="objetoModelo.nombre" class="form-control form-control-sm" ng-change="onCambiarCampo()" >
-                        </span>
-                    </span>
-                </div>
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+            <div class="row px-2">
+                <span class="col-1 navbar-brand" href="#">&#128196;</span>
+                <span class="col-3 pl-0 navbar-text">{{objetoModelo.idTipoMetamodelo}}</span>
+                <span class="col">
+                    <input type="text" ng-model="objetoModelo.nombre" class="form-control form-control-sm" ng-change="onCambiarCampo()" >
+                </span>
+                <span class="col-3" ng-show="cambiado">
+                    <a class="btn btn-sm btn-primary" ng-click="guardarObjetoModelo()">&#128190; Guardar</a>
+                </span>
             </div>
-            
-            <div class="card-body">
-            	
-            	<div class="mt-4 mb-5">  
-            	&nbsp;                  
-                </div>
-                    
-                <div class="form-group-lg">
-                    <label for="objetoModeloDescripcion" class="col-sm-4 form-label form-label-sm">Descripci&oacute;n</label>
-                    <span class="col-sm-8">
-                        <textarea ng-model="objetoModelo.descripcion" rows="2" class="form-control form-control-sm" ng-change="onCambiarCampo()"></textarea>
-                    </span>
-                </div>
-                
-                <div class="form-group" ng-repeat="(indice,atributo) in atributos">
-                    <label class="col-lg-4 form-label form-label-sm">{{atributo.idAtributoMetamodelo}}
-                        <span ng-show=" atributo.esObligatorio == '1' ">(*)</span>
-                    :</label>
-                    <span ng-show="atributo.idCatalogo == null &amp;&amp; atributo.idTipoMetamodeloRef == null" class="col-lg-8">
-                        <input ng-model="atributo.valor" ng-maxlength="obtenerMaxLength(atributo)" class="form-control form-control-sm" ng-change="onCambiarCampo()">
-                    </span>
-                    <span ng-show="atributo.idCatalogo != null" class="col-lg-8">
-                        <select ng-model="atributo.valor" ng-change="onCambiarCampo()" class="form-control form-control-lg">
-                            <option value="">-Seleccionar-</option>
-                            <option ng-repeat="valorCatalogo in catalogos[atributo.idCatalogo]" value="{{valorCatalogo.clave}}" ng-selected="atributo.valor == catalogoValor.clave">
-                                {{valorCatalogo.etiqueta}}
-                            </option>
-                        </select>
-                    </span>
-                    <span ng-show="atributo.idTipoMetamodeloRef != null" class="col-lg-8">
-                        <div class="input-group" ng-click="mostrarSeleccionarReferencia(indice)">
-                          <input disabled ng-model="atributo.nombreRef" class="form-control-lg">
-                          <button class="input-group-append btn btn-secondary">...</button>
-                        </div>
-                    </span>
-                    
-                    <span ng-show="atributo.mensajeError != null" class="text-error col-sm-12">
-                        {{atributo.mensajeError}}
-                    </span>
-                </div>
-                
-            </div>
-            
+        </nav>
+
+        <div class="my-4">  
+            &nbsp;                  
         </div>
+
+        <div class="container">
+
+            <div class="ml-1 btn-group btn-group-sm">
+                <a class='btn btn-outline-danger' ng-show="objetoModelo.idObjeto != modelo.idObjetoRaiz" ng-click="eliminarObjetoModelo()" >&#128465; Eliminar</a>
+                <a class="btn btn-outline-primary" ng-click="exportarModelo()">&#128229; Descargar Modelo</a>
+                <a class='btn btn-outline-secondary' ng-click="validarModelo()" > &#128203; Validar</a>
+                <a class='btn btn-outline-secondary' ng-click="irAInicio()" > &#10006; Cerrar</a>
+            </div>
+    
+    
+            <ul class="breadcrumb m-0 bg-light">
+                <li class="breadcrumb-item" ng-repeat="(indice,objetoPila) in pilaObjetosModelo">
+                    <a ng-click="mostrarObjetoModeloPila(indice)" >{{objetoPila.nombre}}</a>
+                </li>
+            </ul>
+    
+            <div class="form-group form-group-sm row">
+                <label for="objetoModeloDescripcion" class="col-4">Descripci&oacute;n:</label>
+                <span class="col-8">
+                    <textarea ng-model="objetoModelo.descripcion" rows="2" class="form-control form-control-sm" ng-change="onCambiarCampo()"></textarea>
+                </span>
+            </div>
+            
+            <div class="form-group form-group-sm row mt-1" ng-repeat="(indice,atributo) in atributos">
+                <label class="col-4">{{atributo.idAtributoMetamodelo}}
+                    <span ng-show=" atributo.esObligatorio == '1' ">(*)</span>
+                :</label>
+                <span ng-show="atributo.idCatalogo == null &amp;&amp; atributo.idTipoMetamodeloRef == null" class="col-8">
+                    <input ng-model="atributo.valor" ng-maxlength="obtenerMaxLength(atributo)" class="form-control form-control-sm" ng-change="onCambiarCampo()">
+                </span>
+                <span ng-show="atributo.idCatalogo != null" class="col-8">
+                    <select ng-model="atributo.valor" ng-change="onCambiarCampo()" class="form-control-lg">
+                        <option value="">-Seleccionar-</option>
+                        <option ng-repeat="valorCatalogo in catalogos[atributo.idCatalogo]" value="{{valorCatalogo.clave}}" ng-selected="atributo.valor == catalogoValor.clave">
+                            {{valorCatalogo.etiqueta}}
+                        </option>
+                    </select>
+                </span>
+                <span ng-show="atributo.idTipoMetamodeloRef != null" class="col-8">
+                    <div class="input-group" ng-click="mostrarSeleccionarReferencia(indice)">
+                      <input disabled ng-model="atributo.nombreRef" class="form-control form-control-sm">
+                      <button class="input-group-append btn btn-secondary">...</button>
+                    </div>
+                </span>
+                
+                <span ng-show="atributo.mensajeError != null" class="text-error col-12">
+                    {{atributo.mensajeError}}
+                </span>
+            </div>    
+
+        </div>
+
         
         <ul class="nav nav-pills nav-justified">
                     <li class="nav-item" ng-repeat="(indice, lista) in listas">
@@ -195,24 +174,18 @@
             
             <div class="card-body">
                 <div class="list-group">
-                  <div class="list-group-item" ng-repeat="item in listaHijos">
-                      <div class="navbar navbar-default"> 
-                          <div class="navbar-brand" ng-click="abrirHijo(item)" >
+                  <div class="list-group-item p-0" ng-repeat="item in listaHijos">
+                      <div class="w-100 pl-3 d-flex flex-row justify-content-between align-items-center"> 
+                          <div class="btn" ng-click="abrirHijo(item)" >
                               &#128196; {{item.nombre}}
                           </div>
                           
-                          <span class="nav align-items-center">
-                              <span class="nav-item">
-                                  <span class="btn-group-vertical btn-group-lg">
-                                      <div class="btn btn-lg btn-block" ng-click="abrirHijo(item)" >&#9999;</div>
-                                  </span>
-                              </span>
-                              <span class="nav-item">
-                                  <span class="btn-group-vertical btn-group-lg">
-                                      <button class="btn btn-lg" ng-click="moverObjeto(item,'1')" >&#x25B2;</button>
-                                      <button class="btn btn-lg" ng-click="moverObjeto(item,'0')">&#x25BC;</button>
-                                  </span>
-                              </span>
+                          <span class="d-flex flex-row align-items-center">
+                            <div class="btn btn-lg" ng-click="abrirHijo(item)" >&#9999;</div>
+                            <span class="d-flex flex-column">
+                                <button class="btn" ng-click="moverObjeto(item,'1')" >&#x25B2;</button>
+                                <button class="btn" ng-click="moverObjeto(item,'0')">&#x25BC;</button>
+                            </span>
                           </span>
                           
                       </div>

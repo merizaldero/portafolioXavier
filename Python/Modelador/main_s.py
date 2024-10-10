@@ -27,9 +27,11 @@ import config
 import ModeladorDao
 import os
 from os.path import join, dirname, abspath, isdir
-
+import ModeladorDaoTest
+import unittest
 import json
-
+import xpd_usr
+from BottleSessions import BottleSessions
 
 TEMPLATE_PATH.append( join( dirname(abspath( __file__ )) , "views") )
 
@@ -66,6 +68,15 @@ def __exit():
 def __ping():
     return "ok"
 
+@route ('/__test')
+def __test():
+    try:
+        testRunner = unittest.TextTestRunner()
+        testRunner.run( ModeladorDaoTest.ModeladorDaoTestSuite() )
+        return "Pruebas Unitarias realizadas\n verificar log"
+    except (Exception) as ex:
+        return repr(ex)
+
 # @route('/static/<filepath:path>')
 def server_static(filepath):
     return static_file(filepath, root=config.WEB_ROOT)
@@ -93,12 +104,22 @@ def server_static_img(filepath):
 
 # @route ('/getLocalConfig.html',method="POST")
 def server_get_localConfig_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     return config.LOCAL_CONFIG
 
 # @route('/metamodelos.html')
 def server_metamodelos_html ():
-  
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
+    
     salida = {}
     try:
         lista = ModeladorDao.getMetamodelos()
@@ -110,6 +131,11 @@ def server_metamodelos_html ():
 
 # @route('/listaModelos.html')
 def server_lista_modelos_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -122,6 +148,11 @@ def server_lista_modelos_html ():
     
 # @route('/crearModelo.html', method = "POST")
 def server_crear_modelo_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -136,7 +167,12 @@ def server_crear_modelo_html ():
     
 # @route ('/crearObjetoHijo.html',method="POST")
 def server_crear_objeto_hijo_html ():
-   
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
+        
     salida = {}
     try:
         nombre = request.forms.get("nombre")
@@ -155,6 +191,11 @@ def server_crear_objeto_hijo_html ():
     
 # @route ('/getAtributosObjeto.html',method="POST")
 def server_get_atributos_objeto_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -168,7 +209,12 @@ def server_get_atributos_objeto_html ():
 
 # @route ('/actualizarAtributos.html',method="POST")
 def server_actualizar_atributos_html ():
- 
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
+
     salida = {}
     try:
         objetoModelo = { "idObjeto": int( request.forms.get("__idObjeto")) , "nombre":request.forms.get("__nombre") , "descripcion":request.forms.get("__descripcion") , "__atributos":[]}
@@ -185,6 +231,11 @@ def server_actualizar_atributos_html ():
 
 # @route('/inicializarBase.html', method = "POST")
 def server_inicializar_base_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -200,6 +251,11 @@ def server_inicializar_base_html ():
     
 # @route('/regenerarMetamodelo.html', method = "POST")
 def server_regenerar_metamodelo_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -215,6 +271,11 @@ def server_regenerar_metamodelo_html ():
 
 # @route('/getRaizModelo.html',method="POST")
 def server_get_raiz_modelo_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -229,6 +290,11 @@ def server_get_raiz_modelo_html ():
     
 # @route ('/getObjetosByPadre.html',method="POST")
 def server_get_objetos_by_padre_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -244,6 +310,11 @@ def server_get_objetos_by_padre_html ():
 
 # @route ('/getObjetosByModeloTipo.html',method="POST")
 def server_get_objetos_by_modelo_tipo_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -259,6 +330,11 @@ def server_get_objetos_by_modelo_tipo_html ():
     
 # @route ('/getGeneradores.html',method="POST")
 def server_get_generadores_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -273,6 +349,11 @@ def server_get_generadores_html ():
     
 # @route ('/generarModelo.html',method="POST")
 def server_generar_modelo_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     archivoSalida = {}
     try:
@@ -296,6 +377,11 @@ def server_generar_modelo_html ():
                 
 # @route ('/getParches.html',method="POST")
 def server_get_parches_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -310,6 +396,11 @@ def server_get_parches_html ():
 
 # @route ('/verificarParche.html',method="POST")
 def server_verificar_parche_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -324,6 +415,11 @@ def server_verificar_parche_html ():
     
 # @route ('/aplicarParche.html',method="POST")
 def server_aplicar_parche_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -338,6 +434,11 @@ def server_aplicar_parche_html ():
     
 # @route ('/exportarModelo.html',method="POST")
 def server_exportar_modelo_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -359,6 +460,11 @@ def server_exportar_modelo_html ():
 
 # @route ('/eliminarObjeto.html',method="POST")
 def server_eliminar_objeto_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -373,6 +479,11 @@ def server_eliminar_objeto_html ():
     
 # @route ('/moverObjeto.html',method="POST")
 def server_mover_objeto_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     try:
@@ -388,6 +499,11 @@ def server_mover_objeto_html ():
     
 # @route ('/importarModelo.html',method="POST")
 def server_importar_modelo_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = ("")
     strImport =("")
@@ -415,6 +531,11 @@ def server_importar_modelo_html ():
 
 # @route ('/listarFs.html',method="POST")
 def server_listar_fs_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -442,6 +563,11 @@ def server_listar_fs_html ():
 
 # @route ('/catalogos.html',method="POST")
 def server_get_catalogo_valor_html ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -456,6 +582,11 @@ def server_get_catalogo_valor_html ():
 
 # @route ('/validarModelo.html',method="POST")
 def server_validar_modelo ():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
 
     salida = {}
     try:
@@ -472,14 +603,23 @@ def server_validar_modelo ():
 ######### WEBAPP ROUTERS ###############
 @route('/')
 def home():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        redirect('/login')
+    if 'Administrador' not in usuario['roles']:
+        return template('xpd_usr/mensaje', lvl ="danger", mensaje = 'Acceso Denegado', href = '/logout' )
+    #return template('/modelador/modelador', usuario = usuario)
     return server_static("modelador.html")
 
 ######### WEBAPP ROUTERS ###############
 app = Bottle()
 
+xpd_usr.rutearModulo(app, '/security')
+
 app.route('/', method='GET')(home)
 # app.route('/__exit', method=['GET','HEAD'])(__exit)
 app.route('/__ping', method=['GET','HEAD'])(__ping)
+app.route('/__test', method=['GET','HEAD'])(__test)
 app.route ('/getLocalConfig.html',method="POST") ( server_get_localConfig_html )
 app.route('/static/<filepath:path>', method='GET')(server_static)
 app.route('/js/<filepath:path>', method='GET')(server_static_js)
@@ -519,7 +659,7 @@ try:
         #'host': direccion_ip,
         #'password': None
     }
-    
+    BottleSessions(app, session_backing = backing_params, session_secure = False, session_expire = 600 )
     server = MyWSGIRefServer(host=direccion_ip, port=puerto)
     app.run(server=server,reloader=False)
 except (Exception) as ex:
