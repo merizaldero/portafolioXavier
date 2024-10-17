@@ -599,6 +599,61 @@ def server_validar_modelo ():
         print(repr(ex))
     return salida
 
+def server_get_opciones_reubicacion():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
+    
+    salida = {}
+    try:
+        idObjeto = int(request.forms.get("idObjeto"))
+        salida = {'lista' : ModeladorDao.getOpcionesReubicacion( idObjeto ) }
+        if config.DEBUG_MODE:
+            print(str(salida))
+    except (Exception) as ex:
+        salida = {'error': repr(ex) }
+        print(repr(ex))
+    return salida
+
+def server_set_objeto_padre():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
+
+    salida = {}
+    try:
+        idObjeto = int(request.forms.get("idObjeto"))
+        idObjetoPadre = int(request.forms.get("idObjetoPadre"))
+        idJerarquia = request.forms.get("idJerarquia","")
+        salida = ModeladorDao.setObjetoPadre( idObjeto, idObjetoPadre, idJerarquia )
+        if config.DEBUG_MODE:
+            print(str(salida))
+    except (Exception) as ex:
+        salida = {'error': repr(ex) }
+        print(repr(ex))
+    return salida
+
+def server_get_ancestros_objeto():
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        error(401,"Acceso Denegado")
+    if 'Administrador' not in usuario['roles']:
+        error(403,"Acceso Denegado")
+    
+    salida = {}
+    #try:
+    idObjeto = int(request.forms.get("idObjeto"))
+    salida = {'lista' : ModeladorDao.getAncestrosObjetoModelo( idObjeto ) }
+    if config.DEBUG_MODE:
+        print(str(salida))
+    #except (Exception) as ex:
+    #    salida = {'error': repr(ex) }
+    #    print(repr(ex))
+    return salida
 
 ######### WEBAPP ROUTERS ###############
 @route('/')
@@ -649,6 +704,9 @@ app.route ('/importarModelo.html',method="POST") ( server_importar_modelo_html )
 app.route ('/listarFs.html',method="POST") ( server_listar_fs_html )
 app.route ('/catalogos.html',method="POST") ( server_get_catalogo_valor_html )
 app.route ('/validarModelo.html',method="POST") ( server_validar_modelo )
+app.route ('/getOpcionesReubicacion.html',method="POST") ( server_get_opciones_reubicacion )
+app.route ('/setObjetoModeloPadre.html',method="POST") ( server_set_objeto_padre )
+app.route ('/getAncestrosObjeto.html',method="POST") ( server_get_ancestros_objeto )
 
 try:
     direccion_ip = "0.0.0.0"

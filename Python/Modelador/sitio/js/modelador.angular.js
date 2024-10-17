@@ -97,7 +97,6 @@ modeladorApp.controller('modeladorController', function($scope, $http) {
     $scope.cargarModelo = function( modelo ){
         //alert("cargando modelo " + JSON.stringify(modelo));
         $scope.modelo = modelo;
-        $scope.pilaObjetosModelo = [];
         var parametros = "idModelo=" + modelo.idModelo ;
         $http.post( $scope.PREFIJO + '/getRaizModelo' + $scope.SUBFIJO , parametros ).then( 
             (response) => {
@@ -117,21 +116,31 @@ modeladorApp.controller('modeladorController', function($scope, $http) {
         return ($scope.cambiado)?cambiado:noCambiado;
     };
     
-    $scope.cargarObjetoModelo = function( objetoModelo ){
+    $scope.cargarObjetoModelo = async function( objetoModelo ){
         //alert("cargando objetoModelo " + JSON.stringify(objetoModelo));
         $scope.objetoModelo = objetoModelo;
-        $scope.pilaObjetosModelo.push( objetoModelo );
-        $scope.jerarquias = objetoModelo._jerarquias;
-        $scope.listas = objetoModelo._listas;
-        $scope.listaHijos = [];
-        $scope.cambiado = false;
         
+        let parametros = "idObjeto=" + objetoModelo.idObjeto ;
+
+        //recupero ancestros
+        
+        $http.post( $scope.PREFIJO + '/getAncestrosObjeto' + $scope.SUBFIJO , parametros ).then(
+            (response)=>{
+                $scope.pilaObjetosModelo = response.data.lista;
+            },(response_error)=>{
+                alert("No se pudo recuperar ancestros");
+                $scope.pilaObjetosModelo = [];
+            });
+
         //recupero atributos
-        var parametros = "idObjeto=" + objetoModelo.idObjeto ;
-        //alert(parametros);
         $http.post( $scope.PREFIJO + '/getAtributosObjeto' + $scope.SUBFIJO , parametros ).then( 
             (response) => {
                 
+                $scope.jerarquias = response.data._jerarquias;
+                $scope.listas = response.data._listas;
+                $scope.listaHijos = [];
+                $scope.cambiado = false;
+        
                 $scope.atributos = response.data._atributos;
                 
                 //alert('aqui llego al cargar atributos');
@@ -139,6 +148,11 @@ modeladorApp.controller('modeladorController', function($scope, $http) {
                 for(var indice in $scope.atributos ){
                     $scope.atributos[indice].mensajeError = null;
 
+                }
+
+                // marco primera lista como activa y despliego su contenido
+                if($scope.listas.length > 0){
+                    $scope.cargarLista(0);
                 }
                 
                 //alert( "cargado atributos " + JSON.stringify( $scope.atributos ) );
@@ -148,11 +162,6 @@ modeladorApp.controller('modeladorController', function($scope, $http) {
                 $scope.atributos = []
                 alert("Error al cargar modelo");
             });
-        
-        // marco primera lista como activa y despliego su contenido
-        if($scope.listas.length > 0){
-            $scope.cargarLista(0);
-        }
         
     };
     
@@ -240,9 +249,6 @@ modeladorApp.controller('modeladorController', function($scope, $http) {
     
     $scope.mostrarObjetoModeloPila = function( indice ){
         var objetoModelo = $scope.pilaObjetosModelo[indice];
-        while( $scope.pilaObjetosModelo.length > indice ){
-            $scope.pilaObjetosModelo.pop();
-        }
         $scope.cargarObjetoModelo( objetoModelo );
     };
     
@@ -288,6 +294,37 @@ modeladorApp.controller('modeladorController', function($scope, $http) {
             }
         );
     };
+
+    $scope.opcionesReubicacion=[];
+
+    $scope.mostrarOpcionesReubicacionObjetoModelo = ()=>{
+        const parametros = "idObjeto="+ $scope.objetoModelo.idObjeto;
+        $http.post( $scope.PREFIJO + '/getOpcionesReubicacion' + $scope.SUBFIJO , parametros ).then(
+            (response)=>{
+                $scope.opcionesReubicacion = response.data.lista;
+                $scope.currentScreen = "#frmSeleccionarPadre";
+            },(response_err)=>{
+                alert("No se pudo obtener opciones de validacion");
+            }
+        );
+    };
+
+    $scope.seleccionarNuevoPadre = (indice)=>{
+        const nuevoPadre = $scope.opcionesReubicacion[indice];
+        if(nuevoPadre.idObjeto == $scope.objetoModelo.idObjetoPadre){
+            alert("Ya es Padre actual");
+            return;
+        }
+        const parametros = "idObjeto="+ $scope.objetoModelo.idObjeto + "&idObjetoPadre=" + nuevoPadre.idObjeto + "&idJerarquia=" + nuevoPadre.idJerarquia ;
+        $http.post( $scope.PREFIJO + '/setObjetoModeloPadre' + $scope.SUBFIJO , parametros ).then(
+            (response)=>{
+                $scope.cargarObjetoModelo($scope.objetoModelo);
+            },(response_err)=>{
+                alert("No se pudo reubicar Objeto");
+                $scope.cargarObjetoModelo($scope.objetoModelo);
+            }
+        );
+    };
     
     $scope.eliminarObjetoModelo = function(){
         if(! confirm( "Desea eliminar " + $scope.objetoModelo.nombre + " ?" ) ){
@@ -296,7 +333,7 @@ modeladorApp.controller('modeladorController', function($scope, $http) {
         var parametros = "idObjeto=" + $scope.objetoModelo.idObjeto;
         $http.post( $scope.PREFIJO + '/eliminarObjeto' + $scope.SUBFIJO , parametros ).then( 
              (response) => {
-                 $scope.mostrarObjetoModeloPila( $scope.pilaObjetosModelo.length - 2 );
+                 $scope.mostrarObjetoModeloPila( $scope.pilaObjetosModelo.length - 1 );
              }, ( response ) => {
                  alert("Error al cargar modelo");
              }

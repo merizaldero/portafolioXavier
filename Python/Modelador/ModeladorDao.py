@@ -534,6 +534,9 @@ def getAtributosByObjetoModelo( idObjeto ):
                 dao.insertar(conexion,atributo)
         objetoModelo["_atributos"] = lista
         conexion.commit()
+        modeloDao = ModeloDao()
+        modelo = modeloDao.getById(conexion, objetoModelo['idModelo'])
+        obtenerDataObjetoModelo(objetoModelo,modelo['idMetamodelo'],conexion)
         return objetoModelo
     except (Exception) as ex:
         if not (conexion is None):
@@ -1260,4 +1263,88 @@ def generarModelo( idModelo, idGenerador ):
             conexion.close ()
             conexion = None
 
-            
+def getOpcionesReubicacion( idObjeto ):
+    conexion = None
+    try:
+        conexion=xpdbdd.Conexion(config.XPDBASEPATH)
+        sql = """SELECT a.ID_OBJETO as idObjeto , a.NOMBRE as nombre, b.ID_JERARQUIA as idJerarquia
+FROM XMOBJTMDL a, XMJRRQTP b, XMMDL c
+WHERE 
+a.ID_TIPO_METAMODELO = b.ID_TIPO_METAMODELO_PADRE
+and c.ID_MODELO = a.ID_MODELO
+AND c.ID_METAMODELO = b.ID_METAMODELO
+and a.ID_OBJETO <> :idObjeto
+and exists (
+SELECT 1 FROM XMOBJTMDL d 
+where d.ID_OBJETO = :idObjeto
+and d.ID_MODELO = a.ID_MODELO
+and d.ID_TIPO_METAMODELO = b.ID_TIPO_METAMODELO_HIJO )
+"""
+        lista = conexion.consultar(sql,{'idObjeto':idObjeto},['idObjeto', 'nombre', 'idJerarquia'])
+        lista_depurar = []
+        for item in lista:
+            #Depurar los que estan debajo de la jerarquia
+            pass
+        lista = [ x for x in lista if x not in lista_depurar ]
+        return lista
+    except Exception as ex:
+        print('ERROR Consulta ' + repr(ex))
+        return {"error":repr(ex)}
+    finally:
+        if not (conexion is None):
+            conexion.close ()
+            conexion = None
+
+def setObjetoPadre( idObjeto, idObjetoPadre, idJerarquia ):
+    conexion = None
+    try:
+        conexion=xpdbdd.Conexion(config.XPDBASEPATH)
+        objetoModeloDao = ObjetoModeloDao()        
+        objetoModelo = objetoModeloDao.getById(conexion, idObjeto)
+        assert objetoModelo is not None, "Objeto no existe"
+        objetoModeloPadre = objetoModeloDao.getById(conexion, idObjetoPadre)
+        assert objetoModeloPadre is not None, "Objeto Padre no existe"
+        assert objetoModelo['idModelo'] == objetoModeloPadre['idModelo'], "Objeto Padre no pertenece al mismo modelo"
+        assert objetoModelo['idObjetoPadre'] != objetoModeloPadre['idObjeto'], "Objeto ya es padre"
+        modeloDao = ModeloDao()
+        modelo = modeloDao.getById(conexion, objetoModelo['idModelo'])
+        assert modelo is not None, "Modelo no existe"
+        jerarquiaDao = JerarquiaTipoMetamodeloDao()
+        jerarquias = jerarquiaDao.getByTipoMetamodelo(conexion,modelo['idMetamodelo'], objetoModeloPadre['idTipoMetamodelo'],'1')
+        jerarquias = [x for x in jerarquias if x['idJerarquia'] == idJerarquia and x['idTipoMetamodeloHijo'] == objetoModelo['idTipoMetamodelo'] ]
+        assert len(jerarquias) > 0 , "Jerarquia no valida"
+        hermanos = objetoModeloDao.getByObjetoPadre(conexion, idObjetoPadre, idJerarquia)
+
+        objetoModelo['idObjetoPadre'] = idObjetoPadre
+        objetoModelo['idJerarquia'] = idJerarquia
+        objetoModelo['orden'] = len(hermanos) + 1
+
+        objetoModeloDao.actualizar(conexion, objetoModelo)
+
+        conexion.commit()
+        return objetoModelo
+        
+    except (Exception) as ex:
+        conexion.rollback()
+        print('ERROR VALIDACION ' + repr(ex))
+        return {"error":repr(ex)}
+    finally:
+        if not (conexion is None):
+            conexion.close ()
+            conexion = None
+
+def getAncestrosObjetoModelo(idObjeto):
+    conexion = xpdbdd.Conexion(config.XPDBASEPATH)
+    objetoModeloDao = ObjetoModeloDao()
+    resultado = []
+    cola = [idObjeto]
+    while len(cola) > 0:
+        idObjeto1 = cola.pop(0)
+        objetoModelo = objetoModeloDao.getById(conexion, idObjeto1)
+        if objetoModelo is not None:        
+            resultado.insert(0,objetoModelo)
+            if objetoModelo['idObjetoPadre'] is not None:
+                cola.append(objetoModelo['idObjetoPadre'])
+    return resultado[:-1]
+
+    

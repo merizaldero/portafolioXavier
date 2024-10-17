@@ -468,6 +468,42 @@ def server_validar_modelo ():
         print(repr(ex))
     return salida
 
+def server_get_opciones_reubicacion():
+    
+    salida = {}
+    try:
+        idObjeto = int(request.forms.get("idObjeto"))
+        salida = {'lista' : ModeladorDao.getOpcionesReubicacion( idObjeto ) }
+        if config.DEBUG_MODE:
+            print(str(salida))
+    except (Exception) as ex:
+        salida = {'error': repr(ex) }
+        print(repr(ex))
+    return salida
+
+def server_set_objeto_padre():
+
+    salida = {}
+    try:
+        idObjeto = int(request.forms.get("idObjeto"))
+        idObjetoPadre = int(request.forms.get("idObjetoPadre"))
+        idJerarquia = request.forms.get("idJerarquia","")
+        salida = ModeladorDao.setObjetoPadre( idObjeto, idObjetoPadre, idJerarquia )
+        if config.DEBUG_MODE:
+            print(str(salida))
+    except (Exception) as ex:
+        salida = {'error': repr(ex) }
+        print(repr(ex))
+    return salida
+
+def server_get_ancestros_objeto():
+    
+    salida = {}
+    idObjeto = int(request.forms.get("idObjeto"))
+    salida = {'lista' : ModeladorDao.getAncestrosObjetoModelo( idObjeto ) }
+    if config.DEBUG_MODE:
+        print(str(salida))
+    return salida
 
 ######### WEBAPP ROUTERS ###############
 @route('/')
@@ -509,6 +545,9 @@ app.route ('/importarModelo.html',method="POST") ( server_importar_modelo_html )
 app.route ('/listarFs.html',method="POST") ( server_listar_fs_html )
 app.route ('/catalogos.html',method="POST") ( server_get_catalogo_valor_html )
 app.route ('/validarModelo.html',method="POST") ( server_validar_modelo )
+app.route ('/getOpcionesReubicacion.html',method="POST") ( server_get_opciones_reubicacion )
+app.route ('/setObjetoModeloPadre.html',method="POST") ( server_set_objeto_padre )
+app.route ('/getAncestrosObjeto.html',method="POST") ( server_get_ancestros_objeto )
 
 try:
     direccion_ip = "0.0.0.0"

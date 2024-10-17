@@ -107,6 +107,7 @@
 
             <div class="ml-1 btn-group btn-group-sm">
                 <a class='btn btn-outline-danger' ng-show="objetoModelo.idObjeto != modelo.idObjetoRaiz" ng-click="eliminarObjetoModelo()" >&#128465; Eliminar</a>
+                <a class='btn btn-outline-secondary' ng-show="objetoModelo.idObjeto != modelo.idObjetoRaiz" ng-click="mostrarOpcionesReubicacionObjetoModelo()" >Reubicar</a>
                 <a class="btn btn-outline-primary" ng-click="exportarModelo()">&#128229; Descargar Modelo</a>
                 <a class='btn btn-outline-secondary' ng-click="validarModelo()" > &#128203; Validar</a>
                 <a class='btn btn-outline-secondary' ng-click="irAInicio()" > &#10006; Cerrar</a>
@@ -115,7 +116,10 @@
     
             <ul class="breadcrumb m-0 bg-light">
                 <li class="breadcrumb-item" ng-repeat="(indice,objetoPila) in pilaObjetosModelo">
-                    <a ng-click="mostrarObjetoModeloPila(indice)" >{{objetoPila.nombre}}</a>
+                    <a class="text-primary" ng-click="mostrarObjetoModeloPila(indice)" >{{objetoPila.nombre}}</a>
+                </li>
+                <li class="breadcrumb-item active">
+                  <span>{{objetoModelo.nombre}}</span>
                 </li>
             </ul>
     
@@ -134,7 +138,7 @@
                     <input ng-model="atributo.valor" ng-maxlength="obtenerMaxLength(atributo)" class="form-control form-control-sm" ng-change="onCambiarCampo()">
                 </span>
                 <span ng-show="atributo.idCatalogo != null" class="col-8">
-                    <select ng-model="atributo.valor" ng-change="onCambiarCampo()" class="form-control-lg">
+                    <select ng-model="atributo.valor" ng-change="onCambiarCampo()" class="form-control form-control-sm">
                         <option value="">-Seleccionar-</option>
                         <option ng-repeat="valorCatalogo in catalogos[atributo.idCatalogo]" value="{{valorCatalogo.clave}}" ng-selected="atributo.valor == catalogoValor.clave">
                             {{valorCatalogo.etiqueta}}
@@ -151,50 +155,42 @@
                 <span ng-show="atributo.mensajeError != null" class="text-error col-12">
                     {{atributo.mensajeError}}
                 </span>
-            </div>    
-
-        </div>
-
-        
-        <ul class="nav nav-pills nav-justified">
-                    <li class="nav-item" ng-repeat="(indice, lista) in listas">
-                        <a ng-click="cargarLista(indice)" class='nav-link {{lista.cssSeleccionado}}' >{{lista.idJerarquia}}</a>
-                    </li>
-                </ul>
-        
-        <div class="card" ng-show="listas.length &gt; 0">
+            </div>   
             
+            <ul class="nav nav-pills nav-justified">
+              <li class="nav-item" ng-repeat="(indice, lista) in listas">
+                  <a ng-click="cargarLista(indice)" class='nav-link {{lista.cssSeleccionado}}' >{{lista.idJerarquia}}</a>
+              </li>
+            </ul>
+
             <div class="card-header justify-content-end">
-                <div class="btn-group">
-                    <button class="btn btn-primary" ng-click="crearHijo()">
-                       &#10133; Nuevo
-                    </button>
-                </div>
+              <div class="btn-group">
+                  <button class="btn btn-primary" ng-click="crearHijo()">
+                     &#10133; Nuevo
+                  </button>
+              </div>
             </div>
-            
-            <div class="card-body">
-                <div class="list-group">
-                  <div class="list-group-item p-0" ng-repeat="item in listaHijos">
-                      <div class="w-100 pl-3 d-flex flex-row justify-content-between align-items-center"> 
-                          <div class="btn" ng-click="abrirHijo(item)" >
-                              &#128196; {{item.nombre}}
-                          </div>
-                          
-                          <span class="d-flex flex-row align-items-center">
-                            <div class="btn btn-lg" ng-click="abrirHijo(item)" >&#9999;</div>
-                            <span class="d-flex flex-column">
-                                <button class="btn" ng-click="moverObjeto(item,'1')" >&#x25B2;</button>
-                                <button class="btn" ng-click="moverObjeto(item,'0')">&#x25BC;</button>
-                            </span>
-                          </span>
-                          
-                      </div>
-                  </div>
-                </div>
-            </div>
-            
-        </div>
 
+            <div class="list-group">
+              <div class="list-group-item p-0" ng-repeat="item in listaHijos">
+                  <div class="w-100 pl-3 d-flex flex-row justify-content-between align-items-center"> 
+                      <div class="btn" ng-click="abrirHijo(item)" >
+                          &#128196; {{item.nombre}}
+                      </div>
+                      
+                      <span class="d-flex flex-row align-items-center">
+                        <div class="btn btn-lg" ng-click="abrirHijo(item)" >&#9999;</div>
+                        <span class="d-flex flex-column">
+                            <button class="btn" ng-click="moverObjeto(item,'1')" >&#x25B2;</button>
+                            <button class="btn" ng-click="moverObjeto(item,'0')">&#x25BC;</button>
+                        </span>
+                      </span>
+                      
+                  </div>
+              </div>
+            </div>
+
+        </div>
 
     </div>
     
@@ -223,6 +219,35 @@
           </div>
         </div>
       
+    </form>
+
+    <form id="frmSeleccionarPadre" class="card" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmSeleccionarPadre'">
+      <div class="card-header bg-dark text-white fixed-top">
+        <div class="nav justify-content-between">
+            <div>Reubicar {{objetoModelo.nombre}}</div>
+            <button class="btn btn-secondary" ng-click="irAObjetoModelo()">
+                &#10096; Atr&aacute;s
+            </button>
+        </div>
+      </div>
+
+      <div class="my-4">  
+        &nbsp;                  
+      </div>
+
+      <div class="card-body">
+        <div class="d-flex flex-column flex-wrap justify-content-around">
+            <div ng-repeat="(indice, objeto) in opcionesReubicacion" class="card flex-fill mx-0 my-0" ng-click="seleccionarNuevoPadre(indice)">
+                <div class="card-body">
+                  {{objeto.idTipoMetamodelo}} {{objeto.nombre}}
+                </div>
+                <div class="text-info">
+                  Rol: {{objeto.idJerarquia}}
+                </div>
+            </div>
+        </div>
+      </div>
+
     </form>
     
     <form id="frmSeleccionarReferencia" class="card" method="POST" action="#" onsubmit="return false;" ng-show="currentScreen == '#frmSeleccionarReferencia'">
@@ -481,7 +506,7 @@
     </div>
     
     
-    <script src="js/modelador.angular.js?31">
+    <script src="js/modelador.angular.js?37">
     </script>
     
 
