@@ -1,0 +1,13 @@
+/__pycache__/
+/.ipynb_checkpoints/
+/data/base.db
+/inicializador.ipynb
+/xpd_orm.py
+/xpd_usr.py
+/views/xpd_usr
+/static/js/jsm/
+/static/models/glb/
+/static/js/three.module.js
+/eliza.py
+/esEC.py
+/novelas.py

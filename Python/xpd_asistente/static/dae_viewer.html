@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Asistente Virtual Miku</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="css/main.css">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<script src="js/bootstrap.bundle.min.js"></script>
+	</head>
+
+	<body>
+		<div id="divContenedor">
+		</div>
+  <div id="divPie" class="fixed-bottom">
+	<div class="toast w-75" id="toastMensaje">
+		<div class="toast-header">
+			Miku:
+			<button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+		  </div>
+		<div class="toast-body">			
+		</div>
+	</div>
+	<div class="border rounded m-4 p-2" style="background-color: rgba(200, 255, 200, 0.75);">
+		<div class="row m-3">
+			<input id="txtMensaje" class="col col-lg-11 form-control">
+			<button id="btnMensaje" class="col-2 col-lg-1 btn btn-primary">&gt;</button>
+		</div>
+		<div class="text-center border-bottom" data-bs-toggle="collapse" data-bs-target="#divOpciones">&equiv;</div>
+		<div id="divOpciones" class="collapse">
+		  <div class="mb-3">
+			<div class="p-2" style="height:200px; overflow-y:auto;">
+				<div class="row">
+					<span class="col-10">
+						<label for="chkModoConversacion">
+							Modo Conversacion.
+						</label>
+					</span>
+					<span class="col-1 form-check form-switch">
+						<input type="checkbox" class="form-check-input" id="chkModoConversacion" name="chkModoConversacion">
+					</span>
+				</div>
+				<div class="row">
+				  <span class="col-10">
+					  <label for="chkLocucion">
+						   Habilitar Locucion
+					  </label>
+				  </span>
+				  <span class="col-1 form-check form-switch">
+					  <input type="checkbox" class="form-check-input" id="chkLocucion" name="chkLocucion" checked>
+				  </span>
+			  </div>
+				<div class="row">
+				<label class="col-5 col-lg-6 form-label" for="selPoses">
+					Pose:
+				</label>
+					<select class="col-5 col-lg-6 form-select" id="selPoses" name="selPoses">
+					</select>
+				</div>
+				<div class="row">
+					<span class="col-10">
+						<label for="chkPoseTemporal">
+						Revertir en 5 s.
+						</label>
+					</span>
+					<span class="col-1 form-check form-switch">
+						<input type="checkbox" class="form-check-input" id="chkPoseTemporal" name="chkPoseTemporal" checked>
+					</span>
+				</div>
+				<div class="text-center border-top border-bottom" data-bs-toggle="collapse" data-bs-target="#divMorphs">&equiv;Variaciones Faciales&equiv;</div>
+				<div id="divMorphs" class="border-top collapse">
+				</div>
+				<div class="text-center border-top border-bottom" data-bs-toggle="collapse" data-bs-target="#divLayers">&equiv;Accesorios&equiv;</div>
+				<div id="divLayers" class="border-top collapse">
+				</div>
+				<div class="border-top">
+				  <a href="/static/webgl_loader_mmd_pose.html">Ver otra Miku</a>
+				</div>
+			</div>
+		  </div>
+		</div>	
+	</div>
+  </div>
+  <div id="modalProgreso" class="modal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">Cargando ...<span class="spinner-border"></span></div>
+			<div class="modal-body">
+				<div class="progress w-100">
+					<div id="divProgreso" class="progress-bar progress-bar-striped"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+  </div>
+		<script src="js/jsm/libs/ammo.wasm.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "./js/three.module.js",
+					"three/addons/": "./js/jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+			//import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+            import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+			import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
+			//import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let camera, scene, renderer, effect;
+			let mesh, helper, morphing_mesh, skin_meshes, skeletonHelper;
+			let animationGroup, animationMixer;
+			let currentAction = null;
+			let defaultAction = null;
+			let visibilidad;
+			let modalProgreso, divProgreso;
+			
+			let bufferMensaje, procesadorMensaje;
+
+			const vpds = [];
+			const traducciones = {
+				"真面目" : "cejas seria",
+				"困る" : "cejas preocupada",
+				"にこり" : "cejas sonrisa",
+				"怒り" : "cejas enojada",
+				"上" : "cejas arriba",
+				"下" : "cejas abajo",
+				"まばたき" : "ojos parpadear",
+				"笑い" : "ojos risa",
+				"ウィンク" : "guiño izq",
+				"ウィンク２" : "guiño 2 izq",
+				"ウィンク右" : "guiño der",
+				"ｳｨﾝｸ２右" : "guiño 2 der",
+				"はぅ" : "ojos >_<",
+				"なごみ" : "ojos -_-",
+				"びっくり" : "ojos sorpresa",
+				"じと目" : "ojos sueño",
+				"なぬ！" : "ojos queee?",
+				"瞳小" : "ojos pupilas pequeñas",
+				"あ" : "Boca A",
+				"い" : "Boca I",
+				"う" : "Boca U",
+				"お" : "Boca O",
+				"はんっ！" : "Boca humm!",
+				"ぺろっ" : "Boca pero ...",
+				"えー" : "Boca D:",
+				"にやり" : "Boca sonrisa"
+			};
+
+			async function dormir(milisegundos){
+				function dormir1(milis){
+					return new Promise(resolve => setTimeout(resolve, milis) );
+				}
+				await dormir1(milisegundos);
+			}
+
+			const morphs_by_pattern = [
+				{patron:":d",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmileOpen2_max":1.0}},
+				{patron:":p",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmileOpen2_max":0.7, "Expressions_mouthSmile_max":0.5, "Expressions_tongueHoriz_max":0.4, "Expressions_tongueOut_max":1.0, "Expressions_tongueVert_min":1.0}},				
+				{patron:":o",morphs:{"Expressions_browOutVertL_max":1.0, "Expressions_browOutVertR_max":1.0, "Expressions_eyesSmile_max":1.0, "Expressions_mouthOpenLarge_max":1.0}},
+				{patron:":)",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_max":1.0}},
+				{patron:":-)",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_max":1.0}},
+				{patron:";)",morphs:{"Expressions_eyeClosedR_max":0.4, "Expressions_eyesSmile_max":0.5, "Expressions_mouthSmileL_max":1.0, "Expressions_mouthSmileOpen_max":0.5}},
+				{patron:";-)",morphs:{"Expressions_eyeClosedR_max":0.4, "Expressions_eyesSmile_max":0.5, "Expressions_mouthSmileL_max":1.0, "Expressions_mouthSmileOpen_max":0.5}},
+				{patron:":(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
+				{patron:":-(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
+				{patron:":'(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
+				{patron:"uwu",morphs:{"Expressions_browsMidVert_max":1.0,"Expressions_eyesSmile_max":0.6, "Expressions_mouthOpenTeethClosed_min":1.0, "Expressions_mouthSmile_max":1.0}},
+				{patron:"xd",morphs:{"Expressions_browOutVertL_max":1.0, "Expressions_browOutVertR_max":1.0, "Expressions_eyesSmile_max":1.0, "Expressions_mouthSmileOpen2_max":1.0}},
+				{patron:"a",morphs:{"Expressions_mouthOpen_max":0.9, "Expressions_mouthSmile_max":1.0}},
+				{patron:"á",morphs:{"Expressions_mouthOpen_max":0.9, "Expressions_mouthSmile_max":1.0}},
+				{patron:"e",morphs:{"Expressions_mouthOpenO_max":0.5, "Expressions_mouthSmile_max":0.9}},
+				{patron:"é",morphs:{"Expressions_mouthOpenO_max":0.5, "Expressions_mouthSmile_max":0.9}},
+				{patron:"i",morphs:{"Expressions_mouthSmileOpen_max":0.3}},
+				{patron:"í",morphs:{"Expressions_mouthSmileOpen_max":0.3}},
+				{patron:"o",morphs:{"Expressions_mouthOpenO_max":0.5}},
+				{patron:"ó",morphs:{"Expressions_mouthOpenO_max":0.5}},
+				{patron:"u",morphs:{"Expressions_mouthOpenO_max":0.1,"Expressions_mouthOpenO_min":1.0}},
+				{patron:"ú",morphs:{"Expressions_mouthOpenO_max":0.1,"Expressions_mouthOpenO_min":1.0}},
+				{patron:".",morphs:{"Expressions_mouthSmile_max":1.0}}
+			];
+
+			Ammo().then( function ( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+
+			} );
+
+			function init() {
+				
+				const posicionesCamara = [
+					{x:0,y:1.35,z:1.3},
+					{x:0,y:1,z:2}
+				];
+
+				const container = document.createElement( 'div' );
+				// document.body.appendChild( container );
+				document.getElementById("divContenedor").appendChild(container);
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+
+				function ajustarCamara(indice){
+					if( indice >= posicionesCamara.length){
+						indice = posicionesCamara.length -1;
+					}
+					camera.position.x = posicionesCamara[indice].x;
+					camera.position.y = posicionesCamara[indice].y;
+					camera.position.z = posicionesCamara[indice].z;
+				}
+				//camera.position.z = 25;
+				ajustarCamara(0);
+
+				// scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				//scene.background = new THREE.Color( 0x000000 );
+
+				const ambient = new THREE.AmbientLight( 0xaaaaaa, 3 );
+				scene.add( ambient );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
+				scene.add( directionalLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				/*
+				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+				const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+				const cube = new THREE.Mesh( geometry, material );
+				scene.add( cube );
+				*/
+				/*
+				const orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.minDistance = 5;
+				orbitControls.maxDistance = 15;
+				*/
+				effect = new OutlineEffect( renderer );
+
+				// model
+				modalProgreso = new bootstrap.Modal(document.getElementById("modalProgreso"),{keyboard:false});
+				divProgreso = document.getElementById("divProgreso");
+				modalProgreso.show();
+
+				function onProgress( xhr ) {
+
+					if ( xhr.lengthComputable ) {
+
+						const percentComplete = Math.floor(xhr.loaded / xhr.total * 100);
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded ' + xhr.loaded + "/" + xhr.total);
+						divProgreso.style.width = "" + percentComplete + "%";
+						divProgreso.style.minWidth = "" + percentComplete + "%";
+						divProgreso.innerText = "" + percentComplete + " %";
+						if(xhr.loaded >= xhr.total){
+							setTimeout(()=>{
+								modalProgreso.hide();
+							},1000);
+						}
+					}
+
+				}
+
+				const modelFile = 'models/fbx/miku.fbx';
+
+				const fbxLoader = new FBXLoader();
+				const bvhLoader = new BVHLoader();
+
+				fbxLoader.load( modelFile, function ( object ) {
+
+					mesh = object;					
+					animationGroup = object.children.find(item=> item.name =="asis__armature");
+					// animationGroup.rotation.x = 0;
+
+					morphing_mesh = object.children.find(item=> item.name =="asis__body")
+					//mesh.position.y = - 10;
+					
+					skin_meshes = object.children.filter(item => item.type=="SkinnedMesh");
+										
+					skeletonHelper = new THREE.SkeletonHelper(animationGroup);
+					skeletonHelper.visible = false;
+
+					animationMixer = new THREE.AnimationMixer(animationGroup.children.find(item=>item.type=="Bone"));
+
+					scene.add( mesh );
+					scene.add( skeletonHelper );
+
+					function cargarAnimacion() {
+
+						let vpd = mesh;
+						if('animations' in vpd){
+							vpd.animations.forEach(animation_clip=>{
+								const partes_nombre = animation_clip.name.split("|");
+								const nombre = partes_nombre[1].toLowerCase();
+								if(nombre == "defaultpose" && defaultAction == null){
+									defaultAction = animationMixer.clipAction(animation_clip);										
+								}
+								if( nombre.indexOf("pose") != 0 || vpds.find(item=> item.name == nombre) ){
+									return;
+								}
+								const accion = animationMixer.clipAction(animation_clip);
+								accion.name = nombre ;
+								vpds.push(accion);									
+							});
+						}
+					}
+
+					cargarAnimacion();
+					initGui();
+
+				}, onProgress, null );
+
+				
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function initGui() {
+
+					const dictionary = {};
+					
+					if(morphing_mesh){
+						const dictionary_raw = morphing_mesh.morphTargetDictionary;
+						Object.keys(dictionary_raw).forEach(item=>{
+							let clave = item;
+							if( Object.keys(traducciones).indexOf(item) >= 0 ){
+								clave = traducciones[item];
+							}
+							dictionary[clave] = dictionary_raw[item];
+						})
+					}
+					
+					
+					const controls = {};
+					const keys = [];
+
+					function getBaseName( s ) {
+
+						return s.slice( s.lastIndexOf( '/' ) + 1 );
+
+					}
+
+					function initControls() {
+
+						for ( const key in dictionary ) {
+
+							controls[ key ] = 0.0;
+
+						}
+
+						controls.pose = - 1;
+
+						for ( let i = 0; i < vpds.length; i ++ ) {
+
+							controls[ vpds[ i ].name ] = false;
+
+						}
+
+					}
+
+					function initKeys() {
+						//console.log("========\nLISTA DE CLAVES\n==========");
+						for ( const key in dictionary ) {
+							//console.log(`"${key}" : "",`);
+							keys.push( key );
+
+						}
+
+					}
+
+					function initPoses() {
+
+						const files = { default: - 1 };
+
+						for ( let i = 0; i < vpds.length; i ++ ) {							
+							files[ vpds[i].name ] = i;
+						}
+     
+						// poses.add( controls, 'pose', files ).onChange( onChangePose );
+						
+						const selPoses = document.getElementById("selPoses");
+						
+						Object.keys(files).forEach(file=>{
+						    const opcion = document.createElement("option");
+						    opcion.value = files[file];
+						    opcion.innerText = file;
+						    selPoses.appendChild(opcion);
+						    if(file=="default"){
+						        opcion.selected = true;
+						    }
+						});
+						
+						selPoses.addEventListener("change", onChangePose);
+						
+					}
+
+					function initMorphs() {
+					
+					 const divMorphs = document.getElementById("divMorphs");
+
+						for ( const key in dictionary ) {
+
+							// morphs.add( controls, key, 0.0, 1.0, 0.01 ).onChange( onChangeMorph );
+							const indice = dictionary[key];
+							const divRow = document.createElement("div");
+							divRow.classList.add("row","mt-1");
+							const label = document.createElement("label");
+							label.classList.add("col");
+							label.innerText = key.replaceAll("_", " ");
+							const slider = document.createElement("input");
+							slider.classList.add("col","form-range");
+							slider.type="range";
+							slider.min = 0.0;
+							slider.max = 1.0;
+							slider.step = 0.1;
+							slider.value = 0.0;
+							slider.id = `sldMorph${indice}`;
+							slider.dataset.textoid = `txtMorph${indice}`;
+							slider.dataset.morph_key = key;
+							const texto = document.createElement("input");
+							texto.value=0;
+							texto.classList.add("col","form-control","ml-2");
+							texto.id = `txtMorph${indice}`;
+							texto.dataset.sliderid = `sldMorph${indice}`;
+							texto.dataset.indice = indice;
+							texto.disabled = true;
+							divRow.appendChild(label);
+							divRow.appendChild(slider);
+							divRow.appendChild(texto);
+							divMorphs.appendChild(divRow);
+							slider.addEventListener('change', onChangeMorphSlider);
+							
+						}
+
+					}
+					
+					function initLayers(){
+					    const divLayers = document.getElementById("divLayers");
+						if (localStorage.getItem("Miku.Visibilidad") != null){
+							visibilidad = JSON.parse(localStorage.getItem("Miku.Visibilidad"));
+						}else{
+							visibilidad = {};
+						}
+					    skin_meshes.forEach(anim_mesh => {
+					        const row = document.createElement("div");
+					        row.classList.add("row");
+					        const check = document.createElement("input");
+					        check.type = "checkbox";
+					        check.classList.add( "form-check", "form-switch", "col-1");
+					        check.dataset.mesh_id = anim_mesh.name;
+					        row.appendChild(check);
+					        const label = document.createElement("label");
+					        label.innerText = anim_mesh.name;
+					        label.classList.add("form-label", "col");
+					        row.appendChild(label);
+					        divLayers.appendChild(row);
+					        check.addEventListener('click', onChangeCheckLayer);							
+							
+					        check.checked = anim_mesh.name == morphing_mesh.name || anim_mesh.name in visibilidad && visibilidad[anim_mesh.name] || !(anim_mesh.name in visibilidad) && anim_mesh.name.indexOf("Miku.") == 0 ;
+							visibilidad[anim_mesh.name] = check.checked;
+							anim_mesh.visible = check.checked;
+					    });	
+
+						localStorage.setItem("Miku.Visibilidad", JSON.stringify(visibilidad));
+					}
+					
+					function onChangeCheckLayer(event){
+					    const check = event.target;
+					    const anim_mesh = skin_meshes.find(item => item.name == check.dataset.mesh_id);
+					    if(anim_mesh){
+					        //alert("mostrar/ocultar " + check.dataset.mesh_id);
+					        anim_mesh.visible = check.checked;
+							visibilidad[anim_mesh.name] = check.checked;
+							localStorage.setItem("Miku.Visibilidad", JSON.stringify(visibilidad));
+					    }else{
+					        alert("no encontré " + check.dataset.mesh_id);
+					    }
+					}
+					
+					function onChangeMorphSlider(event){
+					  const slider = event.target;
+					  const texto = document.getElementById(slider.dataset.textoid);
+					  texto.value = slider.value;
+					  controls[slider.dataset.morph_key] = parseFloat(slider.value);
+					  onChangeMorph();
+					}
+
+					function onChangeMorph() {
+
+						for ( let i = 0; i < keys.length; i ++ ) {
+
+							const key = keys[ i ];
+							const value = controls[ key ];
+							if(morphing_mesh){
+								morphing_mesh.morphTargetInfluences[ i ] = value;
+							}
+							
+
+						}
+
+					}
+
+					function onChangePose() {
+					 
+						const selPoses = document.getElementById("selPoses");
+						//const index = parseInt( controls.pose );
+						const chkPoseTemporal = document.getElementById("chkPoseTemporal");
+						const divOpciones = document.getElementById("divOpciones");
+						const index = parseInt(selPoses.value);
+
+						if(currentAction != null){
+							currentAction.stop();
+							//animationMixer.update(1);
+						}
+
+						if ( index === - 1 ) {
+
+							//mesh.pose();
+							/*		
+							if(defaultAction !=null){
+								currentAction = defaultAction;
+								currentAction.play();
+							}
+							*/					
+							currentAction = null;
+							ajustarCamara(0);
+
+						} else {
+							
+							//helper.pose( mesh, vpds[ index ] );
+							currentAction = vpds[ index ];
+							currentAction.play();
+							ajustarCamara(index + 1);
+							if(chkPoseTemporal.checked){
+							    setTimeout(()=>{
+							        selPoses.value=-1;
+							        onChangePose();
+							    },5000);
+							}
+						}
+						animationMixer.update(1);
+						
+    					divOpciones.classList.remove("show");
+					}
+
+					procesadorMensaje = ()=>{
+						if( !bufferMensaje || bufferMensaje.length == 0 ){
+							return;
+						}
+						const gesto = morphs_by_pattern.find(item=>{
+							return bufferMensaje.indexOf(item.patron) == 0;
+						});
+						for(const clave in controls){
+							if(gesto && clave in gesto.morphs){
+								controls[clave] = gesto.morphs[clave];
+							}else{
+								controls[clave] = 0.0;
+							}
+						}
+						onChangeMorph();
+						if(gesto){
+							bufferMensaje = bufferMensaje.substring(gesto.patron.length);
+						}else{
+							bufferMensaje = bufferMensaje.substring(1);
+						}
+					};
+
+					const txtMensaje = document.getElementById("txtMensaje");
+					const btnMensaje = document.getElementById("btnMensaje");
+					const chkModoConversacion = document.getElementById("chkModoConversacion");
+					const chkLocucion = document.getElementById("chkLocucion");
+
+					btnMensaje.addEventListener("click",async ()=>{
+						const texto = txtMensaje.value;
+						if(texto.trim().length == 0){
+							return;
+						}
+						if(chkModoConversacion.checked){
+						  const formData = new FormData();
+						  formData.append("texto",texto);
+						  try{
+						    const respuesta = await fetch("/eliza", {method:"POST", body: formData});
+						    if(respuesta.status != 200){
+						      throw {message:"Error " + respuesta.status};
+						    }
+						    const respuesta_json = await respuesta.json();
+						    mostrarToast( respuesta_json.texto);
+						  }catch(ex){
+						    mostrarToast(ex.message);
+						  }
+						  
+						}else{
+						  mostrarToast(texto);
+						}
+						txtMensaje.value = "";
+					});
+
+					function mostrarToast(mensaje){
+						const toastMensaje = document.getElementById("toastMensaje");						
+						const toastBody = toastMensaje.getElementsByClassName("toast-body")[0];
+						toastBody.innerText = mensaje;
+						const tostada = new bootstrap.Toast(toastMensaje);
+						tostada.show();
+						bufferMensaje = mensaje.toLowerCase();
+						if(chkLocucion.checked){
+						    const formData = new FormData();
+					    	formData.append("texto",mensaje);
+					    	fetch("/hablar", {method:"POST", body:formData });
+						}
+						
+					}
+
+					initControls();
+					initKeys();
+					initPoses();
+					initMorphs();
+					initLayers();
+
+					onChangeMorph();
+					onChangePose();
+
+					//poses.open();
+					//morphs.open();
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			async function animate() {
+				if(procesadorMensaje){
+					procesadorMensaje();
+				}
+				effect.render( scene, camera );
+
+				await dormir(1000);
+
+			}
+
+		</script>
+
+	</body>
+</html>

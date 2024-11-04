@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Asistente Virtual Miku</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="css/main.css">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<script src="js/bootstrap.bundle.min.js"></script>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
+		Copyright
+		<a href="https://sites.google.com/view/evpvp/" target="_blank" rel="noopener">Model Data</a>
+		<a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
+		</div>
+		<div id="divContenedor">
+		</div>
+  <div id="divPie" class="fixed-bottom">
+	<div class="toast w-75" id="toastMensaje">
+		<div class="toast-header">
+			Miku:
+			<button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+		  </div>
+		<div class="toast-body">			
+		</div>
+	</div>
+	<div class="border rounded m-4 p-2" style="background-color:rgba(200,255,200,0.75);">
+		<div class="row m-3">
+			<input id="txtMensaje" class="col col-lg-11 form-control">
+			<button id="btnMensaje" class="col-2 col-lg-1 btn btn-primary">&gt;</button>
+		</div>
+		<div class="text-center border-bottom" data-bs-toggle="collapse" data-bs-target="#divOpciones">&equiv;</div>
+		<div id="divOpciones" class="collapse">
+		  <div class="mb-3">
+			<div class="p-2" style="height:200px; overflow-y:auto;">
+			  <div class="row border-bottom">
+				  <span class="col-10">
+					  <label for="chkModoConversacion">
+						Modo Conversacion
+					  </label>
+				  </span>
+				  <span class="col-1 form-check form-switch">
+					  <input type="checkbox" class="form-check-input" id="chkModoConversacion" name="chkModoConversacion" checked>
+				  </span>
+			  </div>
+			  <div class="row border-bottom">
+				  <span class="col-10">
+					  <label for="chkLocucion">
+						   Habilitar Locucion
+					  </label>
+				  </span>
+				  <span class="col-1 form-check form-switch">
+					  <input type="checkbox" class="form-check-input" id="chkLocucion" name="chkLocucion" checked>
+				  </span>
+			  </div>
+			  <div class="row">
+				<label class="col-5 col-lg-6 form-label" for="selPoses">
+					Pose:
+				</label>
+				<select class="col-5 col-lg-6 form-select" id="selPoses" name="selPoses">
+				</select>
+			  </div>
+			  <div class="row">
+				  <span class="col-10">
+					  <label for="chkPoseTemporal">
+						Revertir en 5 s.
+					  </label>
+				  </span>
+				  <span class="col-1 form-check form-switch">
+					  <input type="checkbox" class="form-check-input" id="chkPoseTemporal" name="chkPoseTemporal" checked>
+				  </span>
+			  </div>
+			  <div id="divMorphs" class="border-top">
+			  </div>
+			  <div class="text-center border-top border-bottom" data-bs-toggle="collapse" data-bs-target="#divLayers">&equiv;</div>
+			  <div id="divLayers" class="border-top collapse">
+			  </div>
+			  <div class="border-top">
+			      <a href="/static/dae_viewer.html">Ver otra Miku</a>
+			  </div>
+			</div>
+		  </div>
+		</div>	
+	</div>
+  </div>
+		<script src="js/jsm/libs/ammo.wasm.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "./js/three.module.js",
+					"three/addons/": "./js/jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+			import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+
+			let camera, scene, renderer, effect;
+			let mesh, helper,morphing_mesh, anim_meshes;
+			let animationGroup, animationMixer, currentAction;
+			
+			let bufferMensaje, procesadorMensaje;
+
+			const vpds = [];
+			const traducciones = {
+				"真面目" : "cejas seria",
+				"困る" : "cejas preocupada",
+				"にこり" : "cejas sonrisa",
+				"怒り" : "cejas enojada",
+				"上" : "cejas arriba",
+				"下" : "cejas abajo",
+				"まばたき" : "ojos parpadear",
+				"笑い" : "ojos risa",
+				"ウィンク" : "guiño izq",
+				"ウィンク２" : "guiño 2 izq",
+				"ウィンク右" : "guiño der",
+				"ｳｨﾝｸ２右" : "guiño 2 der",
+				"はぅ" : "ojos >_<",
+				"なごみ" : "ojos -_-",
+				"びっくり" : "ojos sorpresa",
+				"じと目" : "ojos sueño",
+				"なぬ！" : "ojos queee?",
+				"瞳小" : "ojos pupilas pequeñas",
+				"あ" : "Boca A",
+				"い" : "Boca I",
+				"う" : "Boca U",
+				"お" : "Boca O",
+				"はんっ！" : "Boca humm!",
+				"ぺろっ" : "Boca pero ...",
+				"えー" : "Boca D:",
+				"にやり" : "Boca sonrisa"
+			};
+			const morphs_by_pattern = [
+				{patron:":)",morphs:{"cejas sonrisa":0.4, "Boca sonrisa":1.0}},
+				{patron:":-)",morphs:{"cejas sonrisa":0.4, "Boca sonrisa":1.0}},
+				{patron:":(",morphs:{"∧":0.4}},
+				{patron:":-(",morphs:{"∧":0.4}},
+				{patron:":'(",morphs:{"∧":0.4,"ojos -_-":0.4}},
+				{patron:">:)",morphs:{"cejas seria":1.0,"ojos risa":0.8, "ojos pupilas pequeñas":0.8, "Boca I":1, "Boca sonrisa":0.7}},
+				{patron:"xd",morphs:{"cejas sonrisa":0.5, "ojos >_<":1.0, "Boca A":1.0, "Boca sonrisa":1.0}},
+				{patron:"a",morphs:{"Boca A":0.4}},
+				{patron:"á",morphs:{"Boca A":0.4}},
+				{patron:"e",morphs:{"Boca A":0.4,"Boca sonrisa":0.8}},
+				{patron:"é",morphs:{"Boca A":0.4,"Boca sonrisa":0.8}},
+				{patron:"i",morphs:{"Boca I":1.0}},
+				{patron:"í",morphs:{"Boca I":1.0}},
+				{patron:"o",morphs:{"Boca O":1.0}},
+				{patron:"ó",morphs:{"Boca O":1.0}},
+				{patron:"u",morphs:{"Boca U":1.0}},
+				{patron:"ú",morphs:{"Boca U":1.0}},
+				{patron:".",morphs:{"Boca sonrisa":1.0}},
+			];
+
+			Ammo().then( function ( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+
+			} );
+
+			function init() {
+				
+				const posicionesCamara = [
+ 					{x:0,y:7,z:10}, // default
+					{x:-1.5,y:7,z:10}, // 'models/mmd/vpds/01.vpd'
+					{x:2 ,y:6,z:10}, // 'models/mmd/vpds/02.vpd',
+					{x:-3.5,y:6,z:15}, // 'models/mmd/vpds/03.vpd',
+					{x:2,y:4,z:15}, // 'models/mmd/vpds/04.vpd',
+					{x:-2.5,y:6,z:12}, // 'models/mmd/vpds/05.vpd',
+					{x:3.5,y:5.5,z:12}, // 'models/mmd/vpds/06.vpd',
+					{x:-2,y:7,z:12}, // 'models/mmd/vpds/07.vpd',
+					{x:2,y:7,z:11}, // 'models/mmd/vpds/08.vpd',
+					{x:-2,y:7,z:10}, // 'models/mmd/vpds/11.vpd'
+				];
+
+				const container = document.createElement( 'div' );
+				// document.body.appendChild( container );
+				document.getElementById("divContenedor").appendChild(container);
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+
+				function ajustarCamara(indice){
+					if( indice >= posicionesCamara.length){
+						indice = 0;
+					}
+					camera.position.x = posicionesCamara[indice].x;
+					camera.position.y = posicionesCamara[indice].y;
+					camera.position.z = posicionesCamara[indice].z;
+				}
+				//camera.position.z = 25;
+				ajustarCamara(0);
+
+				// scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+
+				const ambient = new THREE.AmbientLight( 0xaaaaaa, 3 );
+				scene.add( ambient );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
+				scene.add( directionalLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				effect = new OutlineEffect( renderer );
+
+				// model
+
+				function onProgress( xhr ) {
+
+					if ( xhr.lengthComputable ) {
+
+						const percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
+				}
+
+				const modelFile = 'models/mmd/miku/miku_v2.pmd';
+				const vpdFiles = [
+					'models/mmd/vpds/01.vpd',
+					'models/mmd/vpds/02.vpd',
+					'models/mmd/vpds/03.vpd',
+					'models/mmd/vpds/04.vpd',
+					'models/mmd/vpds/05.vpd',
+					'models/mmd/vpds/06.vpd',
+					'models/mmd/vpds/07.vpd',
+					'models/mmd/vpds/08.vpd',
+					'models/mmd/vpds/11.vpd'
+				];
+
+				helper = new MMDAnimationHelper();
+
+				const loader = new MMDLoader();
+
+				loader.load( modelFile, function ( object ) {
+
+					mesh = object;
+					mesh.position.y = - 10;
+
+					morphing_mesh = object.children.find(item=> item.name =="asis__body")
+					//mesh.position.y = - 10;
+					
+					anim_meshes = [];
+					
+					object.children.forEach(item => {
+
+						anim_meshes.push(item);
+					});
+					
+					scene.add( mesh );
+
+					let vpdIndex = 0;
+
+					function loadVpd() {
+
+						const vpdFile = vpdFiles[ vpdIndex ];
+
+						loader.loadVPD( vpdFile, false, function ( vpd ) {
+
+							vpds.push( vpd );
+
+							vpdIndex ++;
+
+							if ( vpdIndex < vpdFiles.length ) {
+
+								loadVpd();
+
+							} else {
+
+								initGui();
+
+							}
+						}, onProgress, null );
+
+					}
+
+					loadVpd();
+
+				}, onProgress, null );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function initGui() {
+
+					//const gui = new GUI();
+
+					const dictionary_raw = mesh.morphTargetDictionary;
+
+					const dictionary = {};
+					Object.keys(dictionary_raw).forEach(item=>{
+						let clave = item;
+						if( Object.keys(traducciones).indexOf(item) >= 0 ){
+							clave = traducciones[item];
+						}
+						dictionary[clave] = dictionary_raw[item];
+					})
+
+					const controls = {};
+					const keys = [];
+
+					// const poses = gui.addFolder( 'Poses' );
+					// const morphs = gui.addFolder( 'Morphs' );
+
+					function getBaseName( s ) {
+
+						return s.slice( s.lastIndexOf( '/' ) + 1 );
+
+					}
+
+					function initControls() {
+
+						for ( const key in dictionary ) {
+
+							controls[ key ] = 0.0;
+
+						}
+
+						controls.pose = - 1;
+
+						for ( let i = 0; i < vpdFiles.length; i ++ ) {
+
+							controls[ getBaseName( vpdFiles[ i ] ) ] = false;
+
+						}
+
+					}
+
+					function initKeys() {
+						//console.log("========\nLISTA DE CLAVES\n==========");
+						for ( const key in dictionary ) {
+							//console.log(`"${key}" : "",`);
+							keys.push( key );
+
+						}
+
+					}
+
+					function initPoses() {
+
+						const files = { default: - 1 };
+
+						for ( let i = 0; i < vpdFiles.length; i ++ ) {
+
+							files[ getBaseName( vpdFiles[ i ] ) ] = i;
+
+						}
+     
+						// poses.add( controls, 'pose', files ).onChange( onChangePose );
+						
+						const selPoses = document.getElementById("selPoses");
+						
+						Object.keys(files).forEach(file=>{
+						    const opcion = document.createElement("option");
+						    opcion.value = files[file];
+						    opcion.innerText = file;
+						    selPoses.appendChild(opcion);
+						    if(file=="default"){
+						        opcion.selected = true;
+						    }
+						});
+						
+						selPoses.addEventListener("change", onChangePose);
+						
+					}
+
+					function initMorphs() {
+					
+					 const divMorphs = document.getElementById("divMorphs");
+
+						for ( const key in dictionary ) {
+
+							// morphs.add( controls, key, 0.0, 1.0, 0.01 ).onChange( onChangeMorph );
+							const indice = dictionary[key];
+							const divRow = document.createElement("div");
+							divRow.classList.add("row","mt-1");
+							const label = document.createElement("label");
+							label.classList.add("col");
+							label.innerText = key;
+							const slider = document.createElement("input");
+							slider.classList.add("col","form-range");
+							slider.type="range";
+							slider.min = 0.0;
+							slider.max = 1.0;
+							slider.step = 0.1;
+							slider.value = 0.0;
+							slider.id = `sldMorph${indice}`;
+							slider.dataset.textoid = `txtMorph${indice}`;
+							slider.dataset.morph_key = key;
+							const texto = document.createElement("input");
+							texto.value=0;
+							texto.classList.add("col","form-control","ml-2");
+							texto.id = `txtMorph${indice}`;
+							texto.dataset.sliderid = `sldMorph${indice}`;
+							texto.dataset.indice = indice;
+							texto.disabled = true;
+							divRow.appendChild(label);
+							divRow.appendChild(slider);
+							divRow.appendChild(texto);
+							divMorphs.appendChild(divRow);
+							slider.addEventListener('change', onChangeMorphSlider);
+							
+						}
+
+					}
+
+					function initLayers(){
+					    const divLayers = document.getElementById("divLayers");
+					    anim_meshes.forEach(anim_mesh => {
+					        const row = document.createElement("div");
+					        row.classList.add("row");
+					        const check = document.createElement("input");
+					        check.type = "checkbox";
+					        check.checked = true;
+					        check.classList.add( "form-control", "col-1");
+					        check.dataset.mesh_id = anim_mesh.name;
+					        row.appendChild(check);
+					        const label = document.createElement("label");
+					        label.innerText = anim_mesh.name;
+					        label.classList.add("form-label", "col");
+					        row.appendChild(label);
+					        divLayers.appendChild(row);
+					        check.addEventListener('click', onChangeCheckLayer);
+					    });
+					}
+
+					function onChangeCheckLayer(event){
+					    const check = event.target;
+					    const anim_mesh = anim_meshes.find(item => item.name == check.dataset.mesh_id);
+					    if(anim_mesh){
+					        //alert("mostrar/ocultar " + check.dataset.mesh_id);
+					        anim_mesh.visible = check.checked;
+					    }else{
+					        alert("no encontré " + check.dataset.mesh_id);
+					    }
+					}
+					
+					function onChangeMorphSlider(event){
+					  const slider = event.target;
+					  const texto = document.getElementById(slider.dataset.textoid);
+					  texto.value = slider.value;
+					  controls[slider.dataset.morph_key] = parseFloat(slider.value);
+					  onChangeMorph();
+					}
+
+					function onChangeMorph() {
+
+						for ( let i = 0; i < keys.length; i ++ ) {
+
+							const key = keys[ i ];
+							const value = controls[ key ];
+							mesh.morphTargetInfluences[ i ] = value;
+
+						}
+
+					}
+
+					function onChangePose() {
+					 
+						const selPoses = document.getElementById("selPoses");
+						//const index = parseInt( controls.pose );
+						const chkPoseTemporal = document.getElementById("chkPoseTemporal");
+						const divOpciones = document.getElementById("divOpciones");
+						const index = parseInt(selPoses.value);
+
+						if ( index === - 1 ) {
+
+							mesh.pose();
+							ajustarCamara(0);
+
+						} else {
+
+							helper.pose( mesh, vpds[ index ] );
+							ajustarCamara(index + 1);
+							if(chkPoseTemporal.checked){
+							    setTimeout(()=>{
+							        selPoses.value=-1;
+							        onChangePose();
+							    },5000);
+							}
+						}
+
+    					divOpciones.classList.remove("show");
+					}
+
+					procesadorMensaje = ()=>{
+						if( !bufferMensaje || bufferMensaje.length == 0 ){
+							return;
+						}
+						const gesto = morphs_by_pattern.find(item=>{
+							return bufferMensaje.indexOf(item.patron) == 0;
+						});
+						for(const clave in controls){
+							if(gesto && clave in gesto.morphs){
+								controls[clave] = gesto.morphs[clave];
+							}else{
+								controls[clave] = 0.0;
+							}
+						}
+						onChangeMorph();
+						if(gesto){
+							bufferMensaje = bufferMensaje.substring(gesto.patron.length);
+						}else{
+							bufferMensaje = bufferMensaje.substring(1);
+						}
+					};
+
+					const txtMensaje = document.getElementById("txtMensaje");
+					const btnMensaje = document.getElementById("btnMensaje");
+					const chkModoConversacion = document.getElementById("chkModoConversacion");
+					const chkLocucion = document.getElementById("chkLocucion");
+
+					btnMensaje.addEventListener("click",async ()=>{
+						const texto = txtMensaje.value;
+						if(texto.trim().length == 0){
+							return;
+						}
+						if(chkModoConversacion.checked){
+						  const formData = new FormData();
+						  formData.append("texto",texto);
+						  try{
+						    const respuesta = await fetch("/eliza", {method:"POST", body: formData});
+						    if(respuesta.status != 200){
+						      throw {message:"Error " + respuesta.status};
+						    }
+						    const respuesta_json = await respuesta.json();
+						    mostrarToast( respuesta_json.texto);
+						  }catch(ex){
+						    mostrarToast(ex.message);
+						  }
+						  
+						}else{
+						  mostrarToast(texto);
+						}
+						txtMensaje.value = "";
+					});
+
+					function mostrarToast(mensaje){
+						const toastMensaje = document.getElementById("toastMensaje");						
+						const toastBody = toastMensaje.getElementsByClassName("toast-body")[0];
+						toastBody.innerText = mensaje;
+						const tostada = new bootstrap.Toast(toastMensaje);
+						tostada.show();
+						bufferMensaje = mensaje.toLowerCase();
+						if(chkLocucion.checked){
+						    const formData = new FormData();
+						    formData.append("texto",mensaje);
+						    fetch("/hablar", {method:"POST", body:formData });
+						}
+					}
+
+					initControls();
+					initKeys();
+					initPoses();
+					initMorphs();
+					initLayers();
+
+					onChangeMorph();
+					onChangePose();
+
+					//poses.open();
+					//morphs.open();
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+				if(procesadorMensaje){
+					procesadorMensaje();
+				}
+				effect.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
