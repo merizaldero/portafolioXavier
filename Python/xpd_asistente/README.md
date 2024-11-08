@@ -10,7 +10,7 @@ Esta aplicación muestra en pantalla dos avatares de apariencia customizable.
 - Es una ensayo basado en el demo [loader / mmd / pose](https://threejs.org/examples/#webgl_loader_mmd_pose) de la librer&iacute;a [Three.JS](https://threejs.org/). 
 - Este ensayo ha sustituido la GUI basada en el addon de Three.JS por una GUI basada en Bootstrap 5. 
 - La aparienciencia del Avatar es cargada desde modelos MMD (archivo .pmd para el avatar y archivos .vpd para las poses).
-- Incluye interface a Pseudo Chatbot basado en Eliza, implementado en [eliza]{../eliza/README.md}.
+- Incluye interface a Pseudo Chatbot basado en Eliza, implementado en [eliza](../eliza/README.md).
 - Soporta:
   - 9 Poses.
   - Más de 70 Variaciones Faciales.
