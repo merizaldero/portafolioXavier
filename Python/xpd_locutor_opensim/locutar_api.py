@@ -1,6 +1,6 @@
 from bottle import Bottle, ServerAdapter
 from bottle import run, debug, route, error, static_file, template, request, redirect, TEMPLATE_PATH, response
-from os.path import dirname, abspath, join, exists
+from os.path import dirname, abspath, join, exists, splitext
 from os import remove as remove_file
 import datetime
 import xpd_orm as orm
@@ -197,10 +197,55 @@ def servir_generar_locucion():
     locucion = generar_locucion(texto)
     return str(locucion['id'])
 
+# Edicion de locucion
+def servir_editar_locucion(id_locucion):
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        redirect('/login')
+    con = orm.Conexion(PATH_BDD)
+    locucion = Locuciones.getNamedQuery(con, 'findById',{'id':id_locucion})
+    con.close()
+    if len(locucion) == 0:
+        return template('xpd_usr/mensaje', lvl ='danger', mensaje = 'Locución no existe', href = '/xpd_locutor_opensim/locuciones' )
+    locucion = locucion[0]
+    
+    if request.method == "GET":
+        return template('xpd_locutor_opensim/editar_locucion', usuario = usuario, locucion = locucion, lvl="", mensaje="")
+    
+    # a partir de este punto se asume edición POST
+    
+    archivo = request.files.get('archivo')
+    nombre_archivo, extension = splitext(archivo.filename)
+    
+    if extension.lower() not in ['.mp3']:
+        return template('xpd_locutor_opensim/editar_locucion', usuario = usuario, locucion = locucion, lvl="danger", mensaje="Debe cargar un archivo .mp3")
+
+    nombre_archivo = join(dirname(abspath(__file__)) , "temp", "{0}.mp3".format(str(uuid4())) )
+    
+    try:
+        archivo.save(nombre_archivo)
+        probe = ffmpeg.probe(nombre_archivo)
+        stream_audio = [x for x in probe['streams'] if x['codec_type'] == 'audio'][0]
+        duracion = round( float( stream_audio['duration'] ), 2 )
+
+        with open(nombre_archivo, 'rb') as stream_binario:
+            contenido = stream_binario.read()
+        locucion['contenido'] = contenido
+        locucion['duracion'] = duracion
+        transaccionar(Locuciones.actualizar, locucion)
+    except Exception as ex:
+        loguear('Error: {0}'.format(repr(ex)), forzar = True)
+        return template('xpd_locutor_opensim/editar_locucion', usuario = usuario, locucion = locucion, lvl="danger", mensaje="Se ha producido un error en la carga del archivo")
+    finally:
+        if exists(nombre_archivo):
+            remove_file(nombre_archivo)
+    
+    return template('xpd_usr/mensaje', lvl ='success', mensaje = 'Locución actualizada exitosamente', href = '/xpd_locutor_opensim/locuciones' )
 
 def rutearModulo(app:Bottle, path_base):
     app.route(path_base + '/locutar',method=['GET','POST'])(servir_locutar)
     app.route(path_base + '/locucion/<id_locucion>/play',method=['GET'])(servir_locucion)
+    app.route(path_base + '/locucion/<id_locucion>/edit',method=['GET','POST'])(servir_editar_locucion)
     app.route(path_base + '/locucion/<id_locucion>',method=['GET'])(servir_pagina_locucion)
     app.route(path_base + '/locuciones',method=['GET','POST'])(servir_locuciones)
     app.route(path_base + '/generar_locucion',method=['POST'])(servir_generar_locucion)

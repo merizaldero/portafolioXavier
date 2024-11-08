@@ -20,6 +20,7 @@
       <th>F. Creaci&oacute;n</th>
       <th>F. Lectura</th>
       <th></th>
+      <th></th>
     </tr>
     </thead>
     <tbody>
@@ -31,6 +32,7 @@
         <td>{{locucion['fecha_creacion'][:10]}}</td>
         <td>{{locucion['fecha_lectura']}}</td>
         <td><a target="_blank" href="/xpd_locutor_opensim/locucion/{{locucion['id']}}">Reproducir</a></td>
+        <td><a href="/xpd_locutor_opensim/locucion/{{locucion['id']}}/edit">Editar</a></td>
       </tr>
 % end
 % if len(locuciones) == 0:
