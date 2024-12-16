@@ -129,6 +129,7 @@ class ModeloDao(xpdbdd.DaoBase):
         metamodelo["namedQueries"].append({"nombre":"getAll","whereClause":[],"orderBy":["nombre"]})
         metamodelo["namedQueries"].append({ "nombre":"getByMetamodelo","whereClause":["idMetamodelo" ],"orderBy":["nombre"]})
         metamodelo["namedQueries"].append({ "nombre":"getById","whereClause":["idModelo" ],"orderBy":[]})
+        metamodelo["namedQueries"].append({ "nombre":"getByNombre","whereClause":["nombre"]})
 
         self.setMetamodelo (metamodelo)
         
@@ -1256,8 +1257,9 @@ def generarModelo( idModelo, idGenerador ):
         return GeneradorModelo.generarModelo(modelo, generador)
         
     except (Exception) as ex:
-        print('ERROR VALIDACION ' + repr(ex))
-        return {"error":repr(ex)}
+        print('ERROR GENERACION ' + repr(ex))
+        #return {"error":repr(ex)}
+        raise ex
     finally:
         if not (conexion is None):
             conexion.close ()

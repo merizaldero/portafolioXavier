@@ -34,6 +34,28 @@ TIPOS = {
     'FK_USER': { 'tipo':'ForeignKey' , 'req_max_length' : False },
 }
 
+def getObjetosModeloByTipo( modelo, idTipoMetamodelo ):
+    resultado = []
+    cola = [modelo['__objetoRaiz']]
+    while len(cola) > 0:
+        objetoModelo = cola.pop(0)
+        if objetoModelo['idTipoMetamodelo'] == idTipoMetamodelo:
+            resultado.append(objetoModelo)
+        for lista in objetoModelo['__listas'].keys():
+            for hijo in objetoModelo['__listas'][lista]:
+                cola.append(hijo)
+    return resultado
+
+def getObjetoPadre(modelo, idObjeto):
+    cola = [modelo['__objetoRaiz']]
+    while len(cola) > 0:
+        objetoModelo = cola.pop(0)
+        for lista in objetoModelo['__listas'].keys():
+            for hijo in objetoModelo['__listas'][lista]:
+                if hijo['idObjeto'] == idObjeto:
+                    return objetoModelo
+    return None
+
 def definicionCampoModel(campo, modelo, dominio = 'models'):
     nombreCampo = campo['nombre']
 
@@ -138,7 +160,7 @@ def generarModelsPy(modelo):
         contenido += ")\n"
 
     #incluye Modelos
-    entidades = modelo['__objetoRaiz']['__listas']['Entidades']
+    entidades = getObjetosModeloByTipo(modelo, 'ENTIDAD') # modelo['__objetoRaiz']['__listas']['Entidades']
     for entidad in entidades:
         nombreEntidad = entidad['nombre']
         campos = entidad['__listas']['Campos']

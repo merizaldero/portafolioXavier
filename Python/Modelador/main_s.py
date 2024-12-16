@@ -1,5 +1,5 @@
 #qpy:webapp:XPD Modelador
-#qpy://127.0.0.1:8080/?73
+#qpy://127.0.0.1:8085/?73
 
 """
 Copyright 2015 Marcelo Xavier Merizalde
@@ -373,7 +373,8 @@ def server_generar_modelo_html ():
         
     except (Exception) as ex:
         print(repr(ex))
-        return {"error":"Error al recuperar modelo"}
+        raise ex
+        # return {"error":"Error al recuperar modelo"}
                 
 # @route ('/getParches.html',method="POST")
 def server_get_parches_html ():
@@ -710,7 +711,7 @@ app.route ('/getAncestrosObjeto.html',method="POST") ( server_get_ancestros_obje
 
 try:
     direccion_ip = "0.0.0.0"
-    puerto = 8080
+    puerto = 8085
 
     backing_params = {
         'cache_type': 'SimpleCache', 

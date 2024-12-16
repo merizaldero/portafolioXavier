@@ -1,6 +1,29 @@
 import ModeladorDao
 import config
 
+def getObjetosModeloByTipo( modelo, idTipoMetamodelo ):
+    resultado = []
+    cola = [modelo['__objetoRaiz']]
+    while len(cola) > 0:
+        objetoModelo = cola.pop(0)
+        if objetoModelo['idTipoMetamodelo'] == idTipoMetamodelo:
+            resultado.append(objetoModelo)
+        for lista in objetoModelo['__listas'].keys():
+            for hijo in objetoModelo['__listas'][lista]:
+                cola.append(hijo)
+    return resultado
+
+def getObjetoPadre(modelo, idObjeto):
+    cola = [modelo['__objetoRaiz']]
+    while len(cola) > 0:
+        objetoModelo = cola.pop(0)
+        for lista in objetoModelo['__listas'].keys():
+            for hijo in objetoModelo['__listas'][lista]:
+                if hijo['idObjeto'] == idObjeto:
+                    return objetoModelo
+                cola.append(hijo)
+    return None
+
 def getTipo(campo):
     if campo['__atributos']["tipo"] in ["STRING","EMAIL"]:
         return "varchar (%s)" % campo['__atributos']["tamano"]
@@ -40,6 +63,17 @@ def obtenerCreateTable(entidad, modelo, table_namer = defaultTableNamer):
     campos = entidad['__listas']['Campos']
     camposPk = [x for x in campos if x['__atributos']['pk'] == '1' ]
     namedQueries = entidad['__listas']['NamedQuieries']
+
+    if 'entidadUsuario' in entidad['__atributos'].keys() and entidad['__atributos']['entidadUsuario'] == '1':
+        campos = campos + [{'nombre':'id_user' , '__atributos':{ 'nombreCampo':'ID_USER', 'tipo': 'INTEGER', 'obligatorio':True, 'incremental':False } }]
+
+    maestro = getObjetoPadre(modelo, entidad['idObjeto']) if entidad['idJerarquia'] == 'EntidadesDetalle' else None
+    if maestro is not None:
+        id_maestro = "id_" + maestro['nombre'].lower()
+        #fk_maestro = "FK_{0}_{1}".format( nombreTabla.upper(), maestro['nombre'].upper() ) 
+        campos = campos + [{'nombre':id_maestro , '__atributos':{ 'nombreCampo':id_maestro.upper(), 'tipo': 'INTEGER', 'obligatorio':True, 'incremental':False } }]
+        print("Se incorpora {0} a campos de {1}".format(id_maestro, entidad['nombre'])) 
+
     lista_campos = []
     for campo in campos:
         nombreCampo = campo['__atributos']['nombreCampo'].lower()
@@ -58,13 +92,13 @@ def obtenerCreateTable(entidad, modelo, table_namer = defaultTableNamer):
             unique_flag = 'UNIQUE '
         if len(lista_campos_key) > 0:
             lista_campos.append( "\t{0}KEY {1} ({2})".format( unique_flag, table_namer(namedQuery,modelo), ", ".join(lista_campos_key) ) )
-    archivo = "CREATE TABLE {0} (\n{1}\n)".format( table_namer(entidad,modelo) , ",\n".join(lista_campos) )
+    archivo = "CREATE TABLE {0} (\n{1}\n);\n".format( table_namer(entidad,modelo) , ",\n".join(lista_campos) )
     return archivo
             
 def generarModelo(modelo):
     resultado = { 'archivos' : [ { 'path':'/script.sql', 'contenido':''} ]}
     archivo = ''
-    entidades = modelo['__objetoRaiz']['__listas']['Entidades']    
+    entidades = getObjetosModeloByTipo(modelo, 'ENTIDAD') # modelo['__objetoRaiz']['__listas']['Entidades']    
     for entidad in entidades:
         archivo += obtenerCreateTable(entidad , modelo )
     archivo += "-- Fin de Generacion\n"

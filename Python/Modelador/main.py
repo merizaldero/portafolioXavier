@@ -292,7 +292,8 @@ def server_generar_modelo_html ():
         
     except (Exception) as ex:
         print(repr(ex))
-        return {"error":"Error al recuperar modelo"}
+        raise ex
+        # return {"error":"Error al recuperar modelo"}
                 
 # @route ('/getParches.html',method="POST")
 def server_get_parches_html ():
