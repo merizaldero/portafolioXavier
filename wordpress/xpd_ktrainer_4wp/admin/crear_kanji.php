@@ -37,46 +37,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $kanji_existente = xtk_Nivel_CRUD::consultar_nivel_kanji($kanji['id_nivel'], $kanji['kanji']);
+    $kanji_existente = xtk_Kanji_CRUD::consultar_nivel_kanji($kanji['id_nivel'], $kanji['kanji']);
 
-    if( $modo_edicion ) {
-        if($kanji_existente !==false){
-            add_settings_error('crear_curso', 'error_actualizar_curso', __('Kanji ingresado no es valido', 'xpd_ktrainer_4wp'), 'error');
-        }
-        $resultado = xtk_Nivel_CRUD::actualizar($kanji);
+    if($modo_edicion && $kanji_existente !== null && $kanji_existente['id'] != $kanji['id'] ){
+        add_settings_error('crear_curso', 'error_actualizar_curso', __('Item repetido.', 'xpd_ktrainer_4wp'), 'error');
+    }else if($modo_edicion){
+        $resultado = xtk_Kanji_CRUD::actualizar($kanji);
         if ($resultado !== false) {
             // Redireccionar al listado de cursos con un mensaje de éxito
-            wp_redirect(admin_url('admin.php?page=listar_niveles&id_curso=' . $kanji['id_curso'] . '&message=nivel_actualizado'));
+            wp_redirect(admin_url('admin.php?page=listar_kanjis&id_nivel=' . $kanji['id_nivel'] . '&message=kanji_actualizado'));
+            exit;
+        } else {
+            // Mostrar un mensaje de error
+            add_settings_error('crear_curso', 'error_actualizar_curso', __('Error al actualizar curso. Por favor, intenta de nuevo.', 'xpd_ktrainer_4wp'), 'error');
+        }
+    }else if($kanji_existente !== null){
+        $kanji['id'] = $kanji_existente['id'];
+        $resultado = xtk_Kanji_CRUD::actualizar($kanji);
+        if ($resultado !== false) {
+            // Redireccionar al listado de cursos con un mensaje de éxito
+            wp_redirect(admin_url('admin.php?page=listar_kanjis&id_nivel=' . $kanji['id_nivel'] . '&message=kanji_actualizado'));
             exit;
         } else {
             // Mostrar un mensaje de error
             add_settings_error('crear_curso', 'error_actualizar_curso', __('Error al actualizar curso. Por favor, intenta de nuevo.', 'xpd_ktrainer_4wp'), 'error');
         }
     }else{
-        if($kanji_existente !==false){
-            $resultado = xtk_Nivel_CRUD::actualizar($kanji);
-            if ($resultado !== false) {
-                // Redireccionar al listado de cursos con un mensaje de éxito
-                wp_redirect(admin_url('admin.php?page=listar_niveles&id_curso=' . $kanji['id_curso'] . '&message=nivel_actualizado'));
-                exit;
-            } else {
-                // Mostrar un mensaje de error
-                add_settings_error('crear_curso', 'error_actualizar_curso', __('Error al actualizar curso. Por favor, intenta de nuevo.', 'xpd_ktrainer_4wp'), 'error');
-            }
-        }else{
-            $kanji['orden'] = xtk_Nivel_CRUD::obtener_orden($kanji['id_curso']);
-
-            $resultado = xtk_Nivel_CRUD::insertar($kanji);
-            if ($resultado !== false) {
-                // Redireccionar al listado de cursos con un mensaje de éxito
-                wp_redirect(admin_url('admin.php?page=listar_niveles&id_curso=' . $kanji['id_curso'] . '&message=nivel_creado'));
-                exit;
-            } else {
-                // Mostrar un mensaje de error
-                add_settings_error('crear_curso', 'error_crear_curso', __('Error al crear el curso. Por favor, intenta de nuevo.', 'xpd_ktrainer_4wp'), 'error');
-            }
+        $kanji['id'] = null;
+        $resultado = xtk_Kanji_CRUD::insertar($kanji);
+        if ($resultado !== false) {
+            // Redireccionar al listado de cursos con un mensaje de éxito
+            wp_redirect(admin_url('admin.php?page=listar_kanjis&id_nivel=' . $kanji['id_nivel'] . '&message=nivel_creado'));
+            exit;
+        } else {
+            // Mostrar un mensaje de error
+            add_settings_error('crear_curso', 'error_crear_curso', __('Error al crear el curso. Por favor, intenta de nuevo.', 'xpd_ktrainer_4wp'), 'error');
         }
-
     }
     
 }

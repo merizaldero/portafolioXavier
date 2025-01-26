@@ -3,7 +3,7 @@ Funcionalidad de XPD Kanji Trainer implementado como Plugin para Wordpress.
 
 Kanji Trainer tiene como prop&oacute;sito permitir el aprendizaje de idiomas mediante ejercicios de vocabulario de car&aacute;cter l&uacute;dico.
 
-La funcionalidad original del presente plugin fue implementada originalmente en [Python](../../Python/ktrainer_py/).
+La funcionalidad del presente plugin fue implementada originalmente en [Python](../../Python/ktrainer_py/).
 
 Esta funcionalidad cambia el concepto agrupando los Kanjis en Niveles, y los Niveles son agrupados por Cursos, de forma que se puede soportar varias temáticas de traducción.
 
