@@ -4,8 +4,10 @@ global $xpdjv_public_pages;
 
 $xpdjv_public_pages = [
     [
-        'path' => 'xpd_juego_vida.html',
+        'option_page_id' => 'xpdjv_juego_vida_page_id',
+        'path' => 'juego_vida.php',
         'title' => 'Juego de la Vida',
+        'slug' => 'juego-de-la-vida',
         'js' => [
             [ 'handle'=>'xpdjv_bootstrap_js', 'src'=>'js/bootstrap.bundle.min.js', 'dependencias'=>['jquery'] ], 
             [ 'handle'=>'xpdjv_juego_vida_js', 'src'=>'js/xpdjv_juego_vida.js', 'dependencias'=>['jquery'] ] 
@@ -24,14 +26,17 @@ function xpdjv_registrar_public_pages(){
         throw new ErrorException("Hay un error aqui");
     }
     foreach($xpdjv_public_pages as $page1){
-        $content = file_get_contents(plugin_dir_path(__FILE__) . $page1['path']);
+        $content = "[xpdjv-pagina slug=\"" . $page1['slug'] . "\"]"; //file_get_contents(plugin_dir_path(__FILE__) . $page1['path']);
         // Create the new page
         wp_insert_post(array(
             'post_title' => $page1['title'],
             'post_content' => $content,
+            'post_name' => $page1['slug'],
             'post_status' => 'publish',
             'post_type' => 'page',
         ));
+        $page_id = get_page_by_title($page1['title'], OBJECT, 'page')->ID;
+        add_option($page1['option_page_id'], $page_id);
     }
     
 }
@@ -39,11 +44,29 @@ function xpdjv_registrar_public_pages(){
 function xpdjv_deregistrar_public_pages(){
     global $xpdjv_public_pages;
     foreach($xpdjv_public_pages as $page1){
-        $page_id = get_page_by_title($page1['title'], OBJECT, 'page')->ID;
+        //$page_id = get_page_by_title($page1['title'], OBJECT, 'page')->ID;
+        $page_id = intval(get_option($page1['option_page_id']));
         // Delete the page
         wp_delete_post($page_id, true);
+        delete_option( $page1['option_page_id'] );
     }
 }
+
+
+function xpdjv_desplegar_public_page_shortode($atts = [], $content = null, $tag = '' ){
+    global $xpdjv_public_pages;
+    foreach($xpdjv_public_pages as $page1){
+        if($page1['slug'] == $atts['slug']){
+            ob_start();
+            include_once( plugin_dir_path( __FILE__ ) . $page1['path'] );
+            $salida = ob_get_clean();
+            return $salida;
+        }
+    }
+    return "<h1>Pagina No Encontrada</h1>";
+}
+
+add_shortcode('xpdjv-pagina', 'xpdjv_desplegar_public_page_shortode');
 
 function xpdjv_enqueue_public_scripts( ){
     $current_page_id = get_the_ID();
@@ -53,7 +76,9 @@ function xpdjv_enqueue_public_scripts( ){
     global $xpdjv_public_pages;
     echo("<!-- XPD-JUEGO-VIDA - INYECTANDO SCRIPTS para page_id $current_page_id -->");
     foreach($xpdjv_public_pages as $page){
-        $page_id = get_page_by_title($page['title'], OBJECT, 'page')->ID;
+        //$page_id = get_page_by_title($page['title'], OBJECT, 'page')->ID;
+        $page_id = intval(get_option($page['option_page_id']));
+        echo("<!-- XPD-JUEGO-VIDA - validando page_id $page_id -->");
         if($current_page_id === $page_id){
             echo("<!-- XPD-JUEGO-VIDA - page_id = $current_page_id aplica a scripts -->");
             foreach($page['css'] as $css_def){

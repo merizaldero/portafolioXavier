@@ -53,7 +53,6 @@ class xpdjv_JuegoVida {
             this.celdas[indiceFila] = [];
             for (indiceColumna = 0; indiceColumna < this.columnas; indiceColumna++) {
                 this.celdas[indiceFila][indiceColumna] = new xpdjv_Celda(padre,indiceFila, indiceColumna);
-                //this.celdas[indiceFila][indiceColumna].padre = this;
             }
         }
 
@@ -69,7 +68,6 @@ class xpdjv_JuegoVida {
     }
 
     guardarHistorico() {
-        //const fecha = new Date();
         const resultado = [];
         let indiceColumna;
         for (let indiceFila = 0; indiceFila < this.filas; indiceFila++) {
@@ -78,7 +76,6 @@ class xpdjv_JuegoVida {
                 resultado[indiceFila][indiceColumna] = this.celdas[indiceFila][indiceColumna].estaVivo();
             }
         }
-        //this.historico [fecha] = resultado ;
         return resultado;
     }
 
@@ -106,40 +103,6 @@ class xpdjv_JuegoVida {
             }
         }
     }
-
-    /*
-    tickJuegoVida() {
-        // implementa algoritmo de juego de la vida
-        try {
-            var snapshot = this.guardarHistorico();
-            var columna;
-            var conteoVecinos;
-            var celda;
-            for (var fila = 0; fila < this.filas; fila++) {
-                for (columna = 0; columna < this.columnas; columna++) {
-                    conteoVecinos = this._numeroVecinosVivos(fila, columna, snapshot);
-                    celda = this.celdas[fila][columna];
-                    if (snapshot[fila][columna]) {
-                        //si esta vivo
-                        if (conteoVecinos < 2 || conteoVecinos > 3) {
-                            celda.morir();
-                        } else {
-                            celda.madurar();
-                        }
-
-                    } else {
-                        // si esta muerto
-                        if (conteoVecinos == 3) {
-                            celda.nacer();
-                        }
-                    }
-                }
-            }
-        } catch (ex) {
-            alert(ex.stack);
-        }
-    } 
-    */   
 
     tickJuegoVida() {
         // implementa algoritmo de juego de la vida
@@ -277,7 +240,6 @@ class xpdjv_JuegoVida {
         }
     }
 
-        // instancia de Hilo
     tickJuego() {
         //alert("tick");
         try {
@@ -304,8 +266,6 @@ class xpdjv_JuegoVida {
         }
     }
 }
-
-// fin clase xpdjv_JuegoVida
 
 class xpdjv_MatrizBN {
     constructor(filas, columnas, cellCallback) {
@@ -346,8 +306,8 @@ function xpdjv_onCeldaCambioCallback (fila, columna, estaVivo, edad){
     const indice = Math.floor (edad / 4) + 1;
     divCelda.addClass("xpdjv_vive"+indice);
     divCelda.removeClass("xpdjv_vive"+(indice -1));
-    //divCelda.addClass ("celdaTrue");
-  } else {
+
+} else {
     divCelda.removeClass("xpdjv_vive1 xpdjv_vive2 xpdjv_vive3 xpdjv_vive4 xpdjv_celdaTrue");
   }
 }
@@ -366,17 +326,17 @@ function xpdjv_onJuegoFinalizadoCallback(){
 }
 
 function xpdjv_onClickCeldaTablero(){
-  //alert ("evento1");
-  const fila = parseInt ( jQuery(this).parent().data("fila") );
-  const columna = parseInt ( jQuery(this).data("columna") );
-  //alert(""+fila+"x"+columna);
-  xpdjv_juegoVida.ponerMatriz(xpdjv_matrizBN, fila, columna);
+
+    const fila = parseInt ( jQuery(this).parent().data("fila") );
+    const columna = parseInt ( jQuery(this).data("columna") );
+
+    xpdjv_juegoVida.ponerMatriz(xpdjv_matrizBN, fila, columna);
 }
 
 function xpdjv_onClickCeldaPatron(){
   const fila = parseInt ( jQuery(this).parent().data("fila") );
   const columna = parseInt ( jQuery(this).data("columna") );
-  //alert(""+fila+"x"+columna);
+
   xpdjv_matrizBN.cambiarCelda (fila, columna);
 }
 
@@ -402,8 +362,6 @@ function xpdjv_inicializarGrid(tablero, txtFilas, txtColumnas, prefijo){
   const divGrid = jQuery(tablero);
   const filas = parseInt( jQuery(txtFilas).val() );
   const columnas = parseInt ( jQuery(txtColumnas).val() );
-  //alert ("" + filas +"x"+ columnas);
-  //plantilla de fila
   let divFila;
   let divColumna;
   
@@ -421,36 +379,40 @@ function xpdjv_inicializarGrid(tablero, txtFilas, txtColumnas, prefijo){
     }
     divGrid.append (divFila);
   }
-  //alert (divGrid.html ());
+
   return divGrid;
 }
 
 function xpdjv_iniciarJuego(){
-  try {
-  const filas = parseInt( jQuery("#xpdjv_txtFilas").val () );
-  const columnas = parseInt ( jQuery("#xpdjv_txtColumnas").val () );
-  if (xpdjv_juegoVida == null || filas != juegosVida.filas || columnas != xpdjv_juegoVida.columnas){
-    if (xpdjv_juegoVida != null){
-      xpdjv_juegoVida.detener();
-      xpdjv_juegoVida = null;
+    try {
+        const filas = parseInt( jQuery("#xpdjv_txtFilas").val () );
+        const columnas = parseInt ( jQuery("#xpdjv_txtColumnas").val () );
+        const modo_armagedon = jQuery("#xpdjv_chkArmagedon").is(':checked');
+        
+        if (xpdjv_juegoVida == null || filas != xpdjv_juegoVida.filas || columnas != xpdjv_juegoVida.columnas){
+            if (xpdjv_juegoVida != null){
+                xpdjv_juegoVida.detener();
+                xpdjv_juegoVida = null;
+            }
+            xpdjv_juegoVida = new xpdjv_JuegoVida (filas, columnas, xpdjv_onCeldaCambioCallback , xpdjv_onJuegoFinalizadoCallback );
+            const grid = xpdjv_inicializarGrid( "#xpdjv_tablero", "#xpdjv_txtFilas", "#xpdjv_txtColumnas" ,"tc");
+            xpdjv_juegoVida.arrancar();
+            grid.find(".xpdjv_celda").click( xpdjv_onClickCeldaTablero );
+        }
+
+        if(modo_armagedon){
+            xpdjv_onClickArmagedon();
+        }else{
+            xpdjv_onClickRandomico();
+        }
+
+    } catch (ex){
+        alert(ex.message);
     }
-    xpdjv_juegoVida = new xpdjv_JuegoVida (filas, columnas, xpdjv_onCeldaCambioCallback , xpdjv_onJuegoFinalizadoCallback );
-    const grid = xpdjv_inicializarGrid( "#xpdjv_tablero", "#xpdjv_txtFilas", "#xpdjv_txtColumnas" ,"tc");
-    xpdjv_juegoVida.arrancar();
-    grid.find(".xpdjv_celda").click( xpdjv_onClickCeldaTablero );
-    jQuery("#xpdjv_btnDetener").show();
-    jQuery("#xpdjv_btnArrancar").hide();
-    jQuery("#xpdjv_txtFilas").parent().hide();
-  }
-  //grid.find(".celda").click( onClickCeldaTablero  );
-  } catch (ex){
-    alert(ex.message);
-  }
 }
 
 function xpdjv_iniciarTableroPatron(){
   try {
-    //alert ("inicia tablero patron");
     const filas = parseInt( jQuery("#xpdjv_txtFilasPatron").val () );
     const columnas = parseInt ( jQuery("#xpdjv_txtColumnasPatron").val () );
     const grid = xpdjv_inicializarGrid( "#xpdjv_tableroPatron","#xpdjv_txtFilasPatron","#xpdjv_txtColumnasPatron" ,"tcp");
@@ -467,31 +429,21 @@ function xpdjv_detenerJuego(){
     xpdjv_juegoVida.detener();
     xpdjv_juegoVida = null;
   }
-  jQuery("#xpdjv_btnDetener").hide();
-  jQuery("#xpdjv_btnArrancar").show();
-  jQuery("#xpdjv_txtFilas").parent().show ();
 }
 
 function xpdjv_toggleControles (){
-  //jQuery("#divPanelControles").slideToggle();
-  jQuery("#xpdjv_divPanelControles").toggleClass("collapse");
+
 }
 
 jQuery(document).ready( function(){
   try {
-  //jQuery("body").css("height", ""+ window.screen.height +"px")
+  
   jQuery("#xpdjv_txtFilasPatron").change(xpdjv_iniciarTableroPatron);
   jQuery("#xpdjv_txtColumnasPatron").change(xpdjv_iniciarTableroPatron);
   xpdjv_iniciarTableroPatron();
   
   jQuery("#xpdjv_btnArrancar").click(xpdjv_iniciarJuego);
-  jQuery("#xpdjv_btnDetener").click(xpdjv_detenerJuego);
-  // jQuery("#xpdjv_btnMostrarPanel").click ( xpdjv_toggleControles );
-  jQuery("#xpdjv_btnArmagedon").click( xpdjv_onClickArmagedon );
-  jQuery("#xpdjv_btnRandomico").click( xpdjv_onClickRandomico );
-  // xpdjv_toggleControles();
   xpdjv_iniciarJuego ();
-  // alert("inicializado " + jQuery("#xpdjv_tablero").css("height") ); 
   
   }catch(ex){
     alert (ex.message);
