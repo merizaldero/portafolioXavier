@@ -352,6 +352,22 @@ def servir_registrar_usuario():
     except Exception as ex:
         return template('xpd_usr/registrar_usuario', usuario = {x : '' for x in campos}, lvl = 'danger', mensaje = str(ex) )
 
+
+def agregarUsernames(arreglo, campo_user_id, campo_user_name):
+    ids_usuarios = list(set([ x[campo_user_id] for x in arreglo if x[campo_user_id] is not None ]))
+    if len(ids_usuarios) == 0:
+        return        
+    parametros = { f"d{indice}" : ids_usuarios[indice] for indice,elemento in enumerate(ids_usuarios) }
+    sql = "select a.ID as id, a.USERNAME as username from USUARIOS a where ID in (" + ", ".join([":"+ x for x in parametros.keys()]) + ")"
+    con = orm.Conexion(PATH_BDD)
+    usuarios = con.consultar(sql, parametros, ['id', 'username'])
+    con.close()
+    for item in arreglo:
+        usuario = [ x for x in usuarios if x['id'] == item[campo_user_id] ]
+        if len(usuario) == 0:
+            continue
+        item[campo_user_name] = usuario[0]['username']
+
 # Agregar Mapeos para Bottle
     
 def rutearModulo( app : Bottle, ruta_base : str ):
