@@ -2,8 +2,8 @@
 #include <set>
 using namespace std;
 
-void imprimir_map(set<string> a){
-    cout << "Tamaño cola " << a.size() << "\n";    
+void imprimir_set(set<string> a){
+    cout << "Tamaño set " << a.size() << "\n";    
     if(! a.empty()){
         for(string item : a){
             cout << item << ' ' ;
@@ -15,17 +15,17 @@ void imprimir_map(set<string> a){
 
 int main(){
     set<string> carros = {"Volvo", "BMW", "Ford", "BMW", "Mazda"};
-    imprimir_map(carros);
+    imprimir_set(carros);
 
     carros.insert("Tesla");
     carros.insert("Mazda");
     carros.insert("Toyota");
-    imprimir_map(carros);
+    imprimir_set(carros);
 
     carros.erase("Volvo");
     carros.erase("Mazda");
     carros.insert("Toyota");
-    imprimir_map(carros);
+    imprimir_set(carros);
 
     return 0;
 }
