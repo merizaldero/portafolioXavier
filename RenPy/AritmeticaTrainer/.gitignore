@@ -1,0 +1,5 @@
+/.vscode/
+/game/saves/*.save
+/game/cache/
+/game/tl/
+/log.txt
