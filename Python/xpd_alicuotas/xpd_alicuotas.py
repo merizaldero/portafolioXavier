@@ -37,6 +37,7 @@ Condominios.setMetamodelo({
     'propiedades' : [
         { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
         { 'nombre':'nombre', 'nombreCampo':'NOMBRE', 'tipo':orm.XPDSTRING, 'tamano':64, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'saldo', 'nombreCampo':'SALDO', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'id_user', 'nombreCampo':'ID_USER', 'tipo':orm.XPDINTEGER, 'incremental': False, },
         ],
     'namedQueries' : [
@@ -53,6 +54,46 @@ Departamentos.setMetamodelo({
         { 'nombre':'numero_dep', 'nombreCampo':'NUMERO_DEP', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'propietario', 'nombreCampo':'PROPIETARIO', 'tipo':orm.XPDSTRING, 'tamano':64, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'arrendatario', 'nombreCampo':'ARRENDATARIO', 'tipo':orm.XPDSTRING, 'tamano':64, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'saldo', 'nombreCampo':'SALDO', 'tipo':orm.XPDREAL, 'tamano': 5, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'id_condominio', 'nombreCampo':'ID_CONDOMINIO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
+        ],
+    'namedQueries' : [
+        { 'nombre':'findById', 'whereClause':['id'], },
+        { 'nombre':'findByCondominio', 'whereClause':['id_condominio'], },
+        ]
+    })
+
+Transaccions = orm.Entidad()
+Transaccions.setMetamodelo({
+    'nombreTabla' : 'TRANSACCION',
+    'propiedades' : [
+        { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
+        { 'nombre':'fecha', 'nombreCampo':'FECHA', 'tipo':orm.XPDDATE, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'concepto', 'nombreCampo':'CONCEPTO', 'tipo':orm.XPDSTRING, 'tamano':256, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'monto', 'nombreCampo':'MONTO', 'tipo':orm.XPDREAL, 'tamano': 7, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'saldo_antes', 'nombreCampo':'SALDO_ANTES', 'tipo':orm.XPDREAL, 'tamano': 6, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'saldo_despues', 'nombreCampo':'SALDO_DESPUES', 'tipo':orm.XPDREAL, 'tamano': 6, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'anulado', 'nombreCampo':'ANULADO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'id_abono', 'nombreCampo':'ID_ABONO', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'id_egreso', 'nombreCampo':'ID_EGRESO', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'id_condominio', 'nombreCampo':'ID_CONDOMINIO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
+        ],
+    'namedQueries' : [
+        { 'nombre':'findById', 'whereClause':['id'], },
+        { 'nombre':'findByCondominio', 'whereClause':['id_condominio'], },
+        ]
+    })
+
+Egresos = orm.Entidad()
+Egresos.setMetamodelo({
+    'nombreTabla' : 'EGRESO',
+    'propiedades' : [
+        { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
+        { 'nombre':'fecha', 'nombreCampo':'FECHA', 'tipo':orm.XPDDATE, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'destino', 'nombreCampo':'DESTINO', 'tipo':orm.XPDSTRING, 'tamano':128, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'monto', 'nombreCampo':'MONTO', 'tipo':orm.XPDREAL, 'tamano': 6, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'observaciones', 'nombreCampo':'OBSERVACIONES', 'tipo':orm.XPDSTRING, 'tamano':256, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'anulado', 'nombreCampo':'ANULADO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'id_condominio', 'nombreCampo':'ID_CONDOMINIO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
         ],
     'namedQueries' : [
@@ -80,14 +121,17 @@ Alicuotas.setMetamodelo({
         ]
     })
 
-EventoLimpiezas = orm.Entidad()
-EventoLimpiezas.setMetamodelo({
-    'nombreTabla' : 'EVENTO_LIMPIEZA',
+Abonos = orm.Entidad()
+Abonos.setMetamodelo({
+    'nombreTabla' : 'ABONO',
     'propiedades' : [
         { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
         { 'nombre':'fecha', 'nombreCampo':'FECHA', 'tipo':orm.XPDDATE, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
-        { 'nombre':'fecha_validacion', 'nombreCampo':'FECHA_VALIDACION', 'tipo':orm.XPDDATE, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'monto', 'nombreCampo':'MONTO', 'tipo':orm.XPDREAL, 'tamano': 5, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
         { 'nombre':'observacion', 'nombreCampo':'OBSERVACION', 'tipo':orm.XPDSTRING, 'tamano':256, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'genera_egreso', 'nombreCampo':'GENERA_EGRESO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'aplicado', 'nombreCampo':'APLICADO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'id_egreso', 'nombreCampo':'ID_EGRESO', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
         { 'nombre':'id_departamento', 'nombreCampo':'ID_DEPARTAMENTO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
         ],
     'namedQueries' : [
@@ -98,22 +142,22 @@ EventoLimpiezas.setMetamodelo({
 
 EventoLimpezaAlicuotas = orm.Entidad()
 EventoLimpezaAlicuotas.setMetamodelo({
-    'nombreTabla' : 'EVLIM_ALICUOTA',
+    'nombreTabla' : 'ABONO_ALICUOTA',
     'propiedades' : [
         { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
         { 'nombre':'id_alicuota', 'nombreCampo':'ID_ALICUOTA', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
-        { 'nombre':'id_eventolimpieza', 'nombreCampo':'ID_EVENTOLIMPIEZA', 'tipo':orm.XPDINTEGER, 'incremental': False, },
+        { 'nombre':'id_abono', 'nombreCampo':'ID_ABONO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
         ],
     'namedQueries' : [
         { 'nombre':'fkAlicuota', 'whereClause':['id_alicuota'], },
         { 'nombre':'findById', 'whereClause':['id'], },
-        { 'nombre':'findByEventoLimpieza', 'whereClause':['id_eventolimpieza'], },
+        { 'nombre':'findByAbono', 'whereClause':['id_abono'], },
         ]
     })
 
 
 def inicializar():
-    entidades = [Condominios, Departamentos, Alicuotas, EventoLimpiezas, EventoLimpezaAlicuotas]
+    entidades = [Condominios, Departamentos, Transaccions, Egresos, Alicuotas, Abonos, EventoLimpezaAlicuotas]
     con = orm.Conexion(PATH_BDD)
     try:
         for entidad in entidades:
@@ -156,6 +200,22 @@ def departamento_getowner(conexion, id_departamento):
 
     return (objeto, condominio_getowner(conexion, objeto['id_condominio'])[1] )
 
+def transaccion_getowner(conexion, id_transaccion):
+    objeto = Transaccions.getNamedQuery(conexion, 'findById', {'id': id_transaccion})
+    if len(objeto) == 0:
+        return (None, None)
+    objeto = objeto[0]
+
+    return (objeto, condominio_getowner(conexion, objeto['id_condominio'])[1] )
+
+def egreso_getowner(conexion, id_egreso):
+    objeto = Egresos.getNamedQuery(conexion, 'findById', {'id': id_egreso})
+    if len(objeto) == 0:
+        return (None, None)
+    objeto = objeto[0]
+
+    return (objeto, condominio_getowner(conexion, objeto['id_condominio'])[1] )
+
 def alicuota_getowner(conexion, id_alicuota):
     objeto = Alicuotas.getNamedQuery(conexion, 'findById', {'id': id_alicuota})
     if len(objeto) == 0:
@@ -164,8 +224,8 @@ def alicuota_getowner(conexion, id_alicuota):
 
     return (objeto, departamento_getowner(conexion, objeto['id_departamento'])[1] )
 
-def eventolimpieza_getowner(conexion, id_eventolimpieza):
-    objeto = EventoLimpiezas.getNamedQuery(conexion, 'findById', {'id': id_eventolimpieza})
+def abono_getowner(conexion, id_abono):
+    objeto = Abonos.getNamedQuery(conexion, 'findById', {'id': id_abono})
     if len(objeto) == 0:
         return (None, None)
     objeto = objeto[0]
@@ -178,7 +238,7 @@ def eventolimpezaalicuota_getowner(conexion, id_eventolimpezaalicuota):
         return (None, None)
     objeto = objeto[0]
 
-    return (objeto, eventolimpieza_getowner(conexion, objeto['id_eventolimpieza'])[1] )
+    return (objeto, abono_getowner(conexion, objeto['id_abono'])[1] )
 
 def servir_page_editar_condominio(id):
     usuario = xpd_usr.getCurrentUser(request)
@@ -203,6 +263,16 @@ def servir_page_editar_condominio(id):
 
     if len(condominio["nombre"]) > 64:
         mensajes_error.append("El tamaño de nombre excede el permitido")
+
+    condominio["saldo"] = request.forms.get( "saldo", "").strip()
+        
+    if len(condominio["saldo"]) == 0:
+        mensajes_error.append("saldo es requerido")
+
+    try:
+        condominio["saldo"] = int( condominio["saldo"] )
+    except:
+        mensajes_error.append("El valor de saldo no es válido")
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Condominio", objeto = condominio, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/condominios/" + str(condominio['id']), fecha_iso_to_js = fecha_iso_to_js )    
@@ -236,6 +306,16 @@ def servir_page_insertar_condominio():
     if len(condominio["nombre"]) > 64:
         mensajes_error.append("El tamaño de nombre excede el permitido")
 
+    condominio["saldo"] = request.forms.get( "saldo", "").strip()
+        
+    if len(condominio["saldo"]) == 0:
+        mensajes_error.append("saldo es requerido")
+
+    try:
+        condominio["saldo"] = int( condominio["saldo"] )
+    except:
+        mensajes_error.append("El valor de saldo no es válido")
+
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Condominio", objeto = condominio, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/condominios", fecha_iso_to_js = fecha_iso_to_js )    
     try:
@@ -245,6 +325,29 @@ def servir_page_insertar_condominio():
     return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/condominios/" + str(condominio['id']) )
 
 CONFIG['rutas'].append({'ruta':'/condominios/nuevo', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_condominio })
+
+def servir_page_eliminar_condominio(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    condominio, id_usuario_owner = condominio_getowner( conexion , id)
+    conexion.close()
+    if condominio is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method != "GET":
+        abort( 404, "Metodo no Valido" )
+    try:
+        transaccionar(Condominios.eliminar, condominio)
+    except:
+    
+        return template("xpd_usr/mensaje", lvl = "danger", mensaje = "Error al eliminar objeto.", href ="/xpd_alicuotas/condominios" )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/condominios" )
+    
+CONFIG['rutas'].append({'ruta':'/condominios/<id>/eliminar', 'metodos':['GET','POST'], 'funcion': servir_page_eliminar_condominio })
 
 def servir_page_get_condominio_lista():
     conexion = orm.Conexion(PATH_BDD)
@@ -278,8 +381,12 @@ def servir_page_get_condominio_byid(id_condominio):
     
     departamentos = Departamentos.getNamedQuery( conexion, "findByCondominio", {'id_condominio':objeto['id']} )
 
+    transaccions = Transaccions.getNamedQuery( conexion, "findByCondominio", {'id_condominio':objeto['id']} )
+
+    egresos = Egresos.getNamedQuery( conexion, "findByCondominio", {'id_condominio':objeto['id']} )
+
     conexion.close()
-    return template("xpd_alicuotas/show_condominio", objeto = objeto, usuario = usuario , departamentos = departamentos)
+    return template("xpd_alicuotas/show_condominio", objeto = objeto, usuario = usuario , departamentos = departamentos, transaccions = transaccions, egresos = egresos)
 
 CONFIG['rutas'].append({'ruta':'/condominios/<id_condominio>', 'metodos':['GET'], 'funcion': servir_page_get_condominio_byid })
 
@@ -321,6 +428,16 @@ def servir_page_editar_departamento(id):
         
     if len(departamento["arrendatario"]) > 64:
         mensajes_error.append("El tamaño de arrendatario excede el permitido")
+
+    departamento["saldo"] = request.forms.get( "saldo", "").strip()
+        
+    if len(departamento["saldo"]) == 0:
+        mensajes_error.append("saldo es requerido")
+
+    try:
+        departamento["saldo"] = float( departamento["saldo"] )
+    except:
+        mensajes_error.append("El valor de saldo no es válido")
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Departamento", objeto = departamento, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(departamento['id']), fecha_iso_to_js = fecha_iso_to_js )    
@@ -375,6 +492,16 @@ def servir_page_insertar_departamento(id_condominio):
     if len(departamento["arrendatario"]) > 64:
         mensajes_error.append("El tamaño de arrendatario excede el permitido")
 
+    departamento["saldo"] = request.forms.get( "saldo", "").strip()
+        
+    if len(departamento["saldo"]) == 0:
+        mensajes_error.append("saldo es requerido")
+
+    try:
+        departamento["saldo"] = float( departamento["saldo"] )
+    except:
+        mensajes_error.append("El valor de saldo no es válido")
+
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Departamento", objeto = departamento, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/condominios/" + str(id_condominio), fecha_iso_to_js = fecha_iso_to_js )    
     try:
@@ -384,6 +511,29 @@ def servir_page_insertar_departamento(id_condominio):
     return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/departamentos/" + str(departamento['id']) )
 
 CONFIG['rutas'].append({'ruta':'/condominios/<id_condominio>/nuevodepartamento', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_departamento })
+
+def servir_page_eliminar_departamento(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    departamento, id_usuario_owner = departamento_getowner( conexion , id)
+    conexion.close()
+    if departamento is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method != "GET":
+        abort( 404, "Metodo no Valido" )
+    try:
+        transaccionar(Departamentos.eliminar, departamento)
+    except:
+    
+        return template("xpd_usr/mensaje", lvl = "danger", mensaje = "Error al eliminar objeto.", href ="/xpd_alicuotas/Condominios/" + str(departamento['id_Condominio']) )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/Condominios/" + str(departamento['id_Condominio']) )
+    
+CONFIG['rutas'].append({'ruta':'/departamentos/<id>/eliminar', 'metodos':['GET','POST'], 'funcion': servir_page_eliminar_departamento })
 
 def servir_page_get_departamento_byid(id_departamento):
     usuario = xpd_usr.getCurrentUser(request)
@@ -400,13 +550,413 @@ def servir_page_get_departamento_byid(id_departamento):
         abort( 403, "Acceso no autorizado") 
     
     alicuotas = Alicuotas.getNamedQuery( conexion, "findByDepartamento", {'id_departamento':objeto['id']} )
-
-    eventolimpiezas = EventoLimpiezas.getNamedQuery( conexion, "findByDepartamento", {'id_departamento':objeto['id']} )
+    alicuotas.reverse()
+    abonos = Abonos.getNamedQuery( conexion, "findByDepartamento", {'id_departamento':objeto['id']} )
 
     conexion.close()
-    return template("xpd_alicuotas/show_departamento", objeto = objeto, usuario = usuario , alicuotas = alicuotas, eventolimpiezas = eventolimpiezas)
+    return template("xpd_alicuotas/show_departamento", objeto = objeto, usuario = usuario , alicuotas = alicuotas, abonos = abonos)
 
 CONFIG['rutas'].append({'ruta':'/departamentos/<id_departamento>', 'metodos':['GET'], 'funcion': servir_page_get_departamento_byid })
+
+def servir_page_editar_transaccion(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+    conexion = orm.Conexion(PATH_BDD)
+    transaccion, id_usuario_owner = transaccion_getowner( conexion , id)
+    conexion.close()
+    if transaccion is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method == "GET":        
+        return template("xpd_alicuotas/editar_Transaccion", objeto = transaccion, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/transaccions/" + str(transaccion['id']), fecha_iso_to_js = fecha_iso_to_js)
+    # A partir de este punto se asume POST
+    mensajes_error = []
+
+    transaccion["fecha"] = request.forms.get( "fecha", "").strip()
+        
+    if len(transaccion["fecha"]) == 0:
+        mensajes_error.append("fecha es requerido")
+
+    try:
+        if len(transaccion["fecha"]) > 0:
+            transaccion["fecha"] = fecha_js_to_iso(transaccion["fecha"])
+    except:
+        mensajes_error.append("fecha no es una fecha válida")
+
+    transaccion["concepto"] = request.forms.get( "concepto", "").strip()
+        
+    if len(transaccion["concepto"]) == 0:
+        mensajes_error.append("concepto es requerido")
+
+    if len(transaccion["concepto"]) > 256:
+        mensajes_error.append("El tamaño de concepto excede el permitido")
+
+    transaccion["monto"] = request.forms.get( "monto", "").strip()
+        
+    if len(transaccion["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
+
+    try:
+        transaccion["monto"] = float( transaccion["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
+    transaccion["saldo_antes"] = request.forms.get( "saldo_antes", "").strip()
+        
+    if len(transaccion["saldo_antes"]) == 0:
+        mensajes_error.append("saldo_antes es requerido")
+
+    try:
+        transaccion["saldo_antes"] = float( transaccion["saldo_antes"] )
+    except:
+        mensajes_error.append("El valor de saldo_antes no es válido")
+
+    transaccion["saldo_despues"] = request.forms.get( "saldo_despues", "").strip()
+        
+    if len(transaccion["saldo_despues"]) == 0:
+        mensajes_error.append("saldo_despues es requerido")
+
+    try:
+        transaccion["saldo_despues"] = float( transaccion["saldo_despues"] )
+    except:
+        mensajes_error.append("El valor de saldo_despues no es válido")
+
+    transaccion["anulado"] = request.forms.get( "anulado", "").strip()
+        
+    transaccion["anulado"] = transaccion["anulado"] == "1"
+
+    transaccion["id_abono"] = request.forms.get( "id_abono", "").strip()
+        
+    try:
+        transaccion["id_abono"] = int( transaccion["id_abono"] )
+    except:
+        mensajes_error.append("El valor de id_abono no es válido")
+
+    transaccion["id_egreso"] = request.forms.get( "id_egreso", "").strip()
+        
+    try:
+        transaccion["id_egreso"] = int( transaccion["id_egreso"] )
+    except:
+        mensajes_error.append("El valor de id_egreso no es válido")
+
+    if len(mensajes_error) > 0:
+        return template("xpd_alicuotas/editar_Transaccion", objeto = transaccion, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/transaccions/" + str(transaccion['id']), fecha_iso_to_js = fecha_iso_to_js )    
+    try:
+        transaccionar(Transaccions.actualizar, transaccion)
+    except:
+        return template("xpd_alicuotas/editar_Transaccion", objeto = transaccion, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/transaccions/" + str(transaccion['id']), fecha_iso_to_js = fecha_iso_to_js )
+    return template("xpd_alicuotas/editar_Transaccion", objeto = transaccion, usuario = usuario, lvl = "success", mensaje = "Actualizacion ha sido exitosa", ruta_cancelar = "/xpd_alicuotas/transaccions/" + str(transaccion['id']), fecha_iso_to_js = fecha_iso_to_js )
+
+CONFIG['rutas'].append({'ruta':'/transaccions/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_transaccion })
+
+def servir_page_insertar_transaccion(id_condominio):
+
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    condominio, id_usuario_owner = condominio_getowner( conexion , id_condominio)
+    conexion.close()
+    if condominio is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+
+    transaccion = Transaccions.nuevoDiccionario()
+    if request.method == "GET":        
+        return template("xpd_alicuotas/editar_Transaccion", objeto = transaccion, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/condominios/" + str(id_condominio), fecha_iso_to_js = fecha_iso_to_js)
+    # A partir de este punto se asume POST
+    mensajes_error = []
+
+    transaccion['id_condominio'] = id_condominio
+
+    transaccion["fecha"] = request.forms.get( "fecha", "").strip()
+        
+    if len(transaccion["fecha"]) == 0:
+        mensajes_error.append("fecha es requerido")
+
+    transaccion["concepto"] = request.forms.get( "concepto", "").strip()
+        
+    if len(transaccion["concepto"]) == 0:
+        mensajes_error.append("concepto es requerido")
+
+    if len(transaccion["concepto"]) > 256:
+        mensajes_error.append("El tamaño de concepto excede el permitido")
+
+    transaccion["monto"] = request.forms.get( "monto", "").strip()
+        
+    if len(transaccion["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
+
+    try:
+        transaccion["monto"] = float( transaccion["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
+    transaccion["saldo_antes"] = request.forms.get( "saldo_antes", "").strip()
+        
+    if len(transaccion["saldo_antes"]) == 0:
+        mensajes_error.append("saldo_antes es requerido")
+
+    try:
+        transaccion["saldo_antes"] = float( transaccion["saldo_antes"] )
+    except:
+        mensajes_error.append("El valor de saldo_antes no es válido")
+
+    transaccion["saldo_despues"] = request.forms.get( "saldo_despues", "").strip()
+        
+    if len(transaccion["saldo_despues"]) == 0:
+        mensajes_error.append("saldo_despues es requerido")
+
+    try:
+        transaccion["saldo_despues"] = float( transaccion["saldo_despues"] )
+    except:
+        mensajes_error.append("El valor de saldo_despues no es válido")
+
+    transaccion["anulado"] = request.forms.get( "anulado", "").strip()
+        
+    transaccion["anulado"] = transaccion["anulado"] == "1"
+
+    transaccion["id_abono"] = request.forms.get( "id_abono", "").strip()
+        
+    try:
+        transaccion["id_abono"] = int( transaccion["id_abono"] )
+    except:
+        mensajes_error.append("El valor de id_abono no es válido")
+
+    transaccion["id_egreso"] = request.forms.get( "id_egreso", "").strip()
+        
+    try:
+        transaccion["id_egreso"] = int( transaccion["id_egreso"] )
+    except:
+        mensajes_error.append("El valor de id_egreso no es válido")
+
+    if len(mensajes_error) > 0:
+        return template("xpd_alicuotas/editar_Transaccion", objeto = transaccion, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/condominios/" + str(id_condominio), fecha_iso_to_js = fecha_iso_to_js )    
+    try:
+        transaccionar(Transaccions.insertar, transaccion)
+    except:
+        return template("xpd_alicuotas/editar_Transaccion", objeto = transaccion, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/condominios/" + str(id_condominio), fecha_iso_to_js = fecha_iso_to_js )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/transaccions/" + str(transaccion['id']) )
+
+CONFIG['rutas'].append({'ruta':'/condominios/<id_condominio>/nuevotransaccion', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_transaccion })
+
+def servir_page_eliminar_transaccion(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    transaccion, id_usuario_owner = transaccion_getowner( conexion , id)
+    conexion.close()
+    if transaccion is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method != "GET":
+        abort( 404, "Metodo no Valido" )
+    try:
+        transaccionar(Transaccions.eliminar, transaccion)
+    except:
+    
+        return template("xpd_usr/mensaje", lvl = "danger", mensaje = "Error al eliminar objeto.", href ="/xpd_alicuotas/Condominios/" + str(transaccion['id_Condominio']) )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/Condominios/" + str(transaccion['id_Condominio']) )
+    
+CONFIG['rutas'].append({'ruta':'/transaccions/<id>/eliminar', 'metodos':['GET','POST'], 'funcion': servir_page_eliminar_transaccion })
+
+def servir_page_get_transaccion_byid(id_transaccion):
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )    
+
+    conexion = orm.Conexion(PATH_BDD)
+    objeto, id_user_owner = transaccion_getowner(conexion, id_transaccion)
+    if objeto is None:
+        conexion.close()
+        abort( 404, "El recurso solicitado no existe" )    
+    if usuario['id'] != id_user_owner:
+        conexion.close()
+        abort( 403, "Acceso no autorizado") 
+    
+    conexion.close()
+    return template("xpd_alicuotas/show_transaccion", objeto = objeto, usuario = usuario )
+
+CONFIG['rutas'].append({'ruta':'/transaccions/<id_transaccion>', 'metodos':['GET'], 'funcion': servir_page_get_transaccion_byid })
+
+def servir_page_editar_egreso(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+    conexion = orm.Conexion(PATH_BDD)
+    egreso, id_usuario_owner = egreso_getowner( conexion , id)
+    conexion.close()
+    if egreso is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method == "GET":        
+        return template("xpd_alicuotas/editar_Egreso", objeto = egreso, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/egresos/" + str(egreso['id']), fecha_iso_to_js = fecha_iso_to_js)
+    # A partir de este punto se asume POST
+    mensajes_error = []
+
+    egreso["fecha"] = request.forms.get( "fecha", "").strip()
+        
+    if len(egreso["fecha"]) == 0:
+        mensajes_error.append("fecha es requerido")
+
+    try:
+        if len(egreso["fecha"]) > 0:
+            egreso["fecha"] = fecha_js_to_iso(egreso["fecha"])
+    except:
+        mensajes_error.append("fecha no es una fecha válida")
+
+    egreso["destino"] = request.forms.get( "destino", "").strip()
+        
+    if len(egreso["destino"]) == 0:
+        mensajes_error.append("destino es requerido")
+
+    if len(egreso["destino"]) > 128:
+        mensajes_error.append("El tamaño de destino excede el permitido")
+
+    egreso["monto"] = request.forms.get( "monto", "").strip()
+        
+    if len(egreso["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
+
+    try:
+        egreso["monto"] = float( egreso["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
+    egreso["observaciones"] = request.forms.get( "observaciones", "").strip()
+        
+    if len(egreso["observaciones"]) == 0:
+        mensajes_error.append("observaciones es requerido")
+
+    if len(egreso["observaciones"]) > 256:
+        mensajes_error.append("El tamaño de observaciones excede el permitido")
+
+    egreso["anulado"] = request.forms.get( "anulado", "").strip()
+        
+    egreso["anulado"] = egreso["anulado"] == "1"
+
+    if len(mensajes_error) > 0:
+        return template("xpd_alicuotas/editar_Egreso", objeto = egreso, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/egresos/" + str(egreso['id']), fecha_iso_to_js = fecha_iso_to_js )    
+    try:
+        transaccionar(Egresos.actualizar, egreso)
+    except:
+        return template("xpd_alicuotas/editar_Egreso", objeto = egreso, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/egresos/" + str(egreso['id']), fecha_iso_to_js = fecha_iso_to_js )
+    return template("xpd_alicuotas/editar_Egreso", objeto = egreso, usuario = usuario, lvl = "success", mensaje = "Actualizacion ha sido exitosa", ruta_cancelar = "/xpd_alicuotas/egresos/" + str(egreso['id']), fecha_iso_to_js = fecha_iso_to_js )
+
+CONFIG['rutas'].append({'ruta':'/egresos/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_egreso })
+
+def servir_page_insertar_egreso(id_condominio):
+
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    condominio, id_usuario_owner = condominio_getowner( conexion , id_condominio)
+    conexion.close()
+    if condominio is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+
+    egreso = Egresos.nuevoDiccionario()
+    if request.method == "GET":        
+        return template("xpd_alicuotas/editar_Egreso", objeto = egreso, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/condominios/" + str(id_condominio), fecha_iso_to_js = fecha_iso_to_js)
+    # A partir de este punto se asume POST
+    mensajes_error = []
+
+    egreso['id_condominio'] = id_condominio
+
+    egreso["fecha"] = request.forms.get( "fecha", "").strip()
+        
+    if len(egreso["fecha"]) == 0:
+        mensajes_error.append("fecha es requerido")
+
+    egreso["destino"] = request.forms.get( "destino", "").strip()
+        
+    if len(egreso["destino"]) == 0:
+        mensajes_error.append("destino es requerido")
+
+    if len(egreso["destino"]) > 128:
+        mensajes_error.append("El tamaño de destino excede el permitido")
+
+    egreso["monto"] = request.forms.get( "monto", "").strip()
+        
+    if len(egreso["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
+
+    try:
+        egreso["monto"] = float( egreso["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
+    egreso["observaciones"] = request.forms.get( "observaciones", "").strip()
+        
+    if len(egreso["observaciones"]) == 0:
+        mensajes_error.append("observaciones es requerido")
+
+    if len(egreso["observaciones"]) > 256:
+        mensajes_error.append("El tamaño de observaciones excede el permitido")
+
+    egreso["anulado"] = request.forms.get( "anulado", "").strip()
+        
+    egreso["anulado"] = egreso["anulado"] == "1"
+
+    if len(mensajes_error) > 0:
+        return template("xpd_alicuotas/editar_Egreso", objeto = egreso, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/condominios/" + str(id_condominio), fecha_iso_to_js = fecha_iso_to_js )    
+    try:
+        transaccionar(Egresos.insertar, egreso)
+    except:
+        return template("xpd_alicuotas/editar_Egreso", objeto = egreso, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/condominios/" + str(id_condominio), fecha_iso_to_js = fecha_iso_to_js )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/egresos/" + str(egreso['id']) )
+
+CONFIG['rutas'].append({'ruta':'/condominios/<id_condominio>/nuevoegreso', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_egreso })
+
+def servir_page_eliminar_egreso(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    egreso, id_usuario_owner = egreso_getowner( conexion , id)
+    conexion.close()
+    if egreso is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method != "GET":
+        abort( 404, "Metodo no Valido" )
+    try:
+        transaccionar(Egresos.eliminar, egreso)
+    except:
+    
+        return template("xpd_usr/mensaje", lvl = "danger", mensaje = "Error al eliminar objeto.", href ="/xpd_alicuotas/Condominios/" + str(egreso['id_Condominio']) )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/Condominios/" + str(egreso['id_Condominio']) )
+    
+CONFIG['rutas'].append({'ruta':'/egresos/<id>/eliminar', 'metodos':['GET','POST'], 'funcion': servir_page_eliminar_egreso })
+
+def servir_page_get_egreso_byid(id_egreso):
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )    
+
+    conexion = orm.Conexion(PATH_BDD)
+    objeto, id_user_owner = egreso_getowner(conexion, id_egreso)
+    if objeto is None:
+        conexion.close()
+        abort( 404, "El recurso solicitado no existe" )    
+    if usuario['id'] != id_user_owner:
+        conexion.close()
+        abort( 403, "Acceso no autorizado") 
+    
+    conexion.close()
+    return template("xpd_alicuotas/show_egreso", objeto = objeto, usuario = usuario )
+
+CONFIG['rutas'].append({'ruta':'/egresos/<id_egreso>', 'metodos':['GET'], 'funcion': servir_page_get_egreso_byid })
 
 def servir_page_editar_alicuota(id):
     usuario = xpd_usr.getCurrentUser(request)
@@ -568,6 +1118,29 @@ def servir_page_insertar_alicuota(id_departamento):
 
 CONFIG['rutas'].append({'ruta':'/departamentos/<id_departamento>/nuevoalicuota', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_alicuota })
 
+def servir_page_eliminar_alicuota(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    alicuota, id_usuario_owner = alicuota_getowner( conexion , id)
+    conexion.close()
+    if alicuota is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method != "GET":
+        abort( 404, "Metodo no Valido" )
+    try:
+        transaccionar(Alicuotas.eliminar, alicuota)
+    except:
+    
+        return template("xpd_usr/mensaje", lvl = "danger", mensaje = "Error al eliminar objeto.", href ="/xpd_alicuotas/Departamentos/" + str(alicuota['id_Departamento']) )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/Departamentos/" + str(alicuota['id_Departamento']) )
+    
+CONFIG['rutas'].append({'ruta':'/alicuotas/<id>/eliminar', 'metodos':['GET','POST'], 'funcion': servir_page_eliminar_alicuota })
+
 def servir_page_get_alicuota_byid(id_alicuota):
     usuario = xpd_usr.getCurrentUser(request)
     if usuario is None:
@@ -587,57 +1160,70 @@ def servir_page_get_alicuota_byid(id_alicuota):
 
 CONFIG['rutas'].append({'ruta':'/alicuotas/<id_alicuota>', 'metodos':['GET'], 'funcion': servir_page_get_alicuota_byid })
 
-def servir_page_editar_eventolimpieza(id):
+def servir_page_editar_abono(id):
     usuario = xpd_usr.getCurrentUser(request)
 
     if usuario is None:
         abort( 401, "Acceso no autorizado" )
     conexion = orm.Conexion(PATH_BDD)
-    eventolimpieza, id_usuario_owner = eventolimpieza_getowner( conexion , id)
+    abono, id_usuario_owner = abono_getowner( conexion , id)
     conexion.close()
-    if eventolimpieza is None or usuario['id'] != id_usuario_owner:
+    if abono is None or usuario['id'] != id_usuario_owner:
         abort( 403, "Acceso no autorizado" )
     
     if request.method == "GET":        
-        return template("xpd_alicuotas/editar_EventoLimpieza", objeto = eventolimpieza, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/eventolimpiezas/" + str(eventolimpieza['id']), fecha_iso_to_js = fecha_iso_to_js)
+        return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js)
     # A partir de este punto se asume POST
     mensajes_error = []
 
-    eventolimpieza["fecha"] = request.forms.get( "fecha", "").strip()
+    abono["fecha"] = request.forms.get( "fecha", "").strip()
         
-    if len(eventolimpieza["fecha"]) == 0:
+    if len(abono["fecha"]) == 0:
         mensajes_error.append("fecha es requerido")
 
     try:
-        if len(eventolimpieza["fecha"]) > 0:
-            eventolimpieza["fecha"] = fecha_js_to_iso(eventolimpieza["fecha"])
+        if len(abono["fecha"]) > 0:
+            abono["fecha"] = fecha_js_to_iso(abono["fecha"])
     except:
         mensajes_error.append("fecha no es una fecha válida")
 
-    eventolimpieza["fecha_validacion"] = request.forms.get( "fecha_validacion", "").strip()
+    abono["monto"] = request.forms.get( "monto", "").strip()
         
-    try:
-        if len(eventolimpieza["fecha_validacion"]) > 0:
-            eventolimpieza["fecha_validacion"] = fecha_js_to_iso(eventolimpieza["fecha_validacion"])
-    except:
-        mensajes_error.append("fecha_validacion no es una fecha válida")
+    if len(abono["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
 
-    eventolimpieza["observacion"] = request.forms.get( "observacion", "").strip()
+    try:
+        abono["monto"] = float( abono["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
+    abono["observacion"] = request.forms.get( "observacion", "").strip()
         
-    if len(eventolimpieza["observacion"]) > 256:
+    if len(abono["observacion"]) > 256:
         mensajes_error.append("El tamaño de observacion excede el permitido")
 
-    if len(mensajes_error) > 0:
-        return template("xpd_alicuotas/editar_EventoLimpieza", objeto = eventolimpieza, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/eventolimpiezas/" + str(eventolimpieza['id']), fecha_iso_to_js = fecha_iso_to_js )    
+    abono["anulado"] = request.forms.get( "anulado", "").strip()
+        
+    abono["anulado"] = abono["anulado"] == "1"
+
+    abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
+        
     try:
-        transaccionar(EventoLimpiezas.actualizar, eventolimpieza)
+        abono["id_egreso"] = int( abono["id_egreso"] )
     except:
-        return template("xpd_alicuotas/editar_EventoLimpieza", objeto = eventolimpieza, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/eventolimpiezas/" + str(eventolimpieza['id']), fecha_iso_to_js = fecha_iso_to_js )
-    return template("xpd_alicuotas/editar_EventoLimpieza", objeto = eventolimpieza, usuario = usuario, lvl = "success", mensaje = "Actualizacion ha sido exitosa", ruta_cancelar = "/xpd_alicuotas/eventolimpiezas/" + str(eventolimpieza['id']), fecha_iso_to_js = fecha_iso_to_js )
+        mensajes_error.append("El valor de id_egreso no es válido")
 
-CONFIG['rutas'].append({'ruta':'/eventolimpiezas/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_eventolimpieza })
+    if len(mensajes_error) > 0:
+        return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )    
+    try:
+        transaccionar(Abonos.actualizar, abono)
+    except:
+        return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )
+    return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "success", mensaje = "Actualizacion ha sido exitosa", ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )
 
-def servir_page_insertar_eventolimpieza(id_departamento):
+CONFIG['rutas'].append({'ruta':'/abonos/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_abono })
+
+def servir_page_insertar_abono(id_departamento):
 
     usuario = xpd_usr.getCurrentUser(request)
     if usuario is None:
@@ -645,48 +1231,89 @@ def servir_page_insertar_eventolimpieza(id_departamento):
 
     conexion = orm.Conexion(PATH_BDD)
     departamento, id_usuario_owner = departamento_getowner( conexion , id_departamento)
-    # alicuotas = conexion.consultar("SELECT id as id, anio as anio, mes as mes, monto as monto, monto_pendiente as monto_pendiente, pagado as pagado, observaciones as observaciones, id_departamento as id_departamento FROM ALICUOTA  WHERE ID_DEPARTAMENTO = :id_departamento and PAGADO = '0' order by ANIO, MES", {'id_departamento':id_departamento}, ['id', 'anio', 'mes', 'monto', 'monto_pendiente', 'pagado', 'observaciones', 'id_departamento'])
     conexion.close()
     if departamento is None or usuario['id'] != id_usuario_owner:
         abort( 403, "Acceso no autorizado" )
 
-    eventolimpieza = EventoLimpiezas.nuevoDiccionario()
+    abono = Abonos.nuevoDiccionario()
     if request.method == "GET":        
-        return template("xpd_alicuotas/editar_EventoLimpieza", objeto = eventolimpieza, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js)
+        return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js)
     # A partir de este punto se asume POST
     mensajes_error = []
 
-    eventolimpieza['id_departamento'] = id_departamento
+    abono['id_departamento'] = id_departamento
 
-    eventolimpieza["fecha"] = request.forms.get( "fecha", "").strip()
+    abono["fecha"] = request.forms.get( "fecha", "").strip()
         
-    if len(eventolimpieza["fecha"]) == 0:
+    if len(abono["fecha"]) == 0:
         mensajes_error.append("fecha es requerido")
 
-    eventolimpieza["fecha_validacion"] = request.forms.get( "fecha_validacion", "").strip()
+    abono["monto"] = request.forms.get( "monto", "").strip()
         
-    eventolimpieza["observacion"] = request.forms.get( "observacion", "").strip()
+    if len(abono["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
+
+    try:
+        abono["monto"] = float( abono["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
+    abono["observacion"] = request.forms.get( "observacion", "").strip()
         
-    if len(eventolimpieza["observacion"]) > 256:
+    if len(abono["observacion"]) > 256:
         mensajes_error.append("El tamaño de observacion excede el permitido")
 
-    if len(mensajes_error) > 0:
-        return template("xpd_alicuotas/editar_EventoLimpieza", objeto = eventolimpieza, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )    
+    abono["anulado"] = request.forms.get( "anulado", "").strip()
+        
+    abono["anulado"] = abono["anulado"] == "1"
+
+    abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
+        
     try:
-        transaccionar(EventoLimpiezas.insertar, eventolimpieza)
+        abono["id_egreso"] = int( abono["id_egreso"] )
     except:
-        return template("xpd_alicuotas/editar_EventoLimpieza", objeto = eventolimpieza, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )
-    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/eventolimpiezas/" + str(eventolimpieza['id']) )
+        mensajes_error.append("El valor de id_egreso no es válido")
 
-CONFIG['rutas'].append({'ruta':'/departamentos/<id_departamento>/nuevoeventolimpieza', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_eventolimpieza })
+    if len(mensajes_error) > 0:
+        return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )    
+    try:
+        transaccionar(Abonos.insertar, abono)
+    except:
+        return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/abonos/" + str(abono['id']) )
 
-def servir_page_get_eventolimpieza_byid(id_eventolimpieza):
+CONFIG['rutas'].append({'ruta':'/departamentos/<id_departamento>/nuevoabono', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_abono })
+
+def servir_page_eliminar_abono(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    abono, id_usuario_owner = abono_getowner( conexion , id)
+    conexion.close()
+    if abono is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method != "GET":
+        abort( 404, "Metodo no Valido" )
+    try:
+        transaccionar(Abonos.eliminar, abono)
+    except:
+    
+        return template("xpd_usr/mensaje", lvl = "danger", mensaje = "Error al eliminar objeto.", href ="/xpd_alicuotas/Departamentos/" + str(abono['id_Departamento']) )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/Departamentos/" + str(abono['id_Departamento']) )
+    
+CONFIG['rutas'].append({'ruta':'/abonos/<id>/eliminar', 'metodos':['GET','POST'], 'funcion': servir_page_eliminar_abono })
+
+def servir_page_get_abono_byid(id_abono):
     usuario = xpd_usr.getCurrentUser(request)
     if usuario is None:
         abort( 401, "Acceso no autorizado" )    
 
     conexion = orm.Conexion(PATH_BDD)
-    objeto, id_user_owner = eventolimpieza_getowner(conexion, id_eventolimpieza)
+    objeto, id_user_owner = abono_getowner(conexion, id_abono)
     if objeto is None:
         conexion.close()
         abort( 404, "El recurso solicitado no existe" )    
@@ -694,12 +1321,12 @@ def servir_page_get_eventolimpieza_byid(id_eventolimpieza):
         conexion.close()
         abort( 403, "Acceso no autorizado") 
     
-    eventolimpezaalicuotas = EventoLimpezaAlicuotas.getNamedQuery( conexion, "findByEventoLimpieza", {'id_eventolimpieza':objeto['id']} )
+    eventolimpezaalicuotas = EventoLimpezaAlicuotas.getNamedQuery( conexion, "findByAbono", {'id_abono':objeto['id']} )
 
     conexion.close()
-    return template("xpd_alicuotas/show_eventolimpieza", objeto = objeto, usuario = usuario , eventolimpezaalicuotas = eventolimpezaalicuotas)
+    return template("xpd_alicuotas/show_abono", objeto = objeto, usuario = usuario , eventolimpezaalicuotas = eventolimpezaalicuotas)
 
-CONFIG['rutas'].append({'ruta':'/eventolimpiezas/<id_eventolimpieza>', 'metodos':['GET'], 'funcion': servir_page_get_eventolimpieza_byid })
+CONFIG['rutas'].append({'ruta':'/abonos/<id_abono>', 'metodos':['GET'], 'funcion': servir_page_get_abono_byid })
 
 def servir_page_editar_eventolimpezaalicuota(id):
     usuario = xpd_usr.getCurrentUser(request)
@@ -735,30 +1362,27 @@ def servir_page_editar_eventolimpezaalicuota(id):
         return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", objeto = eventolimpezaalicuota, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/eventolimpezaalicuotas/" + str(eventolimpezaalicuota['id']), fecha_iso_to_js = fecha_iso_to_js )
     return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", objeto = eventolimpezaalicuota, usuario = usuario, lvl = "success", mensaje = "Actualizacion ha sido exitosa", ruta_cancelar = "/xpd_alicuotas/eventolimpezaalicuotas/" + str(eventolimpezaalicuota['id']), fecha_iso_to_js = fecha_iso_to_js )
 
-# CONFIG['rutas'].append({'ruta':'/eventolimpezaalicuotas/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_eventolimpezaalicuota })
+CONFIG['rutas'].append({'ruta':'/eventolimpezaalicuotas/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_eventolimpezaalicuota })
 
-def servir_page_insertar_eventolimpezaalicuota(id_eventolimpieza):
+def servir_page_insertar_eventolimpezaalicuota(id_abono):
 
     usuario = xpd_usr.getCurrentUser(request)
     if usuario is None:
         abort( 401, "Acceso no autorizado" )
 
     conexion = orm.Conexion(PATH_BDD)
-    eventolimpieza, id_usuario_owner = eventolimpieza_getowner( conexion , id_eventolimpieza)
-    alicuotas = []
-    if eventolimpieza is not None:
-        alicuotas = conexion.consultar("SELECT id as id, anio as anio, mes as mes, monto as monto, monto_pendiente as monto_pendiente, pagado as pagado, observaciones as observaciones, id_departamento as id_departamento FROM ALICUOTA  WHERE ID_DEPARTAMENTO = :id_departamento and PAGADO = '0' order by ANIO, MES", {'id_departamento':eventolimpieza['id_departamento']}, ['id', 'anio', 'mes', 'monto', 'monto_pendiente', 'pagado', 'observaciones', 'id_departamento'])
+    abono, id_usuario_owner = abono_getowner( conexion , id_abono)
     conexion.close()
-    if eventolimpieza is None or usuario['id'] != id_usuario_owner:
+    if abono is None or usuario['id'] != id_usuario_owner:
         abort( 403, "Acceso no autorizado" )
 
     eventolimpezaalicuota = EventoLimpezaAlicuotas.nuevoDiccionario()
     if request.method == "GET":        
-        return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", alicuotas = alicuotas, objeto = eventolimpezaalicuota, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/eventolimpiezas/" + str(id_eventolimpieza), fecha_iso_to_js = fecha_iso_to_js)
+        return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", objeto = eventolimpezaalicuota, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/abonos/" + str(id_abono), fecha_iso_to_js = fecha_iso_to_js)
     # A partir de este punto se asume POST
     mensajes_error = []
 
-    eventolimpezaalicuota['id_eventolimpieza'] = id_eventolimpieza
+    eventolimpezaalicuota['id_abono'] = id_abono
 
     eventolimpezaalicuota["id_alicuota"] = request.forms.get( "id_alicuota", "").strip()
         
@@ -771,14 +1395,37 @@ def servir_page_insertar_eventolimpezaalicuota(id_eventolimpieza):
         mensajes_error.append("El valor de id_alicuota no es válido")
 
     if len(mensajes_error) > 0:
-        return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", alicuotas = alicuotas, objeto = eventolimpezaalicuota, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/eventolimpiezas/" + str(id_eventolimpieza), fecha_iso_to_js = fecha_iso_to_js )    
+        return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", objeto = eventolimpezaalicuota, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/abonos/" + str(id_abono), fecha_iso_to_js = fecha_iso_to_js )    
     try:
         transaccionar(EventoLimpezaAlicuotas.insertar, eventolimpezaalicuota)
     except:
-        return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", alicuotas = alicuotas, objeto = eventolimpezaalicuota, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/eventolimpiezas/" + str(id_eventolimpieza), fecha_iso_to_js = fecha_iso_to_js )
+        return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", objeto = eventolimpezaalicuota, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/abonos/" + str(id_abono), fecha_iso_to_js = fecha_iso_to_js )
     return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/eventolimpezaalicuotas/" + str(eventolimpezaalicuota['id']) )
 
-CONFIG['rutas'].append({'ruta':'/eventolimpiezas/<id_eventolimpieza>/nuevoeventolimpezaalicuota', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_eventolimpezaalicuota })
+CONFIG['rutas'].append({'ruta':'/abonos/<id_abono>/nuevoeventolimpezaalicuota', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_eventolimpezaalicuota })
+
+def servir_page_eliminar_eventolimpezaalicuota(id):
+    usuario = xpd_usr.getCurrentUser(request)
+
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )
+
+    conexion = orm.Conexion(PATH_BDD)
+    eventolimpezaalicuota, id_usuario_owner = eventolimpezaalicuota_getowner( conexion , id)
+    conexion.close()
+    if eventolimpezaalicuota is None or usuario['id'] != id_usuario_owner:
+        abort( 403, "Acceso no autorizado" )
+    
+    if request.method != "GET":
+        abort( 404, "Metodo no Valido" )
+    try:
+        transaccionar(EventoLimpezaAlicuotas.eliminar, eventolimpezaalicuota)
+    except:
+    
+        return template("xpd_usr/mensaje", lvl = "danger", mensaje = "Error al eliminar objeto.", href ="/xpd_alicuotas/Abonos/" + str(eventolimpezaalicuota['id_Abono']) )
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/Abonos/" + str(eventolimpezaalicuota['id_Abono']) )
+    
+CONFIG['rutas'].append({'ruta':'/eventolimpezaalicuotas/<id>/eliminar', 'metodos':['GET','POST'], 'funcion': servir_page_eliminar_eventolimpezaalicuota })
 
 def servir_page_get_eventolimpezaalicuota_byid(id_eventolimpezaalicuota):
     usuario = xpd_usr.getCurrentUser(request)
@@ -826,3 +1473,41 @@ def rutearModulo( app : Bottle, ruta_base : str ):
     CONFIG['RUTA_BASE'] = ruta_base
     for item in CONFIG['rutas']:
         app.route( ruta_base + item['ruta'], method = item['metodos'] )( item['funcion'])
+
+def aplicarAbono(con, abono):
+    abono_registrado = Abonos.getNamedQuery(con, "findById", {"id":abono['id']})
+    assert len(abono_registrado) == 1 and abono_registrado[0]['aplicado'] == '0', "No se ha registrado abono" 
+    abono_registrado = abono_registrado[0]
+    abono_registrado['aplicado'] = '1'
+    Abonos.actualizar(con, abono_registrado)
+    id_departamento = abono["id_departamento"]
+    alicuotas = Alicuotas.getNamedQuery(con, "findByDepartamento", {"id_departamento":id_departamento})
+    alicuotas = [ x for x in alicuotas if x['pagado'] == '0']
+    departamento = Departamentos.getNamedQuery(con, "findById", {"id":id_departamento})
+    assert len(departamento) == 1 , "Referencia de Departamento no válida"
+    departamento = departamento[0]
+    condominio = Condominios.getNamedQuery(con, "findById", {"id":departamento['id_condominio']})
+    assert len(condominio) == 1 , "Referencia de Condominio no válida"
+    condominio = condominio[0]
+    monto = abono['monto']
+    for alicuota in alicuotas:
+        if monto == 0:
+            break
+        delta = 0.0
+        if alicuota['monto_pendiente'] <= monto:
+            delta = alicuota['monto_pendiente']
+            monto -= alicuota['monto_pendiente']
+            alicuota['monto_pendiente'] = 0.0
+        else:
+            delta = monto
+            alicuota['monto_pendiente'] -= monto
+            monto = 0.0
+        if alicuota['monto_pendiente'] <= 0.0:
+            alicuota['pagado'] = '1'
+        Alicuotas.actualizar(con, alicuota)
+        detalle_abono = {"id_abono":abono['id'], "id_alicuota":alicuota['id']}
+    departamento['saldo'] += abono['monto']
+    Departamentos.actualizar(con, departamento)
+    condominio['saldo'] += abono['monto']
+    Condominios.actualizar(con, condominio)
+            

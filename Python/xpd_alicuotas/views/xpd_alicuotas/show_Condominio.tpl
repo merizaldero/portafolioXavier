@@ -18,6 +18,15 @@
     </span>
 </div>
 
+<div class="row">
+    <span class="col">
+        saldo:
+    </span>
+    <span class="col">
+        {{objeto['saldo']}}
+    </span>
+</div>
+
     <div class="d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="/xpd_alicuotas/condominios">
             Volver
@@ -33,7 +42,15 @@
     <ul class="mt-3 nav nav-tabs nav-justified">
 
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#divDepartamentos">Departamentos</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#divDepartamentos">Departamentos ({{len(departamentos)}})</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link " data-bs-toggle="tab" href="#divTransaccions">Transaccions ({{len(transaccions)}})</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link " data-bs-toggle="tab" href="#divEgresos">Egresos ({{len(egresos)}})</a>
         </li>
 
     </ul>
@@ -61,6 +78,10 @@
                         </th>
 
                         <th>
+                            Saldo
+                        </th>
+
+                        <th>
                             <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevodepartamento">Crear Nuevo</a>
                         </th>
                     </tr>
@@ -68,7 +89,7 @@
                 <tbody>
 % if len(departamentos) == 0:
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             No hay registros disponibles
                         </td>
                     </tr>
@@ -79,8 +100,140 @@
                         <td>{{departamento['numero_dep']}}</td>
                         <td>{{departamento['propietario']}}</td>
                         <td>{{departamento['arrendatario']}}</td>
+                        <td>{{departamento['saldo']}}</td>
                         <td>
                             <a class="btn btn-primary" href = "/xpd_alicuotas/departamentos/{{departamento['id']}}">Mostrar</a>
+                        </td>
+                    </tr>
+% end
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane container fade" id="divTransaccions">
+            <table class="mt-2 table table-striped">
+                <thead>
+                    <tr>
+
+                        <th>
+                            Id
+                        </th>
+
+                        <th>
+                            Fecha
+                        </th>
+
+                        <th>
+                            Concepto
+                        </th>
+
+                        <th>
+                            Monto
+                        </th>
+
+                        <th>
+                            Saldo_antes
+                        </th>
+
+                        <th>
+                            Saldo_despues
+                        </th>
+
+                        <th>
+                            Anulado
+                        </th>
+
+                        <th>
+                            Id_abono
+                        </th>
+
+                        <th>
+                            Id_egreso
+                        </th>
+
+                        <th>
+                            <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevotransaccion">Crear Nuevo</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+% if len(transaccions) == 0:
+                    <tr>
+                        <td colspan="9">
+                            No hay registros disponibles
+                        </td>
+                    </tr>
+% end
+% for transaccion in transaccions:
+                    <tr>
+                        <td>{{transaccion['id']}}</td>
+                        <td>{{transaccion['fecha']}}</td>
+                        <td>{{transaccion['concepto']}}</td>
+                        <td>{{transaccion['monto']}}</td>
+                        <td>{{transaccion['saldo_antes']}}</td>
+                        <td>{{transaccion['saldo_despues']}}</td>
+                        <td>{{transaccion['anulado']}}</td>
+                        <td>{{transaccion['id_abono']}}</td>
+                        <td>{{transaccion['id_egreso']}}</td>
+                        <td>
+                            <a class="btn btn-primary" href = "/xpd_alicuotas/transaccions/{{transaccion['id']}}">Mostrar</a>
+                        </td>
+                    </tr>
+% end
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane container fade" id="divEgresos">
+            <table class="mt-2 table table-striped">
+                <thead>
+                    <tr>
+
+                        <th>
+                            Id
+                        </th>
+
+                        <th>
+                            Fecha
+                        </th>
+
+                        <th>
+                            Destino
+                        </th>
+
+                        <th>
+                            Monto
+                        </th>
+
+                        <th>
+                            Observaciones
+                        </th>
+
+                        <th>
+                            Anulado
+                        </th>
+
+                        <th>
+                            <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevoegreso">Crear Nuevo</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+% if len(egresos) == 0:
+                    <tr>
+                        <td colspan="6">
+                            No hay registros disponibles
+                        </td>
+                    </tr>
+% end
+% for egreso in egresos:
+                    <tr>
+                        <td>{{egreso['id']}}</td>
+                        <td>{{egreso['fecha']}}</td>
+                        <td>{{egreso['destino']}}</td>
+                        <td>{{egreso['monto']}}</td>
+                        <td>{{egreso['observaciones']}}</td>
+                        <td>{{egreso['anulado']}}</td>
+                        <td>
+                            <a class="btn btn-primary" href = "/xpd_alicuotas/egresos/{{egreso['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end

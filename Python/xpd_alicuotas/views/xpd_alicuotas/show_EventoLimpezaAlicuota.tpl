@@ -19,7 +19,7 @@
 </div>
 
     <div class="d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
-        <a class="btn btn-secondary" href="/xpd_alicuotas/eventolimpiezas/{{objeto['id_eventolimpieza']}}">
+        <a class="btn btn-secondary" href="/xpd_alicuotas/abonos/{{objeto['id_abono']}}">
             Volver
         </a>
         <a class="btn btn-primary" href="/xpd_alicuotas/eventolimpezaalicuotas/{{objeto['id']}}/editar">

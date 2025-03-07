@@ -17,6 +17,17 @@
 
 </div>
 
+<div class="row">
+    <label class="col form-label" for="saldo">
+    saldo*:
+    </label>
+
+<span class="col">
+        <input class="form-control" type="number" name="saldo" value="{{objeto['saldo']}}" maxlength="0">
+    </span>
+
+</div>
+
     <div class="mt-5 d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="{{ruta_cancelar}}">
             Cancelar

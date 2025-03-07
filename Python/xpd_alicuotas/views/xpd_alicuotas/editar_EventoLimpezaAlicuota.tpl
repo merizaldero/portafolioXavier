@@ -5,43 +5,17 @@
 </div>
 % end
 <form method="POST" enctype="multipart/form-data">
-    <div class="row">
-        <label class="col form-label" for="id_alicuota">
-        Seleccionar Al&iacute;cuota pendiente:
-        </label>
-    </div>
-    <table class="mt-2 table table-striped">
-        <thead>
-            <tr>
 
-                <th>
-                    
-                </th>
+<div class="row">
+    <label class="col form-label" for="id_alicuota">
+    id_alicuota*:
+    </label>
 
-                <th>
-                    Anio / Mes
-                </th>
+<span class="col">
+        <input class="form-control" type="number" name="id_alicuota" value="{{objeto['id_alicuota']}}" maxlength="0">
+    </span>
 
-                <th>
-                    Monto
-                </th>
-
-                <th>
-                    Observaciones
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-% for indice, alicuota in enumerate(alicuotas):
-            <tr>
-                <td><input type="radio" name="id_alicuota" value="{{alicuota['id']}}"></td>
-                <td>{{alicuota['anio']}} / {{alicuota['mes']}}</td>
-                <td>{{alicuota['monto']}}</td>
-                <td>{{alicuota['observaciones']}}</td>
-            </tr>
-% end
-        </tbody>
-    </table>
+</div>
 
     <div class="mt-5 d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="{{ruta_cancelar}}">

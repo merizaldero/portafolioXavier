@@ -3,6 +3,7 @@
     <thead>
     <tr>        <th>Id</th>
         <th>Nombre</th>
+        <th>Saldo</th>
 
         <th>Mover</th>
         <th>
@@ -13,7 +14,7 @@
     <tbody>
 % if len(lista) == 0:
     <tr>
-    <td colspan = "2">No se ha encontrado registros</td>
+    <td colspan = "3">No se ha encontrado registros</td>
     </tr>
 % end
 % for objeto in lista:
@@ -23,6 +24,9 @@
         </td>
         <td>
             {{objeto['nombre']}}
+        </td>
+        <td>
+            {{objeto['saldo']}}
         </td>
         <td></td>
         <td>

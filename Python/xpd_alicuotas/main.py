@@ -42,16 +42,19 @@ def __exit():
     global server
     server.stop()
 
-@app.route('/static/<filepath:path>')
+# @app.route('/static/<filepath:path>')
 def server_static(filepath):
     return static_file(filepath, root = dirname(abspath(__file__)) + '/static')
+app.route('/static/<filepath:path>')(server_static)
 
-@app.route('/')
+#@app.route('/')
 def server_home():
     usuario = xpd_usr.getCurrentUser(request)
     if usuario is None:
         redirect('/login')
     redirect('/xpd_alicuotas/main')
+
+app.route('/', method='GET')(server_home)
 
 ######### WEBAPP ROUTERS WRITE YOUR CODE BELOW###############
 
@@ -61,7 +64,7 @@ xpd_alicuotas.rutearModulo(app, '/xpd_alicuotas')
 
 ######### WEBAPP ROUTERS ###############
 
-# app.route('/', method='GET')(home)
+app.route('/', method='GET')(server_home)
 # app.route('/__exit', method=['GET','HEAD'])(__exit)
 # app.route('/assets/<filepath:path>', method='GET')(server_static)
 

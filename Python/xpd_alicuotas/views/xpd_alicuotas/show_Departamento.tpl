@@ -36,6 +36,15 @@
     </span>
 </div>
 
+<div class="row">
+    <span class="col">
+        saldo:
+    </span>
+    <span class="col">
+        {{objeto['saldo']}}
+    </span>
+</div>
+
     <div class="d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="/xpd_alicuotas/condominios/{{objeto['id_condominio']}}">
             Volver
@@ -51,11 +60,11 @@
     <ul class="mt-3 nav nav-tabs nav-justified">
 
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#divAlicuotas">Alicuotas</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#divAlicuotas">Alicuotas ({{len(alicuotas)}})</a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link " data-bs-toggle="tab" href="#divEventoLimpiezas">EventoLimpiezas</a>
+            <a class="nav-link " data-bs-toggle="tab" href="#divAbonos">Abonos ({{len(abonos)}})</a>
         </li>
 
     </ul>
@@ -87,10 +96,6 @@
                         </th>
 
                         <th>
-                            Pagado
-                        </th>
-
-                        <th>
                             Observaciones
                         </th>
 
@@ -113,8 +118,11 @@
                         <td>{{alicuota['anio']}}</td>
                         <td>{{alicuota['mes']}}</td>
                         <td>{{alicuota['monto']}}</td>
-                        <td>{{alicuota['monto_pendiente']}}</td>
-                        <td>{{alicuota['pagado']}}</td>
+%if alicuota['pagado'] == '0':
+                        <td class="text-bg-danger">{{alicuota['monto_pendiente']}}</td>
+% else:
+                        <td class="text-bg-info">{{alicuota['monto_pendiente']}}</td>
+% end
                         <td>{{alicuota['observaciones']}}</td>
                         <td>
                             <a class="btn btn-primary" href = "/xpd_alicuotas/alicuotas/{{alicuota['id']}}">Mostrar</a>
@@ -124,7 +132,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="tab-pane container fade" id="divEventoLimpiezas">
+        <div class="tab-pane container fade" id="divAbonos">
             <table class="mt-2 table table-striped">
                 <thead>
                     <tr>
@@ -138,7 +146,7 @@
                         </th>
 
                         <th>
-                            Fecha_validacion
+                            Monto
                         </th>
 
                         <th>
@@ -146,26 +154,40 @@
                         </th>
 
                         <th>
-                            <a class="btn btn-primary" href="/xpd_alicuotas/departamentos/{{objeto['id']}}/nuevoeventolimpieza">Crear Nuevo</a>
+                            Anulado
+                        </th>
+
+                        <th>
+                            Id_egreso
+                        </th>
+
+                        <th>
+                            <a class="btn btn-primary" href="/xpd_alicuotas/departamentos/{{objeto['id']}}/nuevoabono">Crear Nuevo</a>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-% if len(eventolimpiezas) == 0:
+% if len(abonos) == 0:
                     <tr>
-                        <td colspan="4">
+                        <td colspan="6">
                             No hay registros disponibles
                         </td>
                     </tr>
 % end
-% for eventolimpieza in eventolimpiezas:
+% for abono in abonos:
                     <tr>
-                        <td>{{eventolimpieza['id']}}</td>
-                        <td>{{eventolimpieza['fecha']}}</td>
-                        <td>{{eventolimpieza['fecha_validacion']}}</td>
-                        <td>{{eventolimpieza['observacion']}}</td>
+                        <td>{{abono['id']}}</td>
+                        <td>{{abono['fecha']}}</td>
+                        <td>{{abono['monto']}}</td>
+                        <td>{{abono['observacion']}}</td>
+% if abono['aplicado'] == "1":
+                        <td class="text-bg-success">APROBADO</td>
+% else:
+                        <td class="text-bg-warning">Pendiente Rev</td>
+% end
+                        <td>{{abono['id_egreso']}}</td>
                         <td>
-                            <a class="btn btn-primary" href = "/xpd_alicuotas/eventolimpiezas/{{eventolimpieza['id']}}">Mostrar</a>
+                            <a class="btn btn-primary" href = "/xpd_alicuotas/abonos/{{abono['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end
