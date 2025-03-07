@@ -174,6 +174,10 @@
                         </th>
 
                         <th>
+                            Aplicado_saldo
+                        </th>
+
+                        <th>
                             <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/departamentos/{{objeto['id']}}/nuevoabono">Crear Nuevo</a>
                         </th>
                     </tr>
@@ -181,7 +185,7 @@
                 <tbody>
 % if len(abonos) == 0:
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             No hay registros disponibles
                         </td>
                     </tr>
@@ -201,6 +205,7 @@
                         <td class="text-bg-warning">Pendiente Rev</td>
 % end
                         <td>{{abono['id_egreso']}}</td>
+                        <td>{{abono['aplicado_saldo']}}</td>
                         <td>
                             <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/abonos/{{abono['id']}}">Mostrar</a>
                         </td>

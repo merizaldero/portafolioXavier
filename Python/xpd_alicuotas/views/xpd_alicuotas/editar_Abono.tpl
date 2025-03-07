@@ -94,6 +94,17 @@
 
 </div>
 
+<div class="row">
+    <label class="col form-label" for="aplicado_saldo">
+    aplicado_saldo*:
+    </label>
+
+    <span class="col">
+        <input class="form-check form-switch" type="checkbox" name="aplicado_saldo" value="1">
+    </span>
+
+</div>
+
     <div class="mt-5 d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="{{ruta_cancelar}}">
             Cancelar

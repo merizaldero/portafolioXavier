@@ -98,7 +98,7 @@ Egresos.setMetamodelo({
         ],
     'namedQueries' : [
         { 'nombre':'findById', 'whereClause':['id'], },
-        { 'nombre':'findByCondominio', 'whereClause':['id_condominio'], },
+        { 'nombre':'findByCondominio', 'whereClause':['id_condominio'], 'orderBy':['fecha']},
         ]
     })
 
@@ -139,7 +139,7 @@ Abonos.setMetamodelo({
         ],
     'namedQueries' : [
         { 'nombre':'findById', 'whereClause':['id'], },
-        { 'nombre':'findByDepartamento', 'whereClause':['id_departamento'], },
+        { 'nombre':'findByDepartamento', 'whereClause':['id_departamento'], 'orderBy':['fecha'] },
         ]
     })
 
@@ -149,7 +149,8 @@ EventoLimpezaAlicuotas.setMetamodelo({
     'propiedades' : [
         { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
         { 'nombre':'id_alicuota', 'nombreCampo':'ID_ALICUOTA', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
-        { 'nombre':'id_abono', 'nombreCampo':'ID_ABONO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
+        { 'nombre':'monto', 'nombreCampo':'MONTO', 'tipo':orm.XPDREAL, 'tamano': 5, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'id_abono', 'nombreCampo':'ID_ABONO', 'tipo':orm.XPDINTEGER, 'incremental': False, },        
         ],
     'namedQueries' : [
         { 'nombre':'fkAlicuota', 'whereClause':['id_alicuota'], },
@@ -1240,6 +1241,10 @@ def servir_page_editar_abono(id):
     except:
         mensajes_error.append("El valor de id_egreso no es válido")
 
+    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
+        
+    abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
+
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )    
     try:
@@ -1324,6 +1329,10 @@ def servir_page_insertar_abono(id_departamento):
         abono["id_egreso"] = int( abono["id_egreso"] )
     except:
         mensajes_error.append("El valor de id_egreso no es válido")
+
+    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
+        
+    abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )    
@@ -1535,8 +1544,10 @@ def aplicarAbonos(con, id_departamento):
     assert len(condominio) == 1 , "Referencia de Condominio no válida"
     condominio = condominio[0]
 
-    alicuotas = con.consultar('',{'id_departamento': id_departamento}, [])
-    abonos = con.consultar('',{'id_departamento': id_departamento}, [])
+    alicuotas = Alicuotas.getNamedQuery(con, "findByDepartamento",{"id_departamento":id_departamento})
+    alicuotas = [ x for x in alicuotas if x['pagado'] == '0']
+    abonos = Abonos.getNamedQuery(con, "findByDepartamento",{"id_departamento":id_departamento})
+    abonos = [ x for x in abonos if x['aplicado'] == '1' and x['monto_por_aplicar'] > 0.0 ]
 
     it_alicuotas = iter(alicuotas)
     alicuota = None
@@ -1555,7 +1566,7 @@ def aplicarAbonos(con, id_departamento):
             abono['aplicado_saldo'] = "1"
             
             if abono['genera_egreso'] == '1':
-                egreso = {'fecha':abono['fecha'], 'destino':departamento['propietario'] , 'monto':abono['monto_aprobado'], 'observaciones': abono['observaciones'], 'anulado':'0', 'id_condominio':condominio['id'] }
+                egreso = {'fecha':abono['fecha'], 'destino':departamento['propietario'] , 'monto':abono['monto_aprobado'], 'observaciones': abono['observacion'], 'anulado':'0', 'id_condominio':condominio['id'] }
                 Egresos.insertar(con, egreso)
                 aplicarEgreso(con, egreso)
                 abono['id_egreso'] = egreso['id']
@@ -1585,4 +1596,17 @@ def aplicarAbonos(con, id_departamento):
                 except StopIteration:
                     alicuota = None
 
-            
+def aplicarEgreso(con, egreso):
+    egreso_persistente = Egresos.getNamedQuery(con, "findById", {'id':egreso['id']})
+    assert len(egreso_persistente) == 1 and egreso_persistente[0]['anulado'] == '0', "Registro de egreso no es valido"
+    egreso_persistente = egreso_persistente[0]
+    
+    condominio = Condominios.getNamedQuery(con, "findById", {"id":egreso_persistente['id_condominio']})
+    assert len(condominio) == 1 , "Referencia de Condominio no válida"
+    condominio = condominio[0]
+
+    condominio['saldo'] -= egreso['monto']
+    Condominios.actualizar(con, condominio)
+
+
+

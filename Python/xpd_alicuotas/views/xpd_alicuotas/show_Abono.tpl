@@ -81,6 +81,15 @@
     </span>
 </div>
 
+<div class="row">
+    <span class="col">
+        aplicado_saldo:
+    </span>
+    <span class="col">
+        {{objeto['aplicado_saldo']}}
+    </span>
+</div>
+
     <div class="d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="/xpd_alicuotas/departamentos/{{objeto['id_departamento']}}">
             Volver
