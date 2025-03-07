@@ -29,6 +29,28 @@
 </div>
 
 <div class="row">
+    <label class="col form-label" for="monto_aprobado">
+    monto_aprobado*:
+    </label>
+
+<span class="col">
+        <input class="form-control" type="number" name="monto_aprobado" value="{{objeto['monto_aprobado']}}" maxlength="5">
+    </span>
+
+</div>
+
+<div class="row">
+    <label class="col form-label" for="monto_por_aplicar">
+    monto_por_aplicar*:
+    </label>
+
+<span class="col">
+        <input class="form-control" type="number" name="monto_por_aplicar" value="{{objeto['monto_por_aplicar']}}" maxlength="5">
+    </span>
+
+</div>
+
+<div class="row">
     <label class="col form-label" for="observacion">
     observacion:
     </label>
@@ -40,12 +62,23 @@
 </div>
 
 <div class="row">
-    <label class="col form-label" for="anulado">
-    anulado*:
+    <label class="col form-label" for="genera_egreso">
+    genera_egreso*:
     </label>
 
     <span class="col">
-        <input class="form-check form-switch" type="checkbox" name="anulado" value="1">
+        <input class="form-check form-switch" type="checkbox" name="genera_egreso" value="1">
+    </span>
+
+</div>
+
+<div class="row">
+    <label class="col form-label" for="aplicado">
+    aplicado*:
+    </label>
+
+    <span class="col">
+        <input class="form-check form-switch" type="checkbox" name="aplicado" value="1">
     </span>
 
 </div>

@@ -29,6 +29,24 @@
 
 <div class="row">
     <span class="col">
+        monto_aprobado:
+    </span>
+    <span class="col">
+        {{objeto['monto_aprobado']}}
+    </span>
+</div>
+
+<div class="row">
+    <span class="col">
+        monto_por_aplicar:
+    </span>
+    <span class="col">
+        {{objeto['monto_por_aplicar']}}
+    </span>
+</div>
+
+<div class="row">
+    <span class="col">
         observacion:
     </span>
     <span class="col">
@@ -38,10 +56,19 @@
 
 <div class="row">
     <span class="col">
-        anulado:
+        genera_egreso:
     </span>
     <span class="col">
-        {{objeto['anulado']}}
+        {{objeto['genera_egreso']}}
+    </span>
+</div>
+
+<div class="row">
+    <span class="col">
+        aplicado:
+    </span>
+    <span class="col">
+        {{objeto['aplicado']}}
     </span>
 </div>
 
@@ -76,9 +103,9 @@
     <div class="tab-content">    
 
         <div class="tab-pane container active" id="divEventoLimpezaAlicuotas">
-            <table class="mt-2 table table-striped">
+            <table class="mt-2 table table-striped small">
                 <thead>
-                    <tr>
+                    <tr class="small">
 
                         <th>
                             Id
@@ -89,7 +116,7 @@
                         </th>
 
                         <th>
-                            <a class="btn btn-primary" href="/xpd_alicuotas/abonos/{{objeto['id']}}/nuevoeventolimpezaalicuota">Crear Nuevo</a>
+                            <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/abonos/{{objeto['id']}}/nuevoeventolimpezaalicuota">Crear Nuevo</a>
                         </th>
                     </tr>
                 </thead>
@@ -102,11 +129,11 @@
                     </tr>
 % end
 % for eventolimpezaalicuota in eventolimpezaalicuotas:
-                    <tr>
+                    <tr class="small">
                         <td>{{eventolimpezaalicuota['id']}}</td>
                         <td>{{eventolimpezaalicuota['id_alicuota']}}</td>
                         <td>
-                            <a class="btn btn-primary" href = "/xpd_alicuotas/eventolimpezaalicuotas/{{eventolimpezaalicuota['id']}}">Mostrar</a>
+                            <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/eventolimpezaalicuotas/{{eventolimpezaalicuota['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end

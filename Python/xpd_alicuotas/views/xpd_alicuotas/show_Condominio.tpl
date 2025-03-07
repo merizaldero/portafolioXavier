@@ -57,9 +57,9 @@
     <div class="tab-content">    
 
         <div class="tab-pane container active" id="divDepartamentos">
-            <table class="mt-2 table table-striped">
+            <table class="mt-2 table table-striped small">
                 <thead>
-                    <tr>
+                    <tr class="small">
 
                         <th>
                             Id
@@ -82,7 +82,7 @@
                         </th>
 
                         <th>
-                            <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevodepartamento">Crear Nuevo</a>
+                            <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevodepartamento">Crear Nuevo</a>
                         </th>
                     </tr>
                 </thead>
@@ -95,14 +95,14 @@
                     </tr>
 % end
 % for departamento in departamentos:
-                    <tr>
+                    <tr class="small">
                         <td>{{departamento['id']}}</td>
                         <td>{{departamento['numero_dep']}}</td>
                         <td>{{departamento['propietario']}}</td>
                         <td>{{departamento['arrendatario']}}</td>
                         <td>{{departamento['saldo']}}</td>
                         <td>
-                            <a class="btn btn-primary" href = "/xpd_alicuotas/departamentos/{{departamento['id']}}">Mostrar</a>
+                            <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/departamentos/{{departamento['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end
@@ -110,9 +110,9 @@
             </table>
         </div>
         <div class="tab-pane container fade" id="divTransaccions">
-            <table class="mt-2 table table-striped">
+            <table class="mt-2 table table-striped small">
                 <thead>
-                    <tr>
+                    <tr class="small">
 
                         <th>
                             Id
@@ -151,7 +151,7 @@
                         </th>
 
                         <th>
-                            <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevotransaccion">Crear Nuevo</a>
+                            <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevotransaccion">Crear Nuevo</a>
                         </th>
                     </tr>
                 </thead>
@@ -164,7 +164,7 @@
                     </tr>
 % end
 % for transaccion in transaccions:
-                    <tr>
+                    <tr class="small">
                         <td>{{transaccion['id']}}</td>
                         <td>{{transaccion['fecha']}}</td>
                         <td>{{transaccion['concepto']}}</td>
@@ -175,7 +175,7 @@
                         <td>{{transaccion['id_abono']}}</td>
                         <td>{{transaccion['id_egreso']}}</td>
                         <td>
-                            <a class="btn btn-primary" href = "/xpd_alicuotas/transaccions/{{transaccion['id']}}">Mostrar</a>
+                            <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/transaccions/{{transaccion['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end
@@ -183,9 +183,9 @@
             </table>
         </div>
         <div class="tab-pane container fade" id="divEgresos">
-            <table class="mt-2 table table-striped">
+            <table class="mt-2 table table-striped small">
                 <thead>
-                    <tr>
+                    <tr class="small">
 
                         <th>
                             Id
@@ -212,7 +212,7 @@
                         </th>
 
                         <th>
-                            <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevoegreso">Crear Nuevo</a>
+                            <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/condominios/{{objeto['id']}}/nuevoegreso">Crear Nuevo</a>
                         </th>
                     </tr>
                 </thead>
@@ -225,7 +225,7 @@
                     </tr>
 % end
 % for egreso in egresos:
-                    <tr>
+                    <tr class="small">
                         <td>{{egreso['id']}}</td>
                         <td>{{egreso['fecha']}}</td>
                         <td>{{egreso['destino']}}</td>
@@ -233,7 +233,7 @@
                         <td>{{egreso['observaciones']}}</td>
                         <td>{{egreso['anulado']}}</td>
                         <td>
-                            <a class="btn btn-primary" href = "/xpd_alicuotas/egresos/{{egreso['id']}}">Mostrar</a>
+                            <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/egresos/{{egreso['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end

@@ -71,9 +71,9 @@
     <div class="tab-content">    
 
         <div class="tab-pane container active" id="divAlicuotas">
-            <table class="mt-2 table table-striped">
+            <table class="mt-2 table table-striped small">
                 <thead>
-                    <tr>
+                    <tr class="small">
 
                         <th>
                             Id
@@ -100,7 +100,7 @@
                         </th>
 
                         <th>
-                            <a class="btn btn-primary" href="/xpd_alicuotas/departamentos/{{objeto['id']}}/nuevoalicuota">Crear Nuevo</a>
+                            <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/departamentos/{{objeto['id']}}/nuevoalicuota">Crear Nuevo</a>
                         </th>
                     </tr>
                 </thead>
@@ -113,7 +113,7 @@
                     </tr>
 % end
 % for alicuota in alicuotas:
-                    <tr>
+                    <tr class="small">
                         <td>{{alicuota['id']}}</td>
                         <td>{{alicuota['anio']}}</td>
                         <td>{{alicuota['mes']}}</td>
@@ -125,7 +125,7 @@
 % end
                         <td>{{alicuota['observaciones']}}</td>
                         <td>
-                            <a class="btn btn-primary" href = "/xpd_alicuotas/alicuotas/{{alicuota['id']}}">Mostrar</a>
+                            <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/alicuotas/{{alicuota['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end
@@ -133,9 +133,9 @@
             </table>
         </div>
         <div class="tab-pane container fade" id="divAbonos">
-            <table class="mt-2 table table-striped">
+            <table class="mt-2 table table-striped small">
                 <thead>
-                    <tr>
+                    <tr class="small">
 
                         <th>
                             Id
@@ -150,11 +150,23 @@
                         </th>
 
                         <th>
+                            Monto_aprobado
+                        </th>
+
+                        <th>
+                            Monto_por_aplicar
+                        </th>
+
+                        <th>
                             Observacion
                         </th>
 
                         <th>
-                            Anulado
+                            Genera_egreso
+                        </th>
+
+                        <th>
+                            Aplicado
                         </th>
 
                         <th>
@@ -162,24 +174,27 @@
                         </th>
 
                         <th>
-                            <a class="btn btn-primary" href="/xpd_alicuotas/departamentos/{{objeto['id']}}/nuevoabono">Crear Nuevo</a>
+                            <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/departamentos/{{objeto['id']}}/nuevoabono">Crear Nuevo</a>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
 % if len(abonos) == 0:
                     <tr>
-                        <td colspan="6">
+                        <td colspan="9">
                             No hay registros disponibles
                         </td>
                     </tr>
 % end
 % for abono in abonos:
-                    <tr>
+                    <tr class="small">
                         <td>{{abono['id']}}</td>
                         <td>{{abono['fecha']}}</td>
                         <td>{{abono['monto']}}</td>
+                        <td>{{abono['monto_aprobado']}}</td>
+                        <td>{{abono['monto_por_aplicar']}}</td>
                         <td>{{abono['observacion']}}</td>
+                        <td>{{abono['genera_egreso']}}</td>
 % if abono['aplicado'] == "1":
                         <td class="text-bg-success">APROBADO</td>
 % else:
@@ -187,7 +202,7 @@
 % end
                         <td>{{abono['id_egreso']}}</td>
                         <td>
-                            <a class="btn btn-primary" href = "/xpd_alicuotas/abonos/{{abono['id']}}">Mostrar</a>
+                            <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/abonos/{{abono['id']}}">Mostrar</a>
                         </td>
                     </tr>
 % end

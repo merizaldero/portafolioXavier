@@ -128,9 +128,12 @@ Abonos.setMetamodelo({
         { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
         { 'nombre':'fecha', 'nombreCampo':'FECHA', 'tipo':orm.XPDDATE, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
         { 'nombre':'monto', 'nombreCampo':'MONTO', 'tipo':orm.XPDREAL, 'tamano': 5, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'monto_aprobado', 'nombreCampo':'MONTO_APROBADO', 'tipo':orm.XPDREAL, 'tamano': 5, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'monto_por_aplicar', 'nombreCampo':'MONTO_POR_APLICAR', 'tipo':orm.XPDREAL, 'tamano': 5, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'observacion', 'nombreCampo':'OBSERVACION', 'tipo':orm.XPDSTRING, 'tamano':256, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'genera_egreso', 'nombreCampo':'GENERA_EGRESO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
         { 'nombre':'aplicado', 'nombreCampo':'APLICADO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
+        { 'nombre':'aplicado_saldo', 'nombreCampo':'APLICADO_SALDO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'id_egreso', 'nombreCampo':'ID_EGRESO', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
         { 'nombre':'id_departamento', 'nombreCampo':'ID_DEPARTAMENTO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
         ],
@@ -1197,14 +1200,38 @@ def servir_page_editar_abono(id):
     except:
         mensajes_error.append("El valor de monto no es válido")
 
+    abono["monto_aprobado"] = request.forms.get( "monto_aprobado", "").strip()
+        
+    if len(abono["monto_aprobado"]) == 0:
+        mensajes_error.append("monto_aprobado es requerido")
+
+    try:
+        abono["monto_aprobado"] = float( abono["monto_aprobado"] )
+    except:
+        mensajes_error.append("El valor de monto_aprobado no es válido")
+
+    abono["monto_por_aplicar"] = request.forms.get( "monto_por_aplicar", "").strip()
+        
+    if len(abono["monto_por_aplicar"]) == 0:
+        mensajes_error.append("monto_por_aplicar es requerido")
+
+    try:
+        abono["monto_por_aplicar"] = float( abono["monto_por_aplicar"] )
+    except:
+        mensajes_error.append("El valor de monto_por_aplicar no es válido")
+
     abono["observacion"] = request.forms.get( "observacion", "").strip()
         
     if len(abono["observacion"]) > 256:
         mensajes_error.append("El tamaño de observacion excede el permitido")
 
-    abono["anulado"] = request.forms.get( "anulado", "").strip()
+    abono["genera_egreso"] = request.forms.get( "genera_egreso", "").strip()
         
-    abono["anulado"] = abono["anulado"] == "1"
+    abono["genera_egreso"] = abono["genera_egreso"] == "1"
+
+    abono["aplicado"] = request.forms.get( "aplicado", "").strip()
+        
+    abono["aplicado"] = abono["aplicado"] == "1"
 
     abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
         
@@ -1258,14 +1285,38 @@ def servir_page_insertar_abono(id_departamento):
     except:
         mensajes_error.append("El valor de monto no es válido")
 
+    abono["monto_aprobado"] = request.forms.get( "monto_aprobado", "").strip()
+        
+    if len(abono["monto_aprobado"]) == 0:
+        mensajes_error.append("monto_aprobado es requerido")
+
+    try:
+        abono["monto_aprobado"] = float( abono["monto_aprobado"] )
+    except:
+        mensajes_error.append("El valor de monto_aprobado no es válido")
+
+    abono["monto_por_aplicar"] = request.forms.get( "monto_por_aplicar", "").strip()
+        
+    if len(abono["monto_por_aplicar"]) == 0:
+        mensajes_error.append("monto_por_aplicar es requerido")
+
+    try:
+        abono["monto_por_aplicar"] = float( abono["monto_por_aplicar"] )
+    except:
+        mensajes_error.append("El valor de monto_por_aplicar no es válido")
+
     abono["observacion"] = request.forms.get( "observacion", "").strip()
         
     if len(abono["observacion"]) > 256:
         mensajes_error.append("El tamaño de observacion excede el permitido")
 
-    abono["anulado"] = request.forms.get( "anulado", "").strip()
+    abono["genera_egreso"] = request.forms.get( "genera_egreso", "").strip()
         
-    abono["anulado"] = abono["anulado"] == "1"
+    abono["genera_egreso"] = abono["genera_egreso"] == "1"
+
+    abono["aplicado"] = request.forms.get( "aplicado", "").strip()
+        
+    abono["aplicado"] = abono["aplicado"] == "1"
 
     abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
         
@@ -1474,40 +1525,64 @@ def rutearModulo( app : Bottle, ruta_base : str ):
     for item in CONFIG['rutas']:
         app.route( ruta_base + item['ruta'], method = item['metodos'] )( item['funcion'])
 
-def aplicarAbono(con, abono):
-    abono_registrado = Abonos.getNamedQuery(con, "findById", {"id":abono['id']})
-    assert len(abono_registrado) == 1 and abono_registrado[0]['aplicado'] == '0', "No se ha registrado abono" 
-    abono_registrado = abono_registrado[0]
-    abono_registrado['aplicado'] = '1'
-    Abonos.actualizar(con, abono_registrado)
-    id_departamento = abono["id_departamento"]
-    alicuotas = Alicuotas.getNamedQuery(con, "findByDepartamento", {"id_departamento":id_departamento})
-    alicuotas = [ x for x in alicuotas if x['pagado'] == '0']
+def aplicarAbonos(con, id_departamento):
+
     departamento = Departamentos.getNamedQuery(con, "findById", {"id":id_departamento})
     assert len(departamento) == 1 , "Referencia de Departamento no válida"
     departamento = departamento[0]
+
     condominio = Condominios.getNamedQuery(con, "findById", {"id":departamento['id_condominio']})
     assert len(condominio) == 1 , "Referencia de Condominio no válida"
     condominio = condominio[0]
-    monto = abono['monto']
-    for alicuota in alicuotas:
-        if monto == 0:
-            break
-        delta = 0.0
-        if alicuota['monto_pendiente'] <= monto:
-            delta = alicuota['monto_pendiente']
-            monto -= alicuota['monto_pendiente']
-            alicuota['monto_pendiente'] = 0.0
-        else:
-            delta = monto
-            alicuota['monto_pendiente'] -= monto
-            monto = 0.0
-        if alicuota['monto_pendiente'] <= 0.0:
-            alicuota['pagado'] = '1'
-        Alicuotas.actualizar(con, alicuota)
-        detalle_abono = {"id_abono":abono['id'], "id_alicuota":alicuota['id']}
-    departamento['saldo'] += abono['monto']
-    Departamentos.actualizar(con, departamento)
-    condominio['saldo'] += abono['monto']
-    Condominios.actualizar(con, condominio)
+
+    alicuotas = con.consultar('',{'id_departamento': id_departamento}, [])
+    abonos = con.consultar('',{'id_departamento': id_departamento}, [])
+
+    it_alicuotas = iter(alicuotas)
+    alicuota = None
+    try:
+        alicuota = next(it_alicuotas)
+    except StopIteration:
+        pass
+
+    for abono in abonos:
+
+        if abono['aplicado_saldo'] == "0" :            
+            departamento['saldo'] += abono['monto_aprobado']
+            Departamentos.actualizar(con, departamento)
+            condominio['saldo'] += abono['monto_aprobado']
+            Condominios.actualizar(con, condominio)            
+            abono['aplicado_saldo'] = "1"
+            
+            if abono['genera_egreso'] == '1':
+                egreso = {'fecha':abono['fecha'], 'destino':departamento['propietario'] , 'monto':abono['monto_aprobado'], 'observaciones': abono['observaciones'], 'anulado':'0', 'id_condominio':condominio['id'] }
+                Egresos.insertar(con, egreso)
+                aplicarEgreso(con, egreso)
+                abono['id_egreso'] = egreso['id']
+
+            Abonos.actualizar(con, abono)
+
+        while abono['monto_por_aplicar'] > 0.0:
+            if alicuota is None:
+                break
+            
+            delta = abono['monto_por_aplicar'] if abono['monto_por_aplicar'] < alicuota['monto_pendiente'] else alicuota['monto_pendiente']
+            abono['monto_por_aplicar'] -= delta
+            alicuota['monto_pendiente'] -= delta
+
+            if alicuota['monto_pendiente'] <= 0.0 :
+                 alicuota['monto_pendiente'] = 0.0
+                 alicuota['pagado'] = '1'
+            if abono['monto_por_aplicar'] < 0.0:
+                abono['monto_por_aplicar'] = 0.0
+            
+            Abonos.actualizar(con, abono)
+            Alicuotas.actualizar(con, alicuota)
+
+            if alicuota['pagado'] == '1' :
+                try:
+                    alicuota = next(it_alicuotas)
+                except StopIteration:
+                    alicuota = None
+
             
