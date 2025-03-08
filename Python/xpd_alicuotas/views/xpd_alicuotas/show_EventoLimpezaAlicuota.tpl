@@ -18,6 +18,15 @@
     </span>
 </div>
 
+<div class="row">
+    <span class="col">
+        monto:
+    </span>
+    <span class="col">
+        {{objeto['monto']}}
+    </span>
+</div>
+
     <div class="d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="/xpd_alicuotas/abonos/{{objeto['id_abono']}}">
             Volver

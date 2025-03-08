@@ -170,11 +170,11 @@
                         </th>
 
                         <th>
-                            Id_egreso
+                            Aplicado_saldo
                         </th>
 
                         <th>
-                            Aplicado_saldo
+                            Id_egreso
                         </th>
 
                         <th>
@@ -204,8 +204,8 @@
 % else:
                         <td class="text-bg-warning">Pendiente Rev</td>
 % end
-                        <td>{{abono['id_egreso']}}</td>
                         <td>{{abono['aplicado_saldo']}}</td>
+                        <td>{{abono['id_egreso']}}</td>
                         <td>
                             <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/abonos/{{abono['id']}}">Mostrar</a>
                         </td>

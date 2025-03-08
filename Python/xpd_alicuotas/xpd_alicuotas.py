@@ -14,6 +14,10 @@ CONFIG = {'rutas': []}
 
 import datetime
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 def fecha_js_to_iso(fecha_hora):
     try:
         fecha_hora_obj = datetime.datetime.strptime(fecha_hora, '%m/%d/%Y %I:%M %p')
@@ -134,7 +138,7 @@ Abonos.setMetamodelo({
         { 'nombre':'genera_egreso', 'nombreCampo':'GENERA_EGRESO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
         { 'nombre':'aplicado', 'nombreCampo':'APLICADO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'aplicado_saldo', 'nombreCampo':'APLICADO_SALDO', 'tipo':orm.XPDBOOLEAN, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
-        { 'nombre':'id_egreso', 'nombreCampo':'ID_EGRESO', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
+        { 'nombre':'id_egreso', 'nombreCampo':'ID_EGRESO', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': True, },
         { 'nombre':'id_departamento', 'nombreCampo':'ID_DEPARTAMENTO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
         ],
     'namedQueries' : [
@@ -150,7 +154,7 @@ EventoLimpezaAlicuotas.setMetamodelo({
         { 'nombre':'id', 'nombreCampo':'ID', 'tipo':orm.XPDINTEGER, 'pk': True, 'incremental': True, 'insert': False, 'update': False, },
         { 'nombre':'id_alicuota', 'nombreCampo':'ID_ALICUOTA', 'tipo':orm.XPDINTEGER, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
         { 'nombre':'monto', 'nombreCampo':'MONTO', 'tipo':orm.XPDREAL, 'tamano': 5, 'precision': 2, 'pk': False, 'incremental': False, 'insert': True, 'update': False, },
-        { 'nombre':'id_abono', 'nombreCampo':'ID_ABONO', 'tipo':orm.XPDINTEGER, 'incremental': False, },        
+        { 'nombre':'id_abono', 'nombreCampo':'ID_ABONO', 'tipo':orm.XPDINTEGER, 'incremental': False, },
         ],
     'namedQueries' : [
         { 'nombre':'fkAlicuota', 'whereClause':['id_alicuota'], },
@@ -393,6 +397,90 @@ def servir_page_get_condominio_byid(id_condominio):
     return template("xpd_alicuotas/show_condominio", objeto = objeto, usuario = usuario , departamentos = departamentos, transaccions = transaccions, egresos = egresos)
 
 CONFIG['rutas'].append({'ruta':'/condominios/<id_condominio>', 'metodos':['GET'], 'funcion': servir_page_get_condominio_byid })
+
+def servir_page_graficar_condominio(id_condominio):
+
+    con = orm.Conexion(PATH_BDD)
+    
+    # Obtiene datos de Departamentos 
+    departamentos = Departamentos.getNamedQuery(con, 'findByCondominio', {'id_condominio':id_condominio}) 
+    df_departamentos = pd.DataFrame(departamentos)
+    
+    # Obtiene datos de Alicuotas
+    sql = """SELECT a.id as id, a.anio as anio, a.mes as mes, a.monto as monto, a.monto_pendiente as monto_pendiente, a.pagado as pagado, a.observaciones as observaciones, a.id_departamento as id_departamento 
+, ( SELECT count(1) from ABONO_ALICUOTA b, ABONO c, EGRESO d where b.id_alicuota = a.id and c.id = b.id_abono and d.id = c.id_egreso ) as conteo_egresos
+FROM ALICUOTA a , DEPARTAMENTO b 
+WHERE b.id_condominio = :id_condominio and a.id_departamento = b.id"""
+    alicuotas = con.consultar(sql,{"id_condominio":id_condominio},["id", "anio", "mes", "monto", "monto_pendiente", "pagado", "observaciones", "id_departamento", "conteo_egresos"])
+    df_alicuotas = pd.DataFrame(alicuotas)
+
+    # Obtiene datos de Egresos
+    sql = """SELECT a.id as id, a.fecha as fecha, a.destino as destino, a.monto as monto, a.observaciones as observaciones, a.anulado as anulado, a.id_condominio as id_condominio 
+, b.monto_por_aplicar as monto_por_aplicar
+, c.id as id_departamento, c.numero_dep as numero_dep
+FROM EGRESO a, ABONO b, DEPARTAMENTO c
+WHERE a.id_condominio = :id_condominio and a.anulado = '0' and b.id_egreso = a.id and b.id_departamento = c.id """
+    egresos = con.consultar(sql,{'id_condominio':id_condominio},[ "id", "fecha", "destino", "monto", "observaciones", "anulado", "id_condominio", "monto_por_aplicar", "id_departamento", "numero_dep" ])
+    df_egresos = pd.DataFrame(egresos)
+
+    con.close()
+
+    # Define Rango de Meses y define data para despliegue
+    meses = set()
+    for indice in df_alicuotas.index:
+        df_alicuotas.loc[indice,'aniomes'] = f"{df_alicuotas.loc[indice,'anio']}-{df_alicuotas.loc[indice,'mes']:02d}"
+        if df_alicuotas.loc[indice, 'aniomes'] not in meses:
+            meses.add(df_alicuotas.loc[indice,'aniomes'])
+            
+        df_alicuotas.loc[indice,'color'] = 'green' 
+        if df_alicuotas.loc[indice,'pagado'] == '0':
+            df_alicuotas.loc[indice,'color'] = 'red' 
+        elif df_alicuotas.loc[indice,'conteo_egresos'] > 0:
+            df_alicuotas.loc[indice,'color'] = 'orange' 
+        
+    for indice in df_egresos.index:
+        df_egresos.loc[indice, 'aniomes'] = df_egresos.loc[indice, 'fecha'][:7]
+        if df_egresos.loc[indice, 'aniomes'] not in meses:
+            meses.add(df_egresos.loc[indice, 'aniomes'])
+        
+        df_egresos.loc[indice, 'color'] = "#44FF44"
+        if df_egresos.loc[indice, 'monto_por_aplicar'] > 0:
+                df_egresos.loc[indice, 'color'] = "#FFFF00"
+                
+    meses = list(meses)
+    meses.sort()
+
+    for indice in df_alicuotas.index:    
+        df_alicuotas.loc[indice,'aniomes_x'] = meses.index(df_alicuotas.loc[indice,'aniomes'])
+    for indice in df_egresos.index:    
+        df_egresos.loc[indice,'aniomes_x'] = meses.index(df_egresos.loc[indice,'aniomes'])
+
+    # Genera Gráfica y la guarda en archivo
+    ancho_pulgadas = 10
+    alto_pulgadas = 5
+    dpi = 100
+
+    fig, ax = plt.subplots(figsize=(ancho_pulgadas, alto_pulgadas), dpi=dpi)
+
+    ax.set_title(f"Pago Alicuotas ({datetime.datetime.now().isoformat()})")
+    ax.set_label("Mes")
+
+    yticks = [x for x in range(-1,-7,-1)]
+    ylabels = [f"Dep. {-x}" for x in yticks]
+    xlabels = [meses[0]] + [ x for x in meses if x.endswith('-01') ] + [meses[-1]]
+    xticks = [ meses.index(x) for x in xlabels]
+    ax.set_xticks(xticks, xlabels, rotation=90)
+    ax.set_yticks(yticks, ylabels)
+
+    ax.scatter( df_alicuotas['aniomes_x'], df_alicuotas['id_departamento'] * -1, c = df_alicuotas['color'], s = df_alicuotas['monto'] * 3.0 )
+    ax.scatter( df_egresos['aniomes_x'], df_egresos['id_departamento'] * -1 - 0.2, c = df_egresos['color'], s = df_egresos['monto'] * 3.0 )
+
+    plt.savefig(dirname(abspath(__file__)) + f"/static/graficas/alicuotas_{id_condominio}.png")
+
+    # retorno
+    return "OK"
+
+CONFIG['rutas'].append({'ruta':'/condominios/<id_condominio>/graficar', 'metodos':['GET'], 'funcion': servir_page_graficar_condominio })
 
 def servir_page_editar_departamento(id):
     usuario = xpd_usr.getCurrentUser(request)
@@ -1234,16 +1322,16 @@ def servir_page_editar_abono(id):
         
     abono["aplicado"] = abono["aplicado"] == "1"
 
+    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
+        
+    abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
+
     abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
         
     try:
         abono["id_egreso"] = int( abono["id_egreso"] )
     except:
         mensajes_error.append("El valor de id_egreso no es válido")
-
-    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
-        
-    abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )    
@@ -1323,16 +1411,16 @@ def servir_page_insertar_abono(id_departamento):
         
     abono["aplicado"] = abono["aplicado"] == "1"
 
+    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
+        
+    abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
+
     abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
         
     try:
         abono["id_egreso"] = int( abono["id_egreso"] )
     except:
         mensajes_error.append("El valor de id_egreso no es válido")
-
-    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
-        
-    abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )    
@@ -1414,6 +1502,16 @@ def servir_page_editar_eventolimpezaalicuota(id):
     except:
         mensajes_error.append("El valor de id_alicuota no es válido")
 
+    eventolimpezaalicuota["monto"] = request.forms.get( "monto", "").strip()
+        
+    if len(eventolimpezaalicuota["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
+
+    try:
+        eventolimpezaalicuota["monto"] = float( eventolimpezaalicuota["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", objeto = eventolimpezaalicuota, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/eventolimpezaalicuotas/" + str(eventolimpezaalicuota['id']), fecha_iso_to_js = fecha_iso_to_js )    
     try:
@@ -1453,6 +1551,16 @@ def servir_page_insertar_eventolimpezaalicuota(id_abono):
         eventolimpezaalicuota["id_alicuota"] = int( eventolimpezaalicuota["id_alicuota"] )
     except:
         mensajes_error.append("El valor de id_alicuota no es válido")
+
+    eventolimpezaalicuota["monto"] = request.forms.get( "monto", "").strip()
+        
+    if len(eventolimpezaalicuota["monto"]) == 0:
+        mensajes_error.append("monto es requerido")
+
+    try:
+        eventolimpezaalicuota["monto"] = float( eventolimpezaalicuota["monto"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_EventoLimpezaAlicuota", objeto = eventolimpezaalicuota, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/abonos/" + str(id_abono), fecha_iso_to_js = fecha_iso_to_js )    
@@ -1586,9 +1694,12 @@ def aplicarAbonos(con, id_departamento):
                  alicuota['pagado'] = '1'
             if abono['monto_por_aplicar'] < 0.0:
                 abono['monto_por_aplicar'] = 0.0
+
+            abono_alicuota = {"id_abono":abono['id'], "id_alicuota":alicuota['id'], "monto": delta}
             
             Abonos.actualizar(con, abono)
             Alicuotas.actualizar(con, alicuota)
+            EventoLimpezaAlicuotas.insertar(con, abono_alicuota)
 
             if alicuota['pagado'] == '1' :
                 try:

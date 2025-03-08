@@ -6,3 +6,4 @@
 /xpd_usr.py
 /views/xpd_usr/
 /*.csv
+/static/graficas/*.png

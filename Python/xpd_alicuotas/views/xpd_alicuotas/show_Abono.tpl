@@ -74,19 +74,19 @@
 
 <div class="row">
     <span class="col">
-        id_egreso:
+        aplicado_saldo:
     </span>
     <span class="col">
-        {{objeto['id_egreso']}}
+        {{objeto['aplicado_saldo']}}
     </span>
 </div>
 
 <div class="row">
     <span class="col">
-        aplicado_saldo:
+        id_egreso:
     </span>
     <span class="col">
-        {{objeto['aplicado_saldo']}}
+        {{objeto['id_egreso']}}
     </span>
 </div>
 
@@ -105,7 +105,7 @@
     <ul class="mt-3 nav nav-tabs nav-justified">
 
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#divEventoLimpezaAlicuotas">EventoLimpezaAlicuotas</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#divEventoLimpezaAlicuotas">EventoLimpezaAlicuotas ({{len(eventolimpezaalicuotas)}})</a>
         </li>
 
     </ul>
@@ -125,6 +125,10 @@
                         </th>
 
                         <th>
+                            Monto
+                        </th>
+
+                        <th>
                             <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/abonos/{{objeto['id']}}/nuevoeventolimpezaalicuota">Crear Nuevo</a>
                         </th>
                     </tr>
@@ -132,7 +136,7 @@
                 <tbody>
 % if len(eventolimpezaalicuotas) == 0:
                     <tr>
-                        <td colspan="2">
+                        <td colspan="3">
                             No hay registros disponibles
                         </td>
                     </tr>
@@ -141,6 +145,7 @@
                     <tr class="small">
                         <td>{{eventolimpezaalicuota['id']}}</td>
                         <td>{{eventolimpezaalicuota['id_alicuota']}}</td>
+                        <td>{{eventolimpezaalicuota['monto']}}</td>
                         <td>
                             <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/eventolimpezaalicuotas/{{eventolimpezaalicuota['id']}}">Mostrar</a>
                         </td>

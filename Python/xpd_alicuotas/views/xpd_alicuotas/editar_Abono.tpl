@@ -84,23 +84,23 @@
 </div>
 
 <div class="row">
-    <label class="col form-label" for="id_egreso">
-    id_egreso:
-    </label>
-
-<span class="col">
-        <input class="form-control" type="number" name="id_egreso" value="{{objeto['id_egreso']}}" maxlength="0">
-    </span>
-
-</div>
-
-<div class="row">
     <label class="col form-label" for="aplicado_saldo">
     aplicado_saldo*:
     </label>
 
     <span class="col">
         <input class="form-check form-switch" type="checkbox" name="aplicado_saldo" value="1">
+    </span>
+
+</div>
+
+<div class="row">
+    <label class="col form-label" for="id_egreso">
+    id_egreso:
+    </label>
+
+<span class="col">
+        <input class="form-control" type="number" name="id_egreso" value="{{objeto['id_egreso']}}" maxlength="0">
     </span>
 
 </div>

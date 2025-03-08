@@ -17,6 +17,17 @@
 
 </div>
 
+<div class="row">
+    <label class="col form-label" for="monto">
+    monto*:
+    </label>
+
+<span class="col">
+        <input class="form-control" type="number" name="monto" value="{{objeto['monto']}}" maxlength="5">
+    </span>
+
+</div>
+
     <div class="mt-5 d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
         <a class="btn btn-secondary" href="{{ruta_cancelar}}">
             Cancelar

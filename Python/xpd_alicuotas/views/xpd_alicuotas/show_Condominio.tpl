@@ -39,6 +39,15 @@
         </a>
     </div>
 
+    <div class="card">
+        <div class = "card-body d-flex justify-content-center">
+            <img id="img_alicuotas" src="/static/graficas/alicuotas_{{objeto['id']}}.png">        
+        </div>
+        <div class = "card-footer d-flex justify-content-center">
+            <button id="btn_refrescar_alicuotas" class="btn btn-secondary">Actualizar</button>
+        </div>
+    </div>
+
     <ul class="mt-3 nav nav-tabs nav-justified">
 
         <li class="nav-item">
@@ -241,5 +250,15 @@
             </table>
         </div>
     </div>    
+<script lang="javascript">
+    const btn_refrescar_alicuotas = document.getElementById("btn_refrescar_alicuotas");
+    
+    btn_refrescar_alicuotas.addEventListener("click", async (event) => {
+        const img_alicuotas = document.getElementById("img_alicuotas");
+        respuesta = await fetch("/xpd_alicuotas/condominios/{{objeto['id']}}/graficar");
+        img_alicuotas.src = "/static/graficas/alicuotas_{{objeto['id']}}.png?" + Date.now()
+
+    });
+</script>
 
 % include('xpd_alicuotas/pie.tpl', usuario = usuario)
