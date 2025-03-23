@@ -1,0 +1,112 @@
+<!DOCUMENT html>
+<html langcard="es">
+  <head>
+    <metaÂ charset="utf-8"/>
+    <metaÂ name="viewport" content="width=device-width, initial-scale=1">
+    <metaÂ http-equiv="Cache-control" content="no-cache"/>
+    <meta http-equiv="EXPIRES" content="0">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+  </head>
+  <body class="container bg-light">
+  <div ng-app="visorApp" ng-controller="visorController">
+  
+  <div class="card">
+  <div class = "card-header">
+    Actividad
+  </div>
+  <div class = "card-body">
+  <div class="form-group">
+     <select class="form-control" ng-model="idActividad" ng-change="cargarActividad( idActividad )">
+       <option ng-repeat="actividad in actividades" ng-selected="actividad.idObjeto==idActividad" value = "{{actividad.idObjeto}}">{{actividad.nombre}}</option>
+     </select>
+  </div>
+  </div>
+  </div>
+  
+  <div class="card">
+    <div class = "card-header">
+       {{actividad.nombre}}
+    </div>
+    <div class = "card-body">
+      <div class = "row">
+        <div class="col-6">
+	<div class="card">
+          <div class = "card-header text-center">
+            Entradas
+          </div>
+          <div class = "card-body">
+            <div class = "flex-column">
+            
+              <div class="card my-2 small" ng-repeat="entrada in actividad.__listas.Entradas">
+                <div class = "card-header">
+                  {{entrada.nombre}}
+                </div>
+                <div class = "card-body">
+                  <div class="card-text">
+                    Origen:
+                  </div>
+                  <div class="card-text" ng-show=" 'origen' in entrada ">
+                    <a href="#" ng-click="cargarActividad(entrada.origen.idObjeto)">
+			{{entrada.origen.nombre}}
+		    </a>
+                  </div>
+                </div>
+              </div>
+                
+            </div>
+          </div>
+        </div>
+	</div>
+
+	<div class="col-6">
+        <div class="card">
+          <div class = "card-header text-center">
+            Salidas
+          </div>
+          <div class = "card-body">
+            <div class = "flex-column">
+            
+              <div class="card my-2 small" ng-repeat="salida in actividad.__listas.Salidas">
+                <div class = "card-header">
+                  {{salida.nombre}}
+                </div>
+                <div class = "card-body">
+                  <div class="card-text">
+                    Destino:
+                  </div>
+                  <div class="card-text">
+                    <ul>
+                      <li ng-repeat="destino in salida.destinos">
+			<a href="#" ng-click="cargarActividad(destino.idObjeto)">
+                      {{destino.nombre}}
+			</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+                
+            </div>
+          
+          </div>
+        </div>
+	</div>
+      </div>
+    </div>
+  </div>
+  
+  </div>
+  
+  <script src="assets/visor.js"></script>
+  
+  </body>
+  
+
+

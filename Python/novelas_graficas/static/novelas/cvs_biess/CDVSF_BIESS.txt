@@ -1,0 +1,1879 @@
+{
+  "idModelo":27,
+  "idMetamodelo":5,
+  "nombre":"CDVSF_BIESS",
+  "idObjetoRaiz":2666,
+  "__objetoRaiz":{
+    "idObjeto":2666,
+    "idModelo":27,
+    "idTipoMetamodelo":"MODELO",
+    "idJerarquia":null,
+    "nombre":"CDVSF_BIESS",
+    "descripcion":null,
+    "idObjetoPadre":null,
+    "orden":null,
+    "__atributos":{},
+    "__jerarquias":{},
+    "__listas":{
+      "Areas Conocimiento":[
+        {
+          "idObjeto":2667,
+          "idModelo":27,
+          "idTipoMetamodelo":"AREA_CONOCIMIENTO",
+          "idJerarquia":"Areas Conocimiento",
+          "nombre":"Ciclo de Vida de Software",
+          "descripcion":null,
+          "idObjetoPadre":2666,
+          "orden":1,
+          "__atributos":{},
+          "__jerarquias":{},
+          "__listas":{
+            "Procesos":[
+              {
+                "idObjeto":2668,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Levantar Requerimiento Negocio",
+                "descripcion":"Resp: Subgerente/ Coordinador Area",
+                "idObjetoPadre":2667,
+                "orden":1,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[],
+                  "Salidas":[
+                    {
+                      "idObjeto":2669,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Requerimiento de Negocio",
+                      "descripcion":"01BIESS-CVS-Inicio-RequerimientoNegocio.docx",
+                      "idObjetoPadre":2668,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\01Inicio\\01BIESS-CVS-Inicio-RequerimientoNegocio.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2670,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Validar Requerimientos Negocio",
+                "descripcion":"Resp: Analista Desarrollo (Lider Proyecto)",
+                "idObjetoPadre":2667,
+                "orden":2,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2671,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Requerimiento de Negocio",
+                      "descripcion":"01BIESS-CVS-Inicio-RequerimientoNegocio.docx",
+                      "idObjetoPadre":2670,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2672,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Reporte de Requerimientos",
+                      "descripcion":"Reporte de Requerimientos Actualizada 10BIESS-CVS-Construccion-MatrizRequerimientos",
+                      "idObjetoPadre":2670,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2673,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Realizar Analisis de Mercado y viabilidad de las Soluciones Propuestas",
+                "descripcion":"Resp: Analista de Desarrollo (Lider de Proyecto)",
+                "idObjetoPadre":2667,
+                "orden":3,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2674,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Requerimiento de Negocio",
+                      "descripcion":"",
+                      "idObjetoPadre":2673,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2675,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Lineamientos para la Contratacion de Software",
+                      "descripcion":"06BIESS-CVS-Inicio-LineamientosParaContratacionDeSoftware.docx",
+                      "idObjetoPadre":2673,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\01Inicio\\06BIESS-CVS-Inicio-LineamientosParaContrataciondeSoftware.docx",
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2676,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Estudio de Mercado y Viabilidad",
+                      "descripcion":"04BIESS-CVS-Inicio-EstudioMercadoViabilidad.docx",
+                      "idObjetoPadre":2673,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\01Inicio\\04BIESS-CVS-Inicio-EstudioMercadoViabilidad.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2677,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Priorizar Requerimientos",
+                "descripcion":"Resp: Comit\u00c3\u00a9 de TI",
+                "idObjetoPadre":2667,
+                "orden":4,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2678,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Reporte de Requerimientos",
+                      "descripcion":"Reporte de Requerimientos actualizada",
+                      "idObjetoPadre":2677,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2679,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Reporte de Requerimientos",
+                      "descripcion":"Reporte de Requerimientos priorizada",
+                      "idObjetoPadre":2677,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2680,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Definir y Mantener Requerimientos Tecnicos y Funcionales de Negocio",
+                "descripcion":"Resp: Analista de Desarrollo",
+                "idObjetoPadre":2667,
+                "orden":5,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2681,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Requerimiento de Negocio",
+                      "descripcion":"null",
+                      "idObjetoPadre":2680,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2668"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2682,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Principios de Arquitectura y Descripciones de los Dominios de Referencia",
+                      "descripcion":"01BIESS-CVS-MetodologiaArquitectura.docx",
+                      "idObjetoPadre":2680,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"http://intranet.biess.fin.ec/documents/72007/1968955/RESOLUCI%C3%93N BIESS-018-2016 METODOLOG%C3%8DA DE ARQUITECTURA DE SOFTWARE",
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2683,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Reglamento de Seguridad de Informacion",
+                      "descripcion":"Lo relacionado a desarrollo y mantenimiento de sistemas",
+                      "idObjetoPadre":2680,
+                      "orden":3,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2684,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Lineamientos para la Contratacion de Software",
+                      "descripcion":"06BIESS-CVS-Inicio-LineamientosParaContrataciondeSoftware.docx",
+                      "idObjetoPadre":2680,
+                      "orden":4,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2685,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Definicion de Requerimientos y Criterios de Aceptacion",
+                      "descripcion":" Aprobados, 02BIESS-CVS-Inicio-DefinicionRequerimientosCriteriosAceptacion.docx",
+                      "idObjetoPadre":2680,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2686,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Especificacion de Casos de Uso",
+                      "descripcion":"03BIESS-CVS-Inicio-EspecificacionCasosUso.docx",
+                      "idObjetoPadre":2680,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2687,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Obtener la Aprobacion de las Soluciones",
+                "descripcion":"Resp: Analista de Desarrollo (Lider de Proyecto)",
+                "idObjetoPadre":2667,
+                "orden":6,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2688,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Definicion de Requerimientos y Criterios de Aceptacion",
+                      "descripcion":"02BIESS-CVS-Inicio-DefinicionRequerimientosCriteriosAceptacion.docx",
+                      "idObjetoPadre":2687,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2689,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Estudio de Mercado y Viabilidad",
+                      "descripcion":"02BIESS-CVS-Inicio-EstudioMercadoViabilidad.docx",
+                      "idObjetoPadre":2687,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2690,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Solucion Aprobada",
+                      "descripcion":"En el estudio de Viabilidad",
+                      "idObjetoPadre":2687,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2691,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Realizar Especificaciones Tecnicas",
+                "descripcion":"Resp: Analista de Desarrollo (Lider de Proyecto)",
+                "idObjetoPadre":2667,
+                "orden":7,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2692,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Estudio de Mercado y Viabilidad",
+                      "descripcion":"04BIESS-CVS-EstudioMercadoViabilidad.docx",
+                      "idObjetoPadre":2691,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2693,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Definicion de Requerimientos y Criterios de Aceptacion",
+                      "descripcion":"02BIESS-CVS-DefinicionRequerimientosCriteriosAceptacion.docx",
+                      "idObjetoPadre":2691,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\01Inicio\\02BIESS-CVS-Inicio-DefinicionRequerimientosCriteriosAceptacion.docx",
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2694,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Especificaciones Tecnicas",
+                      "descripcion":"05BIESS-CVS-Inicio-EspecificacionesTecnicas.docx",
+                      "idObjetoPadre":2691,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2695,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Ejecutar el Proceso de Compras e Implantacion del Software",
+                "descripcion":"Resp: Subgerente/ Coordinador Area funcional",
+                "idObjetoPadre":2667,
+                "orden":8,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2696,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Contrato firmado",
+                      "descripcion":"null",
+                      "idObjetoPadre":2695,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2668"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2697,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Documentacion en Lineamientos para Implantacion de Software contratado",
+                      "descripcion":"07BIESS-CVS-Inicio-LineamientosParaImplantaciondeSoftwareContratado.docx",
+                      "idObjetoPadre":2695,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2698,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Disenar Componentes Detallados de la Solucion",
+                "descripcion":"Resp: Arquitecto de TI",
+                "idObjetoPadre":2667,
+                "orden":9,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2699,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Definicion de Requerimientos y Criterios de Aceptacion",
+                      "descripcion":"null",
+                      "idObjetoPadre":2698,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2686"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2700,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Especificaciones de Diseno",
+                      "descripcion":"Si aplica. 01BIESS-CVS-Construccion-EspecificacionesDiseno.docx",
+                      "idObjetoPadre":2698,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\01BIESS-CVS-Construccion-EspecificacionDiseno.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2701,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Solicitar la Actualizacion del Catalogo de Servicios",
+                "descripcion":"Resp: Analista de QA",
+                "idObjetoPadre":2667,
+                "orden":10,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2702,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Requerimiento de Negocio",
+                      "descripcion":"01BIESS-CVS-Inicio-CasoNegocio.docx",
+                      "idObjetoPadre":2701,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2703,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Matriz con Servicios Nuevos o Actualizados",
+                      "descripcion":"02BIESS-CVS-Construccion-MatrizServiciosNuevosActualizados.docx",
+                      "idObjetoPadre":2701,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\11BIESS-CVS-Construccion-MatrizServiciosWeb.xlsx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2704,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Planificar Pruebas",
+                "descripcion":"Resp: Analista QA",
+                "idObjetoPadre":2667,
+                "orden":11,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2705,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Requerimiento de Negocio",
+                      "descripcion":"01BIESS-CVS-Inicio-CasoNegocio.docx",
+                      "idObjetoPadre":2704,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2706,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Especificacion de Casos de Uso",
+                      "descripcion":"03BIESS-CVS-Inicio-EspecificacionCasosUso.docx",
+                      "idObjetoPadre":2704,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"\\\\sRVUIOPROFS24\\Ciclo de Vida del Software\\01Inicio\\03BIESS-CVS-Inicio-EspecificacionCasosUso.docx",
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2707,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Definicion de Requerimientos y Criterios de Aceptacion",
+                      "descripcion":"null",
+                      "idObjetoPadre":2704,
+                      "orden":3,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2686"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2708,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Planes y Escenarios de Prueba",
+                      "descripcion":"03BIESS-Construccion-PlanDePruebas.docx",
+                      "idObjetoPadre":2704,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\03BIESS-CVS-Construcion-PlanDePruebas.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2709,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Especificacion de Casos de Pruebas",
+                      "descripcion":"04BIESS-CVS-Construccion-CasoPrueba",
+                      "idObjetoPadre":2704,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\04BIESS-CVS-Construccion-CasoPrueba.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2710,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Desarrollar Componentes de la Solucion",
+                "descripcion":"Resp: Analista de Desarrollo (Desarrollador de Software)",
+                "idObjetoPadre":2667,
+                "orden":12,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2711,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Definicion de Requerimientos y Criterios de Aceptacion",
+                      "descripcion":"02BIESS-CVS-DefinicionRequerimientosCriteriosAceptacion.docx",
+                      "idObjetoPadre":2710,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2712,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Especificacion de Casos de Uso",
+                      "descripcion":"null",
+                      "idObjetoPadre":2710,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2687"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2713,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Especificaciones de Diseno",
+                      "descripcion":"null",
+                      "idObjetoPadre":2710,
+                      "orden":3,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2701"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2714,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Componentes y Artefactos de Solucion",
+                      "descripcion":null,
+                      "idObjetoPadre":2710,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2715,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Manual Tecnico",
+                      "descripcion":"05BIESS-CVS-Construccion-ManualTecnico",
+                      "idObjetoPadre":2710,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\OSBIESS-CVS-Construccion-ManualTecnico.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2716,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Reporte de Vulnerabilidades",
+                      "descripcion":null,
+                      "idObjetoPadre":2710,
+                      "orden":3,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2717,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Crear o Actualizar Manual de Usuario de los Aplicativos",
+                "descripcion":"Resp: Analista de Desarrollo",
+                "idObjetoPadre":2667,
+                "orden":13,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2718,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Especificacion de Casos de Uso",
+                      "descripcion":"null",
+                      "idObjetoPadre":2717,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2687"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2719,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Especificaciones de Diseno",
+                      "descripcion":"null",
+                      "idObjetoPadre":2717,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2701"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2720,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Manual de Usuario",
+                      "descripcion":"06BIESS-CVS-Construccion-ManualUsuario.docx",
+                      "idObjetoPadre":2717,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\06BIESS-CVS-Construccion-ManualUsuario.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2721,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Establecer Plan de Implantacion",
+                "descripcion":"Resp: Analista de Desarrollo(Desarrollador de software)",
+                "idObjetoPadre":2667,
+                "orden":14,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2722,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Metodologia de Gestion de Calidad",
+                      "descripcion":"00BIESS-QA-MetodologiaCalidad.docx",
+                      "idObjetoPadre":2721,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"http://intranet. biess.fin.ec/en/web/secretaria-general/documentos/document_library/view/1968955",
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2723,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Plan de Implantacion y Marcha Atras",
+                      "descripcion":"07BIESS-CVS-Construccion-PlanImplantacionMarchaAtras.docx",
+                      "idObjetoPadre":2721,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\07BIESS-CVS-Construccion-PlanImplantacionMarchaAtras.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2724,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Realizar Controles de Calidad",
+                "descripcion":"Resp: Analista QA",
+                "idObjetoPadre":2667,
+                "orden":15,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2725,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Metodologia de Gestion de Calidad",
+                      "descripcion":"null",
+                      "idObjetoPadre":2724,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2726,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Componentes y Artefactos de Solucion",
+                      "descripcion":"null",
+                      "idObjetoPadre":2724,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2715"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2727,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Informe de la Revision de Calidad, Excepciones y Correcciones",
+                      "descripcion":"03BIESS-CVS-Transicion-InformeRevisionCalidad.docx",
+                      "idObjetoPadre":2724,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\03Transicion\\03BIESS-CVS-Transicion-informeRevisionCalidad.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2728,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Informe de Vulnerabilidades",
+                      "descripcion":null,
+                      "idObjetoPadre":2724,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2729,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Analizar Vulnerabilidades",
+                "descripcion":"Resp: Analista de Seguridad",
+                "idObjetoPadre":2667,
+                "orden":16,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2730,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Informe de Vulnerabilidades",
+                      "descripcion":"null",
+                      "idObjetoPadre":2729,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2717"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2731,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Acta de Riesgos",
+                      "descripcion":null,
+                      "idObjetoPadre":2729,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2732,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Establecer un Entorno de Pruebas",
+                "descripcion":"Resp: Analista de Infraestructura y Canales",
+                "idObjetoPadre":2667,
+                "orden":17,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2733,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Normativas Internas o de Cumplimiento Legal vigente BIESS",
+                      "descripcion":"null",
+                      "idObjetoPadre":2732,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2672"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2734,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Clasificacion de Sensibilidad de la Informacion",
+                      "descripcion":"De acuerdo a la Pol\u00c3\u00adtica de Seguridad de la Informacion",
+                      "idObjetoPadre":2732,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2735,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Documento Infrastructura",
+                      "descripcion":"11BIESS-CVS-Construccion-RewuerimientoInfrastructura",
+                      "idObjetoPadre":2732,
+                      "orden":3,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\02Construccion\\12BIESS-CVS-Construccion-RequerimientoInfraestructura.docx",
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2736,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Plan de Implantacion y Marcha Atras",
+                      "descripcion":"07BIESS-CVS-Construccion-PlanImplantacionMarchaAtras.docx",
+                      "idObjetoPadre":2732,
+                      "orden":4,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2737,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Ambiente de Preproduccion para Pruebas",
+                      "descripcion":"null",
+                      "idObjetoPadre":2732,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2738,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Empaquetado de la Solucion para Despliegue en Produccion",
+                      "descripcion":null,
+                      "idObjetoPadre":2732,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2739,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Ejecutar Pruebas",
+                "descripcion":"Resp: Analista de QA",
+                "idObjetoPadre":2667,
+                "orden":18,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2740,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Planes y Escenarios de Prueba",
+                      "descripcion":"null",
+                      "idObjetoPadre":2739,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2709"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2741,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Especificacion de Casos de Pruebas",
+                      "descripcion":"null",
+                      "idObjetoPadre":2739,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2710"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2742,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Metodologia de Gestion de Calidad",
+                      "descripcion":"null",
+                      "idObjetoPadre":2739,
+                      "orden":3,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2743,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Acta de Aceptacion de Pruebas",
+                      "descripcion":"01BIESS-CVS-Transicion-ActaAceptacionPruebas",
+                      "idObjetoPadre":2739,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\srvuioprofs24\\Ciclo de Vida del Software\\O3Transicion\\O1BIESS-CVS-Transicion-ActaPruebasAceptacion.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2744,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Analizar, Evaluar y Priorizar las Peticiones de aplicacion de cambio en produccion",
+                "descripcion":"Resp: Comision de Cambios",
+                "idObjetoPadre":2667,
+                "orden":19,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2745,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"RFC",
+                      "descripcion":"null",
+                      "idObjetoPadre":2744,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\04GestionPasosProducci\u00c3\u00b3n\\01BIESS-CSW-AprobacionCambio.docx",
+                        "referencia":"2672"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2746,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Aprobacion del Cambio",
+                      "descripcion":"01BIESS-CSW-AprobacionCambio)",
+                      "idObjetoPadre":2744,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2747,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Matriz de Cambios",
+                      "descripcion":"Actualizada, 02BIESS-CSW-MatrizCambios.xlsx",
+                      "idObjetoPadre":2744,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\04GestionPasosProducci\u00c3\u00b3n\\02BIESS-CSW-MatrizCambios.xlsx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2748,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Pasar a Produccion y Gestionar los Lanzamientos",
+                "descripcion":"Resp: Analista de Infraestructura y Canales",
+                "idObjetoPadre":2667,
+                "orden":20,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2749,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Plan de Implantacion y Marcha Atras",
+                      "descripcion":"null",
+                      "idObjetoPadre":2748,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2724"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2750,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Instructivo de Administracion de Configuracion",
+                      "descripcion":"null",
+                      "idObjetoPadre":2748,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"IN - Administraci\u00c3\u00a9n de la Configuraci\u00c3\u00b3n",
+                        "referencia":"2680"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2751,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Listado de Componentes Configurados",
+                      "descripcion":"Proceso de la administracion de Configuracion",
+                      "idObjetoPadre":2748,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2752,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Componentes Versionados",
+                      "descripcion":null,
+                      "idObjetoPadre":2748,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2753,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Inventario de Aplicaciones",
+                      "descripcion":"Actualizado, 02BIESS-CVS-Construccion-InventarioAplicacionesActualizados",
+                      "idObjetoPadre":2748,
+                      "orden":3,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del software\\02Construccion\\02BIESS-CVS-Construccion-InventarioAplicacionesActualizados.xlsx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2754,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Proporcionar Soporte en Produccion desde el primer Momento",
+                "descripcion":"Resp: Analista de Operaciones y Soporte(Coordinador de Mesa de Servicios)",
+                "idObjetoPadre":2667,
+                "orden":21,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2755,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Ticket de Servicio",
+                      "descripcion":"null",
+                      "idObjetoPadre":2754,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2761"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2756,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Instructivo de Administracion de Solicitudes de Servicio e Incidente",
+                      "descripcion":"IN - Administraci\u00c3\u00b3n Solicitudes de Servicio e Incidentes",
+                      "idObjetoPadre":2754,
+                      "orden":2,
+                      "__atributos":{
+                        "url":"",
+                        "referencia":"2672"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2757,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Registro de Soporte",
+                      "descripcion":"Herramienta Mesa de Servicios",
+                      "idObjetoPadre":2754,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2758,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Ejecutar Revision PostProduccion",
+                "descripcion":"Resp: Analista QA",
+                "idObjetoPadre":2667,
+                "orden":22,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2759,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Definicion de Requerimientos y Criterios de Aceptacion",
+                      "descripcion":"02BIESS-CVS-Inicio-DefinicionRequerimientosCriteriosAceptacion.docx",
+                      "idObjetoPadre":2758,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2760,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Acta de Conformidad",
+                      "descripcion":"02BIESS-CVS-Transicion-ActaConformidad.docx",
+                      "idObjetoPadre":2758,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\03Transicion\\02BIESS-CVS-Transicion-ActaConformidad.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2761,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Informe de Revision de Cambio Emergente",
+                      "descripcion":"05BIESS-CSW-RevisionCambioEmergente.docx",
+                      "idObjetoPadre":2758,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "idObjeto":2762,
+          "idModelo":27,
+          "idTipoMetamodelo":"AREA_CONOCIMIENTO",
+          "idJerarquia":"Areas Conocimiento",
+          "nombre":"Proceso de Cambio Emergente",
+          "descripcion":null,
+          "idObjetoPadre":2666,
+          "orden":2,
+          "__atributos":{},
+          "__jerarquias":{},
+          "__listas":{
+            "Procesos":[
+              {
+                "idObjeto":2763,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Solicitar y Asignar Solicitud de Cambio",
+                "descripcion":"Resp: Analista de Desarrollo(Lider de Desarrollo)",
+                "idObjetoPadre":2762,
+                "orden":1,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2764,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Solicitud de Cambio Emergente",
+                      "descripcion":"null",
+                      "idObjetoPadre":2763,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\04GestionPasosProducci\u00c3\u00b3n\\04BIESS-CSW-SolicitudCambioEmergente.doc",
+                        "referencia":"2785"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2765,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Matriz de Cambios Emergentes",
+                      "descripcion":"Actualizada, 03BIESS-CSW-MatrizCambiosEmergentes.xlsx",
+                      "idObjetoPadre":2763,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software \\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\04GestionPasosProducci\u00c3\u00b3n\\04GestionPasosProducci\u00c3\u00b3n\\02BIESS-CSW-MatrizCambios.xlsx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2766,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Pre Aprobar el Cambio Emergente",
+                "descripcion":"Resp: Subgerentes y/o Coordinador de \u00c3\u00a1reas funcionales",
+                "idObjetoPadre":2762,
+                "orden":2,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[],
+                  "Salidas":[
+                    {
+                      "idObjeto":2767,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Pre aprobacion del Cambio Emergente",
+                      "descripcion":"null",
+                      "idObjetoPadre":2766,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\04GestionPasosProducci\u00c3\u00b3n\\04GestionPasosProducci\u00c3\u00b3n\\04BIESS-CSW-SolicitudCambioEmergente.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2768,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Desarrollar los componentes de la Solucion(Emergente)",
+                "descripcion":"Resp: Analista de Desarrollo(Desarrollador de Software)",
+                "idObjetoPadre":2762,
+                "orden":3,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2769,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Solicitud de Cambio Emergente",
+                      "descripcion":"null",
+                      "idObjetoPadre":2768,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2729"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2770,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Componentes y Artefactos de Solucion",
+                      "descripcion":null,
+                      "idObjetoPadre":2768,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2771,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Establecer un Plan de Implantacion(Emergente)",
+                "descripcion":"Resp: Analista de Desarrollo (Desarrollador de Software)",
+                "idObjetoPadre":2762,
+                "orden":4,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2772,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Metodologia de Gestion de Calidad",
+                      "descripcion":"00BIESS-QA-MetodologiaCalidad.docx",
+                      "idObjetoPadre":2771,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"null"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2773,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Plan de Implantacion y Marcha Atras",
+                      "descripcion":"07BIESS-CVS-Construccion-PlanImplantacionMarchaAtras.docx",
+                      "idObjetoPadre":2771,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2774,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Componentes de App y/o BD modifiicado",
+                      "descripcion":null,
+                      "idObjetoPadre":2771,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2775,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Proporcionar Soporte en Produccion desde el Primer Momento (Emergente)",
+                "descripcion":"null",
+                "idObjetoPadre":2762,
+                "orden":5,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2776,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Plan de Implantacion y Marcha Atras",
+                      "descripcion":"null",
+                      "idObjetoPadre":2775,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2724"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2777,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Componentes Versionados",
+                      "descripcion":null,
+                      "idObjetoPadre":2775,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    },
+                    {
+                      "idObjeto":2778,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Inventario de Aplicaciones",
+                      "descripcion":"Actualizado, 02BIESS-CVS-Construccion-InventarioAplicacionesActualizados",
+                      "idObjetoPadre":2775,
+                      "orden":2,
+                      "__atributos":{
+                        "url":null
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              },
+              {
+                "idObjeto":2779,
+                "idModelo":27,
+                "idTipoMetamodelo":"PROCESO",
+                "idJerarquia":"Procesos",
+                "nombre":"Ejecutar una Revision Post Implantacion(Emergente)",
+                "descripcion":"Resp: Analista QA",
+                "idObjetoPadre":2762,
+                "orden":6,
+                "__atributos":{},
+                "__jerarquias":{},
+                "__listas":{
+                  "Entradas":[
+                    {
+                      "idObjeto":2780,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"REF_ENTREGABLE",
+                      "idJerarquia":"Entradas",
+                      "nombre":"Solicitud de Cambio Emergente",
+                      "descripcion":"null",
+                      "idObjetoPadre":2779,
+                      "orden":1,
+                      "__atributos":{
+                        "url":null,
+                        "referencia":"2672"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ],
+                  "Salidas":[
+                    {
+                      "idObjeto":2781,
+                      "idModelo":27,
+                      "idTipoMetamodelo":"ENTREGABLE",
+                      "idJerarquia":"Salidas",
+                      "nombre":"Informe de Revision de Cambio Emergente",
+                      "descripcion":"05BIESS-CSW-RevisioCambioEmergente.docx",
+                      "idObjetoPadre":2779,
+                      "orden":1,
+                      "__atributos":{
+                        "url":"\\\\SRVUIOPROFS24\\Ciclo de Vida del Software\\03Transicion\\07BIESS-CVS-Transicion-RevisionCambioEmergente.docx"
+                      },
+                      "__jerarquias":{},
+                      "__listas":{}
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "Procesos":[],
+      "Entradas":[],
+      "Salidas":[]
+    }
+  }
+}

@@ -1,0 +1,10 @@
+/__pycache__/
+/.ipynb_checkpoints/
+/data/base.db
+/inicializador.ipynb
+/xpd_orm.py
+/xpd_usr.py
+/views/xpd_usr
+/static/novelas/Eileeniza/
+/static/novelas/AritmeticaTrainer/
+/static/novelas/Presencia/

@@ -1,0 +1,247 @@
+<!DOCUMENT html>
+<html langcard="es">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-control" content="no-cache"/>
+    <meta http-equiv="EXPIRES" content="0">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+  </head>
+  <body class="container bg-light">
+  <div ng-app="visorApp" ng-controller="visorController">
+  
+  <div class="card">
+    <div class="card-header">
+      Actividad
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <select class="form-control" ng-model="idActividad" ng-change="cargarActividad( idActividad )">
+          <option ng-repeat="actividad in actividades" ng-selected="actividad.idObjeto==idActividad"
+            value="{{actividad.idObjeto}}">{{actividad.nombre}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      {{actividad.nombre}}
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 col-12">
+  
+          <div class="card">
+            <div class="card-header text-center">
+              Entradas
+            </div>
+            <div class="card-body">
+              <div class="flex-column">
+  
+                <div class="card my-2 small" ng-repeat="entrada in actividad.entradas">
+                  <div class="card-header">
+                    {{entrada.nombre}}
+                  </div>
+                  
+                  <div class="card-body">
+                    <div class="card-text">
+                      Origen:
+                    </div>
+  
+                    <div class="card-text">
+  
+                      <ul>
+                        <li ng-repeat="origen in entrada.origenes">
+                          <a href="#" ng-click="cargarActividad(origen.idObjeto)">
+                            {{origen.nombre}}
+                          </a>
+                        </li>
+                      </ul>
+  
+                    </div>
+                  </div>
+                  
+                </div>
+  
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="col-md-6 col-12">
+          <div class="card">
+            <div class="card-header text-center">
+              Salidas
+            </div>
+            <div class="card-body">
+              <div class="flex-column">
+  
+                <div class="card my-2 small" ng-repeat="salida in actividad.salidas">
+                  <div class="card-header">
+                    {{salida.nombre}}
+                  </div>
+
+                  <div class="card-body">
+                    <div class="card-text">
+                      Destino:
+                    </div>
+                    <div class="card-text">
+                      <ul>
+                        <li ng-repeat="destino in salida.destinos">
+                          <a href="#" ng-click="cargarActividad(destino.idObjeto)">
+                            {{destino.nombre}}
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+  
+              </div>
+  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card mt-2">
+    <div class="card-header text-center">
+      Diccionario de Artefactos <button class="btn" data-bs-toggle="collapse" data-bs-target="#div_artefactos">&equiv;</button>
+    </div>
+    <div id="div_artefactos" class="card-body collapse show">
+      <div class="list-group">
+        <div class="list-group-item" ng-repeat="artefacto in artefactos">
+          <div class="row">{{artefacto.nombre}}</div>
+          <div class="row">
+            <div class="col-6">
+              <p><b>Origenes:</b></p>
+              <ul>
+                <li ng-repeat="origen in artefacto.origenes">
+                  {{origen.nombre}}
+                </li>
+              </ul>
+            </div>
+            <div class="col-6">
+              <p><b>Destinos:</b></p>
+              <ul>
+                <li ng-repeat="destino in artefacto.destinos">
+                  {{destino.nombre}}
+                </li>
+              </ul>
+            </div>
+          </div>          
+        </div>
+      </div>
+    </div>
+  </div>
+      
+
+
+  </div>
+  
+  <!-- <script src="visor.js?1"> -->
+  <script lang="javascript">
+
+//alert('compila');
+
+var visorApp = angular.module('visorApp', []);
+visorApp.controller('visorController', function($scope, $http) {
+    $scope.actividad={
+        idObjeto:0,
+        nombre:'dummy',
+        __listas:{Entradas:[],Salidas:[]}
+        };
+    $scope.actividades = [];
+    $scope.artefactos = [];
+    $scope.idActividad = 0;
+    
+    $scope.cargarActividad = function( idA ){
+        
+        $scope.idActividad = idA;
+        const actividad = $scope.actividades.find( item => idA == item.idObjeto );
+        if(actividad){
+          $scope.actividad = actividad;
+        }else{
+          alert("No se ha encontrado Proceso " + idA);
+          $scope.actividad = { idObjeto:0, nombre:"No encontrdo", entradas:[], salidas:[]};
+        }
+        
+    };
+    
+    $scope.cargarActividades = function(){
+        
+        $http.get('PmBok.json?3').then(
+            (result) => {
+                $scope.procesarData(result.data)
+            },
+            (result) => {
+                 alert("se fue a la porra \n"+JSON.stringify(result));
+            }
+        );
+        
+    };
+    
+    $scope.procesarData = function(data){
+        //alert(JSON.stringify(data));
+        const actividades = data.__objetoRaiz.__listas.Procesos;
+        const areas = data.__objetoRaiz.__listas['Areas Conocimiento'];
+        areas.forEach(area => {
+            area.__listas.Procesos.forEach(proceso =>{
+                proceso.nombre = area.nombre + " - " + proceso.nombre;
+                actividades.push(proceso);
+            });            
+        });
+        //alert(JSON.stringify(actividades));
+        const artefactos = [];
+        actividades.forEach(actividad=>{
+            let artefacto;
+            actividad.entradas = [];
+            actividad.__listas.Entradas.forEach( entrada=>{
+                artefacto = artefactos.find(item => item.nombre === entrada.nombre);
+                if(artefacto){
+                    artefacto.destinos.push(actividad);
+                }else{
+                    artefacto = {nombre:entrada.nombre, origenes:[], destinos:[actividad] };
+                    artefactos.push(artefacto);
+                }
+                actividad.entradas.push(artefacto);
+            });
+            actividad.salidas = [];
+            actividad.__listas.Salidas.forEach( salida=>{
+                artefacto = artefactos.find(item => item.nombre === salida.nombre);
+                if(artefacto){
+                    artefacto.origenes.push(actividad);
+                }else{
+                    artefacto = {nombre:salida.nombre, origenes:[actividad], destinos:[] };
+                    artefactos.push(artefacto);
+                }
+                actividad.salidas.push(artefacto);
+            });
+        });
+        
+        $scope.actividades = actividades;
+        artefactos.sort( (a,b) => a.nombre.localeCompare(b.nombre));
+        $scope.artefactos = artefactos;
+        
+        $scope.cargarActividad( $scope.actividades[0].idObjeto );
+        //alert("cargado");
+    };
+    
+    $scope.cargarActividades();
+});
+
+  </script>
+  
+  </body>
+  
+
+

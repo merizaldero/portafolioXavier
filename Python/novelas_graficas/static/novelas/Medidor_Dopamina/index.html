@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medidor de Dopamina</title>
+  <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <div class="container-flow">
+    <div class="w-100 mx-1 card">
+
+      <div class="card-header text-center">
+        Medidor de Dopamina
+      </div>
+      
+      <div class="card-body">
+      
+        <div class="w-100 mx-1 card">
+          <div class="card-body d-flex d-row justify-content-between">
+            
+            <button id="btn_start" class="btn btn-primary">
+              Iniciar
+            </button>
+            
+            <button id="btn_stop" class="btn btn-primary">
+              Medir
+            </button>
+            
+            <button id="btn_reset" class="btn btn-primary">
+              Reiniciar
+            </button>
+            
+          </div>
+        </div>
+        
+      <div class="row border-top mt-2">
+        <div class="col-6 text-bg-info">
+          Tiempo Actual
+        </div>
+        <div id="span_white" class="col-6">
+        </div>
+      </div>
+      
+      <div class="row border-top">
+        <div class="col-6 text-bg-info">
+          Media
+        </div>
+        <div id="txt_media" class="col-6">
+        </div>
+      </div>
+      
+      <div class="row border-top">
+        <div class="col-6 text-bg-info">
+          M&aacute;ximo
+        </div>
+        <div class="col-6 text-bg-info">
+          M&iacute;nimo
+        </div>
+        
+      </div>
+      
+      <div class="row">
+        <div id="txt_maximo" class="col-6">
+        </div>
+        <div id="txt_minimo" class="col-6">
+        </div>
+      </div>
+      
+      <div class="row border-top">
+        <div class="col-6 text-bg-info">
+          Desv. Est&aacute;ndar
+        </div>
+        <div id="txt_desviacion" class="col-6">
+        </div>
+      </div>
+      
+      <div class="row border-top">
+        <div class="col-6 text-bg-info">
+          Umbral
+        </div>
+        <div class="col-6">
+          <input id="txt_umbral" type"text">
+        </div>
+      </div>
+      
+      <div class="row border-top">
+        <div class="col-6 text-bg-info">
+          Marcas
+        </div>
+        <div id="txt_marcas" class="col-6">
+        </div>
+      </div>
+      
+      <div class="row border-top">
+        <div class="col-6 text-bg-info">
+          Sobre Umbral
+        </div>
+        <div class="col-6 text-bg-info">
+          Bajo Umbral
+        </div>
+        
+      </div>
+      <div class="row">
+        <div class="col-6">
+        <span id="txt_marcas_s"></span> (<span id="txt_porcentaje_s"></span> %)
+        </div>
+        <div class="col-6">
+        <span id="txt_marcas_b"></span> (<span id="txt_porcentaje_b"></span> %)
+        </div>
+      </div>
+      
+
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/bootstrap.bundle.min.js"></script>
+  <script language="javascript">
+
+const MARCAS = [];
+let MEDIA = 0.0;
+let MAXIMO = 0.0;
+let MINIMO = 0.0;
+let DESVIACION = 0.0;
+
+let UMBRAL = 4.0;
+let MARCAS_BAJO = 0;
+let MARCAS_SOBRE = 0;
+
+class Cronometro{
+  constructor(){
+    this.miliseconds = 0;
+    this.interval = null;
+    this.display = null;
+    this.boton = null;
+    this.lastTime = null;
+    this.activo = false;
+    this.listener = null;
+  }
+  setDisplay(display){
+    this.display = display;
+    this.display.innerText = this.toString();
+  }
+  setListener(listener){
+    this.listener = listener;
+  }
+  setBoton(boton){
+    this.boton = boton;
+    this.boton.addEventListener( 'click', (event)=>{
+      if( this.activo ){
+        this.stop();
+      }else{
+        this.start();
+      }
+    });
+
+  }
+  reset(){
+    this.miliseconds = 0;
+    this.lastTime = null;
+    this.activo = false;
+    if( this.interval != null){
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+    if(this.display != null){
+      this.display.innerText = this.toString();
+    }
+    if(this.listener != null){
+        this.listener();
+    }
+  }
+  start(){
+    this.lastTime = (new Date()).getTime();
+    this.activo = true;
+    this.interval = setInterval(() => {
+      this.update();
+    }, 100);
+    if(this.listener != null){
+        this.listener();
+    }
+  }
+  stop(){
+    this.update();
+    this.activo = false;
+    this.lastTime = null;
+    if( this.interval != null){
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+    if(this.listener != null){
+        this.listener();
+    }
+  }
+  update(){
+    if(!this.activo){
+      return;
+    }
+    const ahora = (new Date()).getTime();
+    const delta = ahora - this.lastTime;
+    this.miliseconds += delta;
+    this.lastTime = ahora;
+    if(this.display != null){
+      this.display.innerText = this.toString();
+    }    
+  }
+  toString(){
+    const minutos = Math.floor( this.miliseconds / 60000 );
+    const segundos = Math.floor( this.miliseconds / 1000 ) % 60;
+    const milesimas = this.miliseconds % 1000;
+    return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}.${milesimas.toString().padStart(3, '0')}`;
+  }
+
+};
+
+
+  //alert("class cronometro ok");
+  
+//document.addEventListener('load', (event)=>{
+    //alert('inicializando');
+  // Elementos del DOM
+  const btnStart = document.getElementById('btn_start');
+  // const btnContinue = document.getElementById('btn_continue');
+  const btnStop = document.getElementById('btn_stop');
+  const btnReset = document.getElementById('btn_reset');
+  const span_white = document.getElementById('span_white');
+  const btn_white = document.getElementById('btn_white');
+  
+  const txt_media = document.getElementById('txt_media');
+  const txt_maximo = document.getElementById('txt_maximo');
+  const txt_minimo = document.getElementById('txt_minimo');
+  const txt_desviacion = document.getElementById('txt_desviacion');
+  
+  const txt_umbral = document.getElementById('txt_umbral');
+  const txt_marcas = document.getElementById('txt_marcas');
+  const txt_porcentaje_b = document.getElementById('txt_porcentaje_b');
+  const txt_porcentaje_s = document.getElementById('txt_porcentaje_s');
+  const txt_marcas_b = document.getElementById('txt_marcas_b');
+  const txt_marcas_s = document.getElementById('txt_marcas_s');
+  
+  //alert("gui objetos ok");
+
+  const crono = new Cronometro();
+  //alert("cronometro ok");
+  crono.setDisplay(span_white);
+  //alert("setDisplay ok");
+  //crono.setBoton(btn_white);
+  
+  //alert("setBotonOk ok");
+  
+  const ajustarEstilosBotones = ()=>{
+    [btnStart, btnStop, btnReset, btn_white].forEach(boton => {
+        if(boton.enabled){
+            boton.classList.remove("disabled");
+        }else{
+            boton.classList.add("disabled");
+        }
+        
+        txt_media.innerText = `${MEDIA.toFixed(3)}`;
+        txt_maximo.innerText = `${MAXIMO}`;
+        txt_minimo.innerText = `${MINIMO}`;
+        txt_desviacion.innerText = `${DESVIACION.toFixed(3)}`;
+        
+        txt_marcas.innerText = `${MARCAS.length}`;
+        txt_marcas_b.innerText = `${MARCAS_BAJO}`;
+        txt_marcas_s.innerText = `${MARCAS_SOBRE}`;
+        if(MARCAS.length == 0){
+            //alert("Lleno encerado");
+            txt_porcentaje_b.innerText = "0";
+            txt_porcentaje_s.innerText = "0";
+             txt_porcentaje_b.parentNode.classList.remove("text-bg-danger");
+        }else{
+            //alert("hay data " + MARCAS.length);
+            let porcentaje = (MARCAS_BAJO + 0.0)/MARCAS.length * 100.0;
+            txt_porcentaje_b.innerText = `${porcentaje.toFixed(2)}`;
+            porcentaje = (MARCAS_SOBRE + 0.0)/MARCAS.length * 100.0;
+            txt_porcentaje_s.innerText = `${porcentaje.toFixed(2)}`;
+            if(MARCAS_BAJO > MARCAS_SOBRE){
+                txt_porcentaje_b.parentNode.classList.add("text-bg-danger");
+            }else{
+                txt_porcentaje_b.parentNode.classList.remove("text-bg-danger");
+            }
+        }
+        
+    });
+    
+  }
+  
+  const startCronometro = ()=>{
+    btnStart.enabled = false;
+    btnStop.enabled = true;
+    btnReset.enabled = true;
+    
+    crono.start();
+    ajustarEstilosBotones();
+  };
+
+  // crono.setListener(ajustarEstilosBotones);
+
+  const resetCronometro = ()=>{
+    btnStart.enabled = true;
+    btnStop.enabled = false;
+    btnReset.enabled = false;
+    //alert("botones ok");
+    while(MARCAS.length > 0){
+        MARCAS.pop();
+    }
+    //alert("registro vaciado");
+    MEDIA = 0.0;
+    MAXIMO = 0.0;
+    MINIMO = 0.0;
+    DESVIACION = 0.0;
+
+    MARCAS_BAJO = 0;
+    MARCAS_SOBRE = 0;
+    
+    crono.reset();
+    alert("crono.reset");
+    ajustarEstilosBotones();
+  };
+
+  const stopCronometro = ()=>{
+    //btnStart.enabled = false;
+    //btnStop.enabled = false;
+    //btnReset.enabled = true;
+    
+    crono.stop();
+    retroalimentar_crono();
+    crono.reset();
+    crono.start();
+    ajustarEstilosBotones();
+  };
+  
+  const retroalimentar_crono = ()=>{
+      MARCAS.push(  crono.miliseconds / 1000.0 );
+      MEDIA = MARCAS.reduce( (accumulator, currentValue) => accumulator + currentValue, 0.0 ) / MARCAS.length;
+      MAXIMO = MARCAS.reduce((a, b) => Math.max(a, b), -Infinity);
+      MINIMO = MARCAS.reduce((a, b) => Math.min(a, b), Infinity);
+      DESVIACION = Math.sqrt(MARCAS.map(x => Math.pow(x - MEDIA, 2)).reduce((a, b) => a + b) / MARCAS.length);
+      const arreglo_bajo = MARCAS.filter( item => item < UMBRAL );
+      MARCAS_BAJO = arreglo_bajo.length;
+      MARCAS_SOBRE = MARCAS.length - MARCAS_BAJO;
+  };
+
+  // Eventos para los botones
+  btnStart.addEventListener('click', startCronometro);
+  btnReset.addEventListener('click', resetCronometro);
+  btnStop.addEventListener('click', stopCronometro);
+  alert("voy a inicializar");
+  resetCronometro();
+  alert("inicializado");
+// });
+
+  </script>
+</body>
+</html>
