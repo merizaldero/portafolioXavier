@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Reportes Estado</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-control" content="no-cache"/>
+    <meta http-equiv="EXPIRES" content="0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+</head>
+<body>
+
+<div ng-app="reporteApp" ng-controller="reporteController">
+
+    <button class="btn btn-outline-secondary border-start-0 border-top-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#div_funciones">
+        Funciones
+    </button>
+
+    <div class="offcanvas offcanvas-start small" id="div_funciones">
+        <div class="offcanvas-header">
+            <h4 class="offcanvas-title">Funciones</h4>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <button class="btn btn-primary" ng-click="agregarFuncion()">Agregar</button>
+            <table class="table table-striped small">
+                <tbody>
+                    <tr ng-repeat="funcion in data.funciones track by $index">
+                        <td class="col-1">{{$index + 1}}</td>
+                        <td class="col-10"><input class="w-100" type="text" ng-model="funcion.descripcion" ng-change="guardarData()"></td>
+                        <td class="col-1"><button class="btn btn-danger" ng-click="eliminarFuncion($index)"></button>Remover</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container container-fluid-sm" ng-show="pantallaActual == 'principal'">
+        <div class="card">
+            <div class="card-header">
+                Informaci&oacute;n General
+            </div>
+            <div class="card-body row">
+                <div class="row">
+                    <label class="col-sm-4 col-12">
+                        Identificaci&oacute;n:
+                    </label>
+                    <input class="col-sm-4 col-12 border-top-0 border-start-0 border-end-0" type="text" ng-model="data.identificacion" ng-change="guardarData()">
+                </div>
+                <div class="row">
+                    <label class="col-sm-4 col-12">
+                        Nombre:
+                    </label>
+                    <input class="col-sm-7 col-12 border-top-0 border-start-0 border-end-0" type="text" ng-model="data.nombre" ng-change="guardarData()">
+                </div>
+                <div class="row">
+                    <label class="col-sm-4 col-12">
+                        Cargo:
+                    </label>
+                    <input class="col-sm-7 col-12 border-top-0 border-start-0 border-end-0" type="text" ng-model="data.cargo" ng-change="guardarData()">
+                </div>
+                <div class="row">
+                    <label class="col-sm-4 col-12">
+                        # Contrato:
+                    </label>
+                    <input class="col-sm-4 col-12 border-top-0 border-start-0 border-end-0" type="text" ng-model="data.numero_contrato" ng-change="guardarData()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header d-flex flex-row justify-content-between">
+                <span>Reportes</span>
+                <button class = "btn btn-primary" ng-click="agregarReporte()">Crear Nuevo</button>                      
+            </div>
+            <div class="card-body">
+                <table class="table table-striped small">
+                    <tbody>
+                        <tr ng-repeat="reporte in data.reportes track by $index">
+                            <td><a href="#" ng-click="seleccionarReporte($index)">{{reporte.periodo}}</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container container-fluid-sm" ng-show="pantallaActual == 'reporte'">
+        <button class="btn btn-secondary" ng-click="irPrincipal()">Regresar</button>
+        <button class="btn btn-danger" ng-click="eliminarReporteActual()">Eliminar</button>
+
+<div class="card">
+<div class="card-header">
+    Periodo
+</div>
+<div class="card-body">
+
+    <div class="row">
+        <label class="col-sm-4 col-12">
+            Periodo:
+        </label>
+        <input class="col-sm-7 col-12 border-top-0 border-start-0 border-end-0" type="text" ng-model="reporteActual.periodo" ng-change="guardarData()">
+    </div>
+    
+</div>
+</div>
+            
+<div id="accordion">
+
+<div class="card">
+<div class="card-header">
+<a class="btn" data-bs-toggle="collapse" href="#collapseCronograma">
+    Cronograma
+</a>
+</div>
+<div id="collapseCronograma" class="collapse show" data-bs-parent="#accordion">
+<div class="card-body">
+
+    <button class="col-4 btn btn-primary btn-small" ng-click="agregarCronograma()">Nueva Entrada</button>
+    <div class="list-group small">
+        <div class="list-group-item" ng-repeat="item in reporteActual.items_cronograma track by $index">
+            <label class="col-5">
+                # {{$index + 1}}
+            </label>
+
+            <button class="col-5 btn btn-danger btn-small" ng-click="eliminarCronograma($index)">Eliminar</button>
+
+            <label class="col-5">
+                Tarea:
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="item.descripcion" ng-change="guardarData()">                
+
+            <label class="col-5">
+                Fecha Inicio:
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="item.fecha_inicio" ng-change="guardarData()">                
+
+            <label class="col-5">
+                Fecha Fin:
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="item.fecha_fin" ng-change="guardarData()">                
+
+            <label class="col-5">
+                % Avance :
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="item.avance" ng-change="guardarData()">                
+
+            <label class="col-5">
+                Estado :
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="item.estado" ng-change="guardarData()">                
+
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<a class="collapsed btn" data-bs-toggle="collapse" href="#collapseActividades">
+    Actividades
+</a>
+</div>
+<div id="collapseActividades" class="collapse" data-bs-parent="#accordion">
+<div class="card-body">
+
+    <button class="col-4 btn btn-primary btn-small" ng-click="agregarActividad()">Nueva Entrada</button>        
+    <div class="list-group small">
+        <div class="list-group-item" ng-repeat="actividad in reporteActual.actividades track by $index">
+            <label class="col-5">
+                # {{$index + 1}}
+            </label>
+
+            <button class="col-5 btn btn-danger btn-small" ng-click="eliminarActividad($index)">Eliminar</button>
+
+            <label class="col-5">
+                T&iacute;tulo:
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="actividad.titulo" ng-change="guardarData()">                
+
+
+            <label class="col-10">
+                Descripci&oacute;n:
+            </label>
+            <textarea class="col-10" rows="5" ng-model="actividad.descripcion" ng-change="guardarData()">
+            </textarea>                
+
+            <label class="col-5">
+                N&uacute;mero Actividad:
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="actividad.numero_actividad" ng-change="guardarData()">                
+
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<a class="collapsed btn" data-bs-toggle="collapse" href="#collapseProductos">
+    Productos
+</a>
+</div>
+<div id="collapseProductos" class="collapse" data-bs-parent="#accordion">
+<div class="card-body">
+
+    <button class="col-4 btn btn-primary btn-small" ng-click="agregarProducto()">Nueva Entrada</button>            
+    <div class="list-group small">
+        <div class="list-group-item" ng-repeat="producto in reporteActual.productos track by $index">
+            <label class="col-5">
+                # {{$index + 1}}
+            </label>
+
+            <button class="col-5 btn btn-danger btn-small" ng-click="eliminarProducto($index)">Eliminar</button>
+
+            <label class="col-5">
+                T&iacute;tulo:
+            </label>
+            <input class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="producto.titulo" ng-change="guardarData()">                
+
+
+            <label class="col-10">
+                Descripci&oacute;n:
+            </label>
+            <textarea class="col-10" rows="5" ng-model="producto.descripcion" ng-change="guardarData()">
+            </textarea>                
+
+            <label class="col-5">
+                Tablas:
+            </label>
+            <label class="col-5">
+                Conclusi&oacute;n:
+            </label>
+            <textarea class="col-5" rows="5" ng-model="producto.tablas" ng-change="guardarData()">
+            </textarea>
+
+            
+            <textarea class="col-5" rows="5" ng-model="producto.conclusion" ng-change="guardarData()">
+            </textarea>
+
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<a class="collapsed btn" data-bs-toggle="collapse" href="#collapseConclusiones">
+    Conclusiones y Recomendaciones
+</a>
+</div>
+<div id="collapseConclusiones" class="collapse" data-bs-parent="#accordion">
+<div class="card-body">
+
+    <div class="row">
+        <label class="col-6">
+            Conclusiones:
+        </label>
+        <label class="col-6">
+            Recomendaciones:
+        </label>
+        <textarea class="col-6" rows="5" ng-model="reporteActual.conclusiones" ng-change="guardarData()">
+        </textarea>
+        <textarea class="col-6" rows="5" ng-model="reporteActual.recomendaciones" ng-change="guardarData()">
+        </textarea>
+    </div>
+
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<a class="collapsed btn" data-bs-toggle="collapse" href="#collapseAnexos">
+    Anexos
+</a>
+</div>
+<div id="collapseAnexos" class="collapse" data-bs-parent="#accordion">
+<div class="card-body">
+
+    <button class="col-4 btn btn-primary btn-small" ng-click="agregarAnexo()">Nueva Entrada</button>            
+    <div class="list-group small">
+        <div class="list-group-item" ng-repeat="anexo in reporteActual.anexos track by $index">
+            <label class="col-1">
+                # {{$index + 1}}
+            </label>
+            <input placeholder="T&iacute;tulo" class="col-6 border-top-0 border-start-0 border-end-0" type="text" ng-model="anexo.titulo" ng-change="guardarData()">                
+            <button class="col-1 btn btn-danger btn-small" ng-click="eliminarAnexo($index)">Eliminar</button>
+
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<a class="collapsed btn" data-bs-toggle="collapse" href="#collapseActas">
+    Actas
+</a>
+</div>
+<div id="collapseActas" class="collapse" data-bs-parent="#accordion">
+<div class="card-body">
+
+    <button class="col-4 btn btn-primary btn-small" ng-click="agregarActa()">Nueva Entrada</button>            
+    <div class="list-group small">
+        <div class="list-group-item" ng-repeat="acta in reporteActual.actas track by $index">
+            <label class="col-1">
+                # {{$index + 1}}
+            </label>
+            <input placeholder="N&uacute;mero Acta" class="col-1 border-top-0 border-start-0 border-end-0" type="text" ng-model="acta.numero_acta" ng-change="guardarData()">
+            <input placeholder="T&iacute;tulo" class="col-5 border-top-0 border-start-0 border-end-0" type="text" ng-model="acta.titulo" ng-change="guardarData()">
+            <input placeholder="Fecha" class="col-1 border-top-0 border-start-0 border-end-0" type="text" ng-model="acta.fecha" ng-change="guardarData()">
+            <input placeholder="H Inicio" class="col-1 border-top-0 border-start-0 border-end-0" type="text" ng-model="acta.hora_inicio" ng-change="guardarData()">
+            <input placeholder="H Fin" class="col-1 border-top-0 border-start-0 border-end-0" type="text" ng-model="acta.hora_fin" ng-change="guardarData()">
+            <button class="col-1 btn btn-danger btn-small" ng-click="eliminarActa($index)">Eliminar</button>
+
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<a class="collapsed btn" data-bs-toggle="collapse" href="#collapsePreview">
+    Preview
+</a>
+</div>
+<div id="collapsePreview" class="collapse" data-bs-parent="#accordion">
+<div class="card-body">
+
+    <p><b>4.&nbsp;DESARROLLO DE LAS ACTIVIDADES</b></p>
+    <p>En el marco del contrato vigente, como {{data.cargo}}, a continuaci&oacute;n, se presenta el detalle de las actividades ejecutadas en este periodo, de acuerdo con las actividades establecidas en el contrato vigente.</p>
+
+    <p><b>4.1&nbsp;Cronograma</b></p>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nro.</th>
+                <th>Tarea</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>% Avance</th>
+                <th>Estado</th>
+            </tr>
+            
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in reporteActual.items_cronograma track by $index">
+                <td>{{$index +1}}</td>
+                <td>{{item.descripcion}}<span class="text-danger" ng-show="item.descripcion.trim().length == 0">No especificado!</span></td>
+                <td>{{item.fecha_inicio}}<span class="text-danger" ng-show="item.fecha_inicio.trim().length == 0">No especificado!</span></td>
+                <td>{{item.fecha_fin}}<span class="text-danger" ng-show="item.fecha_fin.trim().length == 0">No especificado!</span></td>
+                <td>{{item.avance}}<span class="text-danger" ng-show="item.avance.trim().length == 0">No especificado!</span></td>
+                <td>{{item.estado}}<span class="text-danger" ng-show="item.estado.trim().length == 0">No especificado!</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><b>4.2&nbsp;Reporte de actividades del mes</b></p>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th width="10%">Nro.</th>
+                <th width="80%">Actividades Ejecutadas</th>
+                <th width="10%">Nro. Actividad en el Contrato</th>
+            </tr>
+            
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in reporteActual.actividades track by $index">
+                <td width="10%">{{$index +1}}</td>
+                <td width="80%">
+                    <p><b>{{item.titulo}}<span class="text-danger" ng-show="item.titulo.trim().length == 0">No especificado!</span></b></p>
+                    <p>{{item.descripcion}}<span class="text-danger" ng-show="item.descripcion.trim().length == 0">No especificado!</span></p>
+                </td>
+                <td width="10%">{{item.numero_actividad}}<span class="text-danger" ng-show="item.numero_actividad.trim().length == 0">No especificado!</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><b>5.&nbsp;PRODUCTOS GENERADOS</b></p>
+    <div ng-repeat="item in reporteActual.productos track by $index">
+        <p><b>5.{{$index + 1}}&nbsp;{{item.titulo}}</b></p>
+        <p>{{item.descripcion}}</p>
+        <div ng-show="item.tablas.trim().length &gt; 0">
+            <p><b>Tablas Principales:</b></p>
+            <p>{{item.tablas}}</p>
+        </div>
+        <p><b>Conclusión:</b></p>
+        <p>{{item.conclusion}}<span class="text-danger" ng-show="item.conclusion.trim().length == 0">&nbsp;No se ha especificado!!</span></p>
+    </div>
+
+    <p><b>6.&nbsp;CONCLUSIONES</b></p>
+    <p>{{reporteActual.conclusiones}}<span class="text-danger" ng-show="reporteActual.conclusiones.trim().length == 0">&nbsp;No se ha especificado!!</span></p>
+
+    <p><b>7.&nbsp;RECOMENDACIONES</b></p>
+    <p>{{reporteActual.recomendaciones}}<span class="text-danger" ng-show="reporteActual.recomendaciones.trim().length == 0">&nbsp;No se ha especificado!!</span></p>
+
+    <p><b>8.&nbsp;ANEXOS</b></p>
+    <ul>
+        <li ng-repeat="item in reporteActual.anexos track by $index">
+            <b>Anexo Nro. {{$index + 1}}</b> - {{item.titulo}} <span class="text-danger" ng-show="item.titulo.trim().length == 0">&nbsp;No se ha especificado!!</span>
+        </li>        
+    </ul>
+
+    <p><b>9.&nbsp;ACTAS</b></p>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nro.</th>
+                <th>T&iacute;tulo</th>
+                <th>Fecha</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+            </tr>
+            
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in reporteActual.actas track by $index">
+                <td>{{item.numero_acta}}<span class="text-danger" ng-show="item.numero_acta.trim().length == 0">No especificado!</span></td>
+                <td>{{item.titulo}}<span class="text-danger" ng-show="item.titulo.trim().length == 0">No especificado!</span></td>
+                <td>{{item.fecha}}<span class="text-danger" ng-show="item.fecha.trim().length == 0">No especificado!</span></td>
+                <td>{{item.hora_inicio}}<span class="text-danger" ng-show="item.hora_inicio.trim().length == 0">No especificado!</span></td>
+                <td>{{item.hora_fin}}<span class="text-danger" ng-show="item.hora_fin.trim().length == 0">No especificado!</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<script lang="javascript">
+
+function generateUUIDv4() {
+    // Create an array of 16 random bytes
+    const cryptoObj = window.crypto || window.msCrypto; // for IE 11
+    const bytes = new Uint8Array(16);
+    cryptoObj.getRandomValues(bytes);
+
+    // Adjust certain bits according to RFC 4122 section 4.4
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // Set the version to 0100
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // Set the variant to 10
+
+    // Convert bytes to hex and format as UUID
+    const hexBytes = Array.from(bytes, byte => byte.toString(16).padStart(2, '0'));
+    return [
+        hexBytes.slice(0, 4).join(''),
+        hexBytes.slice(4, 6).join(''),
+        hexBytes.slice(6, 8).join(''),
+        hexBytes.slice(8, 10).join(''),
+        hexBytes.slice(10, 16).join('')
+    ].join('-');
+}
+
+const reporteApp = angular.module("reporteApp",[]);
+
+reporteApp.controller("reporteController", function($scope){
+    
+    $scope.cargarData = ()=>{
+        $scope.data = null;
+        const xpdrep_data = localStorage.getItem("xpdrep_data");
+        //const xpdrep_data = null;
+        if(xpdrep_data != null){
+            try{
+                $scope.data = JSON.parse(xpdrep_data);
+            }catch(ex){
+            }
+        }
+        if($scope.data == null){
+            $scope.data = {id:generateUUIDv4(), identificacion:"", nombre:"", cargo:"", numero_contrato:"" , funciones:[], reportes:[]};
+            $scope.guardarData();
+        }
+    };
+
+    $scope.guardarData = ()=>{
+        const data_string = JSON.stringify($scope.data)
+        localStorage.setItem("xpdrep_data", data_string);
+    };
+
+    $scope.agregarFuncion = ()=>{
+        $scope.data.funciones.push({id:generateUUIDv4(), descripcion:""});
+        $scope.guardarData();
+    }
+
+    $scope.eliminarFuncion = (indice) => {
+        if(indice < 0 || indice >= $scope.data.funciones.length){
+            alert("Funcion no econtrada");
+            return;
+        }
+        if (! confirm(`Desea realmente eliminar la funcion "${$scope.data.funciones[indice].descripcion}" ?`)){
+            return;
+        }
+        $scope.data.funciones.splice(indice, 1);
+        $scope.guardarData();
+        alert("Función Removida");        
+    };
+
+    $scope.agregarReporte = ()=>{
+        const nuevo_reporte = {periodo:"Mes Año", items_cronograma:[], actividades:[], productos:[], conclusiones:"", recomendaciones:"", anexos:[], actas:[]};
+        $scope.data.reportes.reverse();
+        $scope.data.reportes.push(nuevo_reporte);
+        $scope.data.reportes.reverse();
+        $scope.guardarData();
+        $scope.seleccionarReporte(nuevo_reporte);
+    }
+
+    $scope.eliminarReporteActual = ()=>{
+        const indice = $scope.data.reportes.indexOf($scope.reporteActual);
+        if(indice < 0 || indice >= $scope.data.reportes.length){
+            alert("Reporte no econtrado");
+            return;
+        }
+        if (! confirm(`Desea realmente eliminar Reporte "${$scope.data.reportes[indice].periodo}" ?`)){
+            return;
+        }
+        $scope.data.reportes.splice(indice, 1);
+        $scope.guardarData();        
+        alert("Reporte Removido");
+        $scope.irPrincipal();
+    };
+
+    $scope.agregarCronograma = ()=>{
+        const nuevo_cronograma = {descripcion:"", fecha_inicio:"", fecha_fin:"", avance:0, estado:""};
+        $scope.reporteActual.items_cronograma.push(nuevo_cronograma);
+        $scope.guardarData();
+    };
+
+    $scope.eliminarCronograma = (indice)=>{
+        if(indice < 0 || indice >= $scope.reporteActual.items_cronograma.length){
+            alert("Cronograma no econtrado");
+            return;
+        }
+        if (! confirm(`Desea realmente eliminar cronograma "${$scope.reporteActual.items_cronograma[indice].descripcion}" ?`)){
+            return;
+        }
+        $scope.reporteActual.items_cronograma.splice(indice, 1);
+        $scope.guardarData();
+        alert("Cronograma Removido");
+    };
+
+    $scope.agregarActividad = ()=>{
+        const nuevo_actividad = {titulo:"", descripcion:"", numero_actividad:""};
+        $scope.reporteActual.actividades.push(nuevo_actividad);
+        $scope.guardarData();
+    };
+
+    $scope.eliminarActividad = (indice)=>{
+        if(indice < 0 || indice >= $scope.reporteActual.actividades.length){
+            alert("Actividad no econtrado");
+            return;
+        }
+        if (! confirm(`Desea realmente eliminar actividad "${$scope.reporteActual.actividades[indice].titulo}" ?`)){
+            return;
+        }
+        $scope.reporteActual.actividades.splice(indice, 1);
+        $scope.guardarData();
+        alert("Actividad Removida");
+    };
+
+    $scope.agregarProducto = ()=>{
+        const nuevo_producto = {titulo:"", descripcion:"", tablas:"", conclusion:""};
+        $scope.reporteActual.productos.push(nuevo_producto);
+        $scope.guardarData();
+    };
+
+    $scope.eliminarProducto = (indice)=>{
+        if(indice < 0 || indice >= $scope.reporteActual.productos.length){
+            alert("Producto no econtrado");
+            return;
+        }
+        if (! confirm(`Desea realmente eliminar producto "${$scope.reporteActual.productos[indice].titulo}" ?`)){
+            return;
+        }
+        $scope.reporteActual.productos.splice(indice, 1);
+        $scope.guardarData();
+        alert("Producto Removido");
+    };
+
+    $scope.agregarAnexo = ()=>{
+        const nuevo_anexo = {titulo:""};
+        $scope.reporteActual.anexos.push(nuevo_anexo);
+        $scope.guardarData();
+    };
+
+    $scope.eliminarAnexo = (indice)=>{
+        if(indice < 0 || indice >= $scope.reporteActual.anexos.length){
+            alert("Anexo no econtrado");
+            return;
+        }
+        if (! confirm(`Desea realmente eliminar anexo "${$scope.reporteActual.anexos[indice].titulo}" ?`)){
+            return;
+        }
+        $scope.reporteActual.anexos.splice(indice, 1);
+        $scope.guardarData();
+        alert("Anexo Removido");
+    };
+
+    $scope.agregarActa = ()=>{
+        const nueva_acta = {numero_acta:"", titulo:"", fecha:"", hora_inicio:"", hora_fin:""};
+        $scope.reporteActual.actas.push(nueva_acta);
+        $scope.guardarData();
+    };
+
+    $scope.eliminarActa = (indice)=>{
+        if(indice < 0 || indice >= $scope.reporteActual.actas.length){
+            alert("Acta no econtrada");
+            return;
+        }
+        if (! confirm(`Desea realmente eliminar acta "${$scope.reporteActual.actas[indice].titulo}" ?`)){
+            return;
+        }
+        $scope.reporteActual.actas.splice(indice, 1);
+        $scope.guardarData();
+        alert("Anexo Removido");
+    };
+
+    $scope.irPrincipal = ()=>{
+        $scope.reporteActual = null;
+        $scope.pantallaActual = "principal";
+    };
+
+    $scope.seleccionarReporte = (indice)=>{
+        $scope.reporteActual = $scope.data.reportes[indice];
+        $scope.pantallaActual = "reporte";
+    }
+
+    $scope.cargarData();
+    $scope.reporteActual = null;
+    $scope.pantallaActual = "principal";
+});
+
+</script>
+</body>
+</html>
