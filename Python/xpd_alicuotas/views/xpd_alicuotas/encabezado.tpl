@@ -13,7 +13,7 @@
 % end
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-expand fixed-top border-bottom justify-content-between w-100 p-0">
+    <nav class="navbar navbar-expand fixed-top border-bottom justify-content-between w-100 p-0" style="background-color:#8888FF">
         <a class="navbar-brand ml-5" href="/">{{titulo}}</a>
         <div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
 % if usuario:

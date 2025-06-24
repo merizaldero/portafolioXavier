@@ -26,7 +26,7 @@
             {{objeto['nombre']}}
         </td>
         <td>
-            {{objeto['saldo']}}
+            {{"{0:0.2f}".format(objeto['saldo'])}}
         </td>
         <td></td>
         <td>

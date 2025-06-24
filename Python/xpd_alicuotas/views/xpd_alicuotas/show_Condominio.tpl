@@ -23,7 +23,7 @@
         saldo:
     </span>
     <span class="col">
-        {{objeto['saldo']}}
+        {{"{0:0.2f}".format(objeto['saldo'])}}
     </span>
 </div>
 
@@ -34,14 +34,16 @@
         <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/editar">
             Editar
         </a>
+% if len(departamentos) + len(transaccions) + len(egresos) == 0:
         <a class="btn btn-secondary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/eliminar" onclick="return confirm('Desea proceder con eliminación?');">
             Eliminar
         </a>
+% end
     </div>
 
     <div class="card">
         <div class = "card-body d-flex justify-content-center">
-            <img id="img_alicuotas" src="/static/graficas/alicuotas_{{objeto['id']}}.png">        
+            <img class="w-100" id="img_alicuotas" src="/static/graficas/alicuotas_{{objeto['id']}}.png">        
         </div>
         <div class = "card-footer d-flex justify-content-center">
             <button id="btn_refrescar_alicuotas" class="btn btn-secondary">Actualizar</button>
@@ -109,7 +111,7 @@
                         <td>{{departamento['numero_dep']}}</td>
                         <td>{{departamento['propietario']}}</td>
                         <td>{{departamento['arrendatario']}}</td>
-                        <td>{{departamento['saldo']}}</td>
+                        <td>{{"{0:0.2f}".format(departamento['saldo'])}}</td>
                         <td>
                             <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/departamentos/{{departamento['id']}}">Mostrar</a>
                         </td>
@@ -177,9 +179,9 @@
                         <td>{{transaccion['id']}}</td>
                         <td>{{transaccion['fecha']}}</td>
                         <td>{{transaccion['concepto']}}</td>
-                        <td>{{transaccion['monto']}}</td>
-                        <td>{{transaccion['saldo_antes']}}</td>
-                        <td>{{transaccion['saldo_despues']}}</td>
+                        <td>{{"{0:0.2f}".format(transaccion['monto'])}}</td>
+                        <td>{{"{0:0.2f}".format(transaccion['saldo_antes'])}}</td>
+                        <td>{{"{0:0.2f}".format(transaccion['saldo_despues'])}}</td>
                         <td>{{transaccion['anulado']}}</td>
                         <td>{{transaccion['id_abono']}}</td>
                         <td>{{transaccion['id_egreso']}}</td>
@@ -238,7 +240,7 @@
                         <td>{{egreso['id']}}</td>
                         <td>{{egreso['fecha']}}</td>
                         <td>{{egreso['destino']}}</td>
-                        <td>{{egreso['monto']}}</td>
+                        <td>{{"{0:0.2f}".format(egreso['monto'])}}</td>
                         <td>{{egreso['observaciones']}}</td>
                         <td>{{egreso['anulado']}}</td>
                         <td>

@@ -1066,27 +1066,11 @@ def servir_page_editar_alicuota(id):
     # A partir de este punto se asume POST
     mensajes_error = []
 
-    alicuota["anio"] = request.forms.get( "anio", "").strip()
-        
-    if len(alicuota["anio"]) == 0:
-        mensajes_error.append("anio es requerido")
-
-    try:
-        alicuota["anio"] = int( alicuota["anio"] )
-    except:
-        mensajes_error.append("El valor de anio no es válido")
-
-    alicuota["mes"] = request.forms.get( "mes", "").strip()
-        
-    if len(alicuota["mes"]) == 0:
-        mensajes_error.append("mes es requerido")
-
-    try:
-        alicuota["mes"] = int( alicuota["mes"] )
-    except:
-        mensajes_error.append("El valor de mes no es válido")
+    if alicuota['pagado'] == '1' or alicuota["monto_pendiente"] < alicuota["monto"]:
+        mensajes_error.append("observaciones es requerido")
 
     alicuota["monto"] = request.forms.get( "monto", "").strip()
+    alicuota["monto_pendiente"] = alicuota["monto"]
         
     if len(alicuota["monto"]) == 0:
         mensajes_error.append("monto es requerido")
@@ -1095,22 +1079,6 @@ def servir_page_editar_alicuota(id):
         alicuota["monto"] = float( alicuota["monto"] )
     except:
         mensajes_error.append("El valor de monto no es válido")
-
-    alicuota["monto_pendiente"] = request.forms.get( "monto_pendiente", "").strip()
-        
-    if len(alicuota["monto_pendiente"]) == 0:
-        mensajes_error.append("monto_pendiente es requerido")
-
-    try:
-        alicuota["monto_pendiente"] = float( alicuota["monto_pendiente"] )
-    except:
-        mensajes_error.append("El valor de monto_pendiente no es válido")
-
-    alicuota["pagado"] = request.forms.get( "pagado", "").strip()
-        
-    alicuota["pagado"] = alicuota["pagado"] == "1"
-
-    alicuota["observaciones"] = request.forms.get( "observaciones", "").strip()
         
     if len(alicuota["observaciones"]) == 0:
         mensajes_error.append("observaciones es requerido")
@@ -1120,13 +1088,16 @@ def servir_page_editar_alicuota(id):
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Alicuota", objeto = alicuota, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/alicuotas/" + str(alicuota['id']), fecha_iso_to_js = fecha_iso_to_js )    
+
     try:
         transaccionar(Alicuotas.actualizar, alicuota)
     except:
         return template("xpd_alicuotas/editar_Alicuota", objeto = alicuota, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/alicuotas/" + str(alicuota['id']), fecha_iso_to_js = fecha_iso_to_js )
+
     return template("xpd_alicuotas/editar_Alicuota", objeto = alicuota, usuario = usuario, lvl = "success", mensaje = "Actualizacion ha sido exitosa", ruta_cancelar = "/xpd_alicuotas/alicuotas/" + str(alicuota['id']), fecha_iso_to_js = fecha_iso_to_js )
 
-CONFIG['rutas'].append({'ruta':'/alicuotas/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_alicuota })
+# Edicion de Alicuotas se deshabilita para guardar consistencia con saldo de departamento
+# CONFIG['rutas'].append({'ruta':'/alicuotas/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_alicuota })
 
 def servir_page_insertar_alicuota(id_departamento):
 
@@ -1149,48 +1120,33 @@ def servir_page_insertar_alicuota(id_departamento):
     alicuota['id_departamento'] = id_departamento
 
     alicuota["anio"] = request.forms.get( "anio", "").strip()
-        
     if len(alicuota["anio"]) == 0:
         mensajes_error.append("anio es requerido")
-
     try:
         alicuota["anio"] = int( alicuota["anio"] )
     except:
         mensajes_error.append("El valor de anio no es válido")
 
     alicuota["mes"] = request.forms.get( "mes", "").strip()
-        
     if len(alicuota["mes"]) == 0:
         mensajes_error.append("mes es requerido")
-
     try:
         alicuota["mes"] = int( alicuota["mes"] )
     except:
         mensajes_error.append("El valor de mes no es válido")
 
     alicuota["monto"] = request.forms.get( "monto", "").strip()
-        
     if len(alicuota["monto"]) == 0:
         mensajes_error.append("monto es requerido")
-
     try:
         alicuota["monto"] = float( alicuota["monto"] )
     except:
         mensajes_error.append("El valor de monto no es válido")
 
-    alicuota["monto_pendiente"] = request.forms.get( "monto_pendiente", "").strip()
+    alicuota["monto_pendiente"] = alicuota['monto'] # request.forms.get( "monto_pendiente", "").strip()
         
-    if len(alicuota["monto_pendiente"]) == 0:
-        mensajes_error.append("monto_pendiente es requerido")
-
-    try:
-        alicuota["monto_pendiente"] = float( alicuota["monto_pendiente"] )
-    except:
-        mensajes_error.append("El valor de monto_pendiente no es válido")
-
-    alicuota["pagado"] = request.forms.get( "pagado", "").strip()
-        
-    alicuota["pagado"] = alicuota["pagado"] == "1"
+    alicuota["pagado"] = '0'
+    alicuota["pagado"] = alicuota["pagado"] == '1'
 
     alicuota["observaciones"] = request.forms.get( "observaciones", "").strip()
         
@@ -1202,10 +1158,17 @@ def servir_page_insertar_alicuota(id_departamento):
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Alicuota", objeto = alicuota, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )    
+    con = orm.Conexion(PATH_BDD)
     try:
-        transaccionar(Alicuotas.insertar, alicuota)
+        departamento['saldo'] -= alicuota['monto_pendiente']
+        Alicuotas.insertar(con, alicuota)
+        Departamentos.actualizar(con, departamento)
+        con.commit()
     except:
+        con.rollback()
         return template("xpd_alicuotas/editar_Alicuota", objeto = alicuota, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )
+    finally:
+        con.close()
     return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/alicuotas/" + str(alicuota['id']) )
 
 CONFIG['rutas'].append({'ruta':'/departamentos/<id_departamento>/nuevoalicuota', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_alicuota })
@@ -1268,77 +1231,44 @@ def servir_page_editar_abono(id):
     # A partir de este punto se asume POST
     mensajes_error = []
 
-    abono["fecha"] = request.forms.get( "fecha", "").strip()
-        
-    if len(abono["fecha"]) == 0:
-        mensajes_error.append("fecha es requerido")
+    if abono['aplicado'] == '1':
+        mensajes_error.append("El abono ha sido aplicado y no se puede editar")
 
-    try:
-        if len(abono["fecha"]) > 0:
-            abono["fecha"] = fecha_js_to_iso(abono["fecha"])
-    except:
-        mensajes_error.append("fecha no es una fecha válida")
-
-    abono["monto"] = request.forms.get( "monto", "").strip()
-        
-    if len(abono["monto"]) == 0:
-        mensajes_error.append("monto es requerido")
-
-    try:
-        abono["monto"] = float( abono["monto"] )
-    except:
-        mensajes_error.append("El valor de monto no es válido")
-
-    abono["monto_aprobado"] = request.forms.get( "monto_aprobado", "").strip()
-        
+    abono["monto_aprobado"] = request.forms.get( "monto_aprobado", "").strip()        
     if len(abono["monto_aprobado"]) == 0:
         mensajes_error.append("monto_aprobado es requerido")
-
     try:
         abono["monto_aprobado"] = float( abono["monto_aprobado"] )
     except:
         mensajes_error.append("El valor de monto_aprobado no es válido")
 
-    abono["monto_por_aplicar"] = request.forms.get( "monto_por_aplicar", "").strip()
-        
-    if len(abono["monto_por_aplicar"]) == 0:
-        mensajes_error.append("monto_por_aplicar es requerido")
-
-    try:
-        abono["monto_por_aplicar"] = float( abono["monto_por_aplicar"] )
-    except:
-        mensajes_error.append("El valor de monto_por_aplicar no es válido")
+    abono["monto_por_aplicar"] = abono["monto_aprobado"] # request.forms.get( "monto_por_aplicar", "").strip()
 
     abono["observacion"] = request.forms.get( "observacion", "").strip()
-        
     if len(abono["observacion"]) > 256:
         mensajes_error.append("El tamaño de observacion excede el permitido")
 
     abono["genera_egreso"] = request.forms.get( "genera_egreso", "").strip()
-        
     abono["genera_egreso"] = abono["genera_egreso"] == "1"
 
     abono["aplicado"] = request.forms.get( "aplicado", "").strip()
-        
     abono["aplicado"] = abono["aplicado"] == "1"
-
-    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
-        
-    abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
-
-    abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
-        
-    try:
-        abono["id_egreso"] = int( abono["id_egreso"] )
-    except:
-        mensajes_error.append("El valor de id_egreso no es válido")
 
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )    
+    
+    con = orm.Conexion(PATH_BDD)
     try:
-        transaccionar(Abonos.actualizar, abono)
+        Abonos.actualizar(con, abono)
+        if abono['aplicado'] == '1':
+            aplicarAbonos(con, abono['id_departamento'])
+        con.commit()
     except:
+        con.rollback()
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )
+    finally:
+        con.close()
+        
     return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "success", mensaje = "Actualizacion ha sido exitosa", ruta_cancelar = "/xpd_alicuotas/abonos/" + str(abono['id']), fecha_iso_to_js = fecha_iso_to_js )
 
 CONFIG['rutas'].append({'ruta':'/abonos/<id>/editar', 'metodos':['GET','POST'], 'funcion': servir_page_editar_abono })
@@ -1363,71 +1293,51 @@ def servir_page_insertar_abono(id_departamento):
 
     abono['id_departamento'] = id_departamento
 
-    abono["fecha"] = request.forms.get( "fecha", "").strip()
-        
+    abono["fecha"] = request.forms.get( "fecha", "").strip()        
     if len(abono["fecha"]) == 0:
         mensajes_error.append("fecha es requerido")
 
-    abono["monto"] = request.forms.get( "monto", "").strip()
-        
-    if len(abono["monto"]) == 0:
-        mensajes_error.append("monto es requerido")
-
-    try:
-        abono["monto"] = float( abono["monto"] )
-    except:
-        mensajes_error.append("El valor de monto no es válido")
-
     abono["monto_aprobado"] = request.forms.get( "monto_aprobado", "").strip()
-        
     if len(abono["monto_aprobado"]) == 0:
         mensajes_error.append("monto_aprobado es requerido")
-
     try:
         abono["monto_aprobado"] = float( abono["monto_aprobado"] )
     except:
         mensajes_error.append("El valor de monto_aprobado no es válido")
 
-    abono["monto_por_aplicar"] = request.forms.get( "monto_por_aplicar", "").strip()
+    abono["monto_por_aplicar"] = abono['monto_aprobado'] # request.forms.get( "monto_por_aplicar", "").strip()
         
-    if len(abono["monto_por_aplicar"]) == 0:
-        mensajes_error.append("monto_por_aplicar es requerido")
-
-    try:
-        abono["monto_por_aplicar"] = float( abono["monto_por_aplicar"] )
-    except:
-        mensajes_error.append("El valor de monto_por_aplicar no es válido")
-
     abono["observacion"] = request.forms.get( "observacion", "").strip()
         
     if len(abono["observacion"]) > 256:
         mensajes_error.append("El tamaño de observacion excede el permitido")
 
     abono["genera_egreso"] = request.forms.get( "genera_egreso", "").strip()
-        
     abono["genera_egreso"] = abono["genera_egreso"] == "1"
 
     abono["aplicado"] = request.forms.get( "aplicado", "").strip()
-        
     abono["aplicado"] = abono["aplicado"] == "1"
 
-    abono["aplicado_saldo"] = request.forms.get( "aplicado_saldo", "").strip()
-        
+    abono["aplicado_saldo"] = '0' # request.forms.get( "aplicado_saldo", "").strip()        
     abono["aplicado_saldo"] = abono["aplicado_saldo"] == "1"
 
-    abono["id_egreso"] = request.forms.get( "id_egreso", "").strip()
-        
-    try:
-        abono["id_egreso"] = int( abono["id_egreso"] )
-    except:
-        mensajes_error.append("El valor de id_egreso no es válido")
-
+    abono["id_egreso"] = None
+    
     if len(mensajes_error) > 0:
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error), ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )    
-    try:
-        transaccionar(Abonos.insertar, abono)
+    
+    con = orm.Conexion(PATH_BDD)
+    try:        
+        Abonos.insertar(con, abono)
+        if abono['aplicado'] == True:
+            aplicarAbonos(con, departamento['id'])
+        con.commit()
     except:
+        con.rollback()
         return template("xpd_alicuotas/editar_Abono", objeto = abono, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al guardar la información", ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js )
+    finally:
+        con.close()
+    
     return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/abonos/" + str(abono['id']) )
 
 CONFIG['rutas'].append({'ruta':'/departamentos/<id_departamento>/nuevoabono', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_abono })

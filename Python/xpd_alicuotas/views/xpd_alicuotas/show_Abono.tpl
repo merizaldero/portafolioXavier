@@ -83,10 +83,14 @@
 
 <div class="row">
     <span class="col">
-        id_egreso:
+        Egreso Generado:
     </span>
     <span class="col">
-        {{objeto['id_egreso']}}
+% if objeto['id_egreso'] is not None:
+        <a href="/xpd_alicuotas/egresos/{{objeto['id_egreso']}}">Mostrar</a>
+% else:
+        No Generado
+% end
     </span>
 </div>
 
@@ -94,18 +98,20 @@
         <a class="btn btn-secondary" href="/xpd_alicuotas/departamentos/{{objeto['id_departamento']}}">
             Volver
         </a>
+% if objeto['aplicado'] == '0':
         <a class="btn btn-primary" href="/xpd_alicuotas/abonos/{{objeto['id']}}/editar">
             Editar
         </a>
         <a class="btn btn-secondary" href="/xpd_alicuotas/abonos/{{objeto['id']}}/eliminar" onclick="return confirm('Desea proceder con eliminación?');">
             Eliminar
         </a>
+% end
     </div>
 
     <ul class="mt-3 nav nav-tabs nav-justified">
 
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#divEventoLimpezaAlicuotas">EventoLimpezaAlicuotas ({{len(eventolimpezaalicuotas)}})</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#divEventoLimpezaAlicuotas">Abonos Aplicados ({{len(eventolimpezaalicuotas)}})</a>
         </li>
 
     </ul>
@@ -128,9 +134,6 @@
                             Monto
                         </th>
 
-                        <th>
-                            <a class="btn btn-primary btn-sm" href="/xpd_alicuotas/abonos/{{objeto['id']}}/nuevoeventolimpezaalicuota">Crear Nuevo</a>
-                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,9 +149,7 @@
                         <td>{{eventolimpezaalicuota['id']}}</td>
                         <td>{{eventolimpezaalicuota['id_alicuota']}}</td>
                         <td>{{eventolimpezaalicuota['monto']}}</td>
-                        <td>
-                            <a class="btn btn-primary btn-sm" href = "/xpd_alicuotas/eventolimpezaalicuotas/{{eventolimpezaalicuota['id']}}">Mostrar</a>
-                        </td>
+
                     </tr>
 % end
                 </tbody>

@@ -11,7 +11,7 @@
 
 <div class="row">
     <span class="col">
-        anio:
+        A&nacute;o:
     </span>
     <span class="col">
         {{objeto['anio']}}
@@ -20,7 +20,7 @@
 
 <div class="row">
     <span class="col">
-        mes:
+        Mes:
     </span>
     <span class="col">
         {{objeto['mes']}}
@@ -67,12 +67,11 @@
         <a class="btn btn-secondary" href="/xpd_alicuotas/departamentos/{{objeto['id_departamento']}}">
             Volver
         </a>
-        <a class="btn btn-primary" href="/xpd_alicuotas/alicuotas/{{objeto['id']}}/editar">
-            Editar
-        </a>
+% if objeto['pagado'] == '0' and objeto['monto'] == objeto['monto_pendiente'] :
         <a class="btn btn-secondary" href="/xpd_alicuotas/alicuotas/{{objeto['id']}}/eliminar" onclick="return confirm('Desea proceder con eliminación?');">
             Eliminar
         </a>
+% end
     </div>
 
 % include('xpd_alicuotas/pie.tpl', usuario = usuario)

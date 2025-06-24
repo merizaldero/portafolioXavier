@@ -8,7 +8,7 @@
 
 <div class="row">
     <label class="col form-label" for="anio">
-    anio*:
+    A&nacute;o *:
     </label>
 
 <span class="col">
@@ -19,7 +19,7 @@
 
 <div class="row">
     <label class="col form-label" for="mes">
-    mes*:
+    Mes *:
     </label>
 
 <span class="col">
@@ -30,33 +30,11 @@
 
 <div class="row">
     <label class="col form-label" for="monto">
-    monto*:
+    Monto *:
     </label>
 
 <span class="col">
-        <input class="form-control" type="number" name="monto" value="{{objeto['monto']}}" maxlength="5">
-    </span>
-
-</div>
-
-<div class="row">
-    <label class="col form-label" for="monto_pendiente">
-    monto_pendiente*:
-    </label>
-
-<span class="col">
-        <input class="form-control" type="number" name="monto_pendiente" value="{{objeto['monto_pendiente']}}" maxlength="5">
-    </span>
-
-</div>
-
-<div class="row">
-    <label class="col form-label" for="pagado">
-    pagado*:
-    </label>
-
-    <span class="col">
-        <input class="form-check form-switch" type="checkbox" name="pagado" value="1">
+        <input class="form-control" type="number" step="0.01" name="monto" value="{{objeto['monto']}}" maxlength="5">
     </span>
 
 </div>
@@ -76,7 +54,9 @@
         <a class="btn btn-secondary" href="{{ruta_cancelar}}">
             Cancelar
         </a>
+% if objeto['id'] is None or (objeto['pagado'] == '0' and objeto['monto'] == objeto['monto_pendiente']) :
         <input type="submit" value="Guardar" class="btn btn-primary">
+% end
     </div>
 </form>
 % include('xpd_alicuotas/pie.tpl', usuario = usuario)

@@ -23,7 +23,11 @@
     </label>
 
 <span class="col">
-        <input class="form-control" type="number" name="saldo" value="{{objeto['saldo']}}" maxlength="0">
+% if 'id' in objeto and objeto['id'] is not None:
+        {{"{0:.2f}".format(objeto['saldo'])}}
+% else:
+        <input class="form-control" type="number" name="saldo" value="{{objeto['saldo']}}" maxlength="9">
+% end
     </span>
 
 </div>
