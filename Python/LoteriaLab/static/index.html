@@ -32,45 +32,138 @@
     </div>            
 </div>
 
-<div id="seccion_resultado" class="mt-3 w-100 d-flex flex-row justify-content-center">
-    <div class="btn-group mt-3">
-        <button id="resultado_0" class="btn btn-success">1</button>
-        <button id="resultado_1" class="btn btn-success">2</button>
-        <button id="resultado_2" class="btn btn-success">3</button>
-        <button id="resultado_3" class="btn btn-success">4</button>
-        <button id="resultado_4" class="btn btn-success">5</button>
-        <button id="resultado_5" class="btn btn-success">6</button>
+    <div class="mt-3 row">
+        <button id="resultado_0" class="col-2 btn btn-success">1</button>
+        <button id="resultado_1" class="col-2 btn btn-success">2</button>
+        <button id="resultado_2" class="col-2 btn btn-success">3</button>
+        <button id="resultado_3" class="col-2 btn btn-success">4</button>
+        <button id="resultado_4" class="col-2 btn btn-success">5</button>
+        <button id="resultado_5" class="col-2 btn btn-success">6</button>
     </div>
+
+
+    <div id="seccion_success" class="mt-3 row">
+        <div class="col-2 alert alert-success d-flex flex-column align-items-center" id="success_pos_0"></div>
+        <div class="col-2 alert alert-success d-flex flex-column align-items-center" id="success_pos_1"></div>
+        <div class="col-2 alert alert-success d-flex flex-column align-items-center" id="success_pos_2"></div>
+        <div class="col-2 alert alert-success d-flex flex-column align-items-center" id="success_pos_3"></div>
+        <div class="col-2 alert alert-success d-flex flex-column align-items-center" id="success_pos_4"></div>
+        <div class="col-2 alert alert-success d-flex flex-column align-items-center" id="success_pos_5"></div>
+    </div>
+
+<div id="seccion_warning" class="mt-1 row">
+    <div class="col-2 alert alert-warning d-flex flex-column align-items-center" id="warning_pos_0"></div>
+    <div class="col-2 alert alert-warning d-flex flex-column align-items-center" id="warning_pos_1"></div>
+    <div class="col-2 alert alert-warning d-flex flex-column align-items-center" id="warning_pos_2"></div>
+    <div class="col-2 alert alert-warning d-flex flex-column align-items-center" id="warning_pos_3"></div>
+    <div class="col-2 alert alert-warning d-flex flex-column align-items-center" id="warning_pos_4"></div>
+    <div class="col-2 alert alert-warning d-flex flex-column align-items-center" id="warning_pos_5"></div>
 </div>
 
-<div id="seccion_success" class="mt-3 w-100 d-flex flex-row justify-content-center">
-    <div class="btn-group-vertical" id="success_pos_0"></div>
-    <div class="btn-group-vertical" id="success_pos_1"></div>
-    <div class="btn-group-vertical" id="success_pos_2"></div>
-    <div class="btn-group-vertical" id="success_pos_3"></div>
-    <div class="btn-group-vertical" id="success_pos_4"></div>
-    <div class="btn-group-vertical" id="success_pos_5"></div>
-</div>
-
-<div id="seccion_warning" class="mt-1 w-100 d-flex flex-row justify-content-center">
-    <div class="btn-group-vertical" id="warning_pos_0"></div>
-    <div class="btn-group-vertical" id="warning_pos_1"></div>
-    <div class="btn-group-vertical" id="warning_pos_2"></div>
-    <div class="btn-group-vertical" id="warning_pos_3"></div>
-    <div class="btn-group-vertical" id="warning_pos_4"></div>
-    <div class="btn-group-vertical" id="warning_pos_5"></div>
-</div>
-
-<div id="seccion_danger" class="mt-1 w-100 d-flex flex-row justify-content-center">
-    <div class="btn-group-vertical" id="danger_pos_0"></div>
-    <div class="btn-group-vertical" id="danger_pos_1"></div>
-    <div class="btn-group-vertical" id="danger_pos_2"></div>
-    <div class="btn-group-vertical" id="danger_pos_3"></div>
-    <div class="btn-group-vertical" id="danger_pos_4"></div>
-    <div class="btn-group-vertical" id="danger_pos_5"></div>
+<div id="seccion_danger" class="mt-1 row">
+    <div class="col-2 alert alert-danger d-flex flex-column align-items-center" id="danger_pos_0"></div>
+    <div class="col-2 alert alert-danger d-flex flex-column align-items-center" id="danger_pos_1"></div>
+    <div class="col-2 alert alert-danger d-flex flex-column align-items-center" id="danger_pos_2"></div>
+    <div class="col-2 alert alert-danger d-flex flex-column align-items-center" id="danger_pos_3"></div>
+    <div class="col-2 alert alert-danger d-flex flex-column align-items-center" id="danger_pos_4"></div>
+    <div class="col-2 alert alert-danger d-flex flex-column align-items-center" id="danger_pos_5"></div>
 </div>
 
 
 </body>
-<script src="js/lotto.js?5"></script>
+<script>
+
+function on_tecla(event){
+    const tecla = event.target.innerText;
+    const txtNumero = document.getElementById("txtNumero");
+    if( txtNumero.value.length >= 6 ){
+        return;
+    }
+    txtNumero.value += tecla;
+}
+
+function btnBorrar_click(event){
+    const txtNumero = document.getElementById("txtNumero");
+    txtNumero.value = "";
+}
+
+async function btnConsultar_click(event){
+    const txtNumero = document.getElementById("txtNumero");
+    // const seccion_resultado = document.getElementById("seccion_resultado");
+    const valor = txtNumero.value.trim();
+    if( valor.length != 6 ){
+        alert("Debe ingresar 6 dígitos");
+        return;
+    }
+
+    /*
+    if( !seccion_resultado.classList.contains("collapse") ){
+        seccion_resultado.classList.add("collapse");
+    }
+    */
+
+    let formBody = new FormData();
+    formBody.append('numero', valor);
+    res = await fetch('/evaluar',  {
+        method: "POST",
+        body: formBody
+       // headers: { "Content-Type": "application/x-www-form-urlencoded",}
+    });
+
+    if(res.status!=200){
+        alert("ocurrió error " + res.status);
+        return;
+    }
+
+    const obj_resultado = await res.json();
+    let clase = "";
+
+    for(let indice = 0; indice < 6; indice ++){
+        const btn_resultado = document.getElementById("resultado_" + indice);
+        btn_resultado.classList.remove("btn-success","btn-warning","btn-danger")
+        btn_resultado.innerText = valor.charAt(indice);
+        clase = "btn-" + obj_resultado.resultado[indice];
+        btn_resultado.classList.add(clase);
+    }
+
+    //sseccion_resultado.classList.remove("collapse");
+}
+
+function cargar_top(){
+    ['success','warning','danger'].forEach(async (ranking) =>{
+        const res = await fetch(`/ranking/${ranking}`,  {
+            method: "GET",
+        });
+        if(res.status!=200){
+            alert("No se pudo obtener top. error " + res.status);
+            return;
+        }
+        const obj_resultado = await res.json();
+        let divPadre, spanNumero;
+        obj_resultado.resultado.forEach(item => {
+            divPadre = document.getElementById(`${ranking}_pos_${item.posicion}`);
+            spanNumero = document.createElement("div");
+            spanNumero.innerHTML = `<span><b>${item.digito}</b></span><span>${(item.probabilidad*100).toFixed(2)}%</span>`;
+            spanNumero.classList.add("d-flex","flex-column","small","align-items-center");
+            // data-bs-toggle="tooltip" title="Hooray!"
+            spanNumero.setAttribute('data-bs-toggle','tooltip');
+            spanNumero.setAttribute('title',`${"Pos "+item.posicion+"\nDigito: "+item.digito + "\nProbabilidad: " + item.probabilidad}`);
+            divPadre.appendChild(spanNumero);
+        });    
+    });
+}
+
+window.addEventListener("load", (event) => {
+    cargar_top();
+    //habilita botones como teclado
+    const lista_botones = document.getElementsByClassName("teclado");
+    for(let indice = 0; indice< lista_botones.length; indice++){
+        lista_botones[indice].addEventListener("click", on_tecla);
+    }
+    document.getElementById("btnBorrar").addEventListener("click", btnBorrar_click);
+    document.getElementById("btnConsultar").addEventListener("click", btnConsultar_click);
+
+});
+
+</script>
 </html>
