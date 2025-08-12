@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPD Karaoke</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body id="divPantalla" style="height: 700px;" class="container-fluid">
+    <div class="h-100 w-100" ng-app="xpd_karaoke_app" ng-controller="xpd_karaoke_controller">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">XPD Karaoke</a>
+                <span class="navbar-text" ng-show="cancion_actual">{{cancion_actual.label}}</span>
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#divOffcanvas">
+                Elegir Canci&oacute;n &gt;
+                </button>
+            </div>            
+        </nav>
+        <div class="offcanvas offcanvas-end" id="divOffcanvas">
+            <div class="offcanvas-header">
+                <h1 class="offcanvas-title">Lista de Canciones</h1>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body h-100 overflow-auto">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr ng-repeat="cancion in canciones" style="cursor: pointer;">
+                            <td class="w-100 small" ng-click="seleccionar_cancion(cancion)" data-bs-dismiss="offcanvas">
+                            {{cancion.label}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="w-100 h-100 p-5 d-flex flex-row justify-content-center align-items-center">
+            <div class="display-1 border text-center" >
+                <b ng-bind-html="texto_resaltado"></b><span ng-bind-html="texto_pendiente"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="/static/js/angular.min.js">
+    </script>
+    <script src="/static/js/MIDI.min.js">
+    </script>
+<script>
+var app = angular.module('xpd_karaoke_app', []);
+app.controller('xpd_karaoke_controller', function($scope, $http, $sce, $timeout) {
+    $scope.canciones = [];
+    $scope.cancion_actual = null;
+    $scope.texto_resaltado=$sce.trustAsHtml("XPD Karaoke<br>");
+    $scope.texto_pendiente=$sce.trustAsHtml("Bienvenidos");
+    $scope.letra = [];
+    $scope.indice_letra = 0;
+    $scope.timeout_handler = null;
+
+    $scope.ajustar_pantalla = () => {
+        //const divPantalla = document.getElementById("divPantalla");
+        //divPantalla.style.height = window.height + "px";
+        //console.log(window.height);
+        //console.log("Alto maximo a " + divPantalla.style.height);
+    };
+
+    $scope.cargar_canciones = () => {
+        $http.get("/xpd_karaoke/karaokes").then( result => {
+            $scope.canciones = result.data.lista;
+        }).catch( error => {
+            alert("Error: " + JSON.stringify(error));
+        });
+    };
+
+    $scope.inicializar = () => {
+        $scope.ajustar_pantalla();
+        window.addEventListener("resize", $scope.ajustar_pantalla);
+        $scope.cargar_canciones();
+        // Configura un callback para el inicio de la reproducción
+        /*
+        MIDI.loadPlugin(() =>{
+            console.log("MIDI Iniciado exitosamente");
+        });
+        */
+        MIDI.Player.onstart = () => {
+            console.log("reproduccion iniciada"); // Este mensaje se mostrará al iniciar la reproducción
+            $scope.iniciar_letra();
+        };
+
+    };
+
+    $scope.seleccionar_cancion = (cancion) => {
+        //const divOffcanvas = document.getElementById("divOffcanvas");
+        //const bsOffcanvas = new bootstrap.Offcanvas(divOffcanvas)
+        //bsOffcanvas.toggle();
+        $scope.cancion_actual = cancion;
+        console.log("Ha elegido Canción " + $scope.cancion_actual.label);
+        $http.get("/xpd_karaoke/letra/" + $scope.cancion_actual.slug).then( resultado => {
+            $scope.letra = resultado.data.letra;
+            MIDI.Player.timeWarp = 1;
+            MIDI.Player.loadFile("/xpd_karaoke/karaokes/" + $scope.cancion_actual.slug, ()=>{
+                console.log("secuencia midi cargada");
+                MIDI.Player.start();
+            });
+            //TODO Quitar cuando funcione la parte de los midis
+            MIDI.Player.onstart();
+        }).catch( error => {
+            alert("Error: " + JSON.stringify(error));
+        });        
+    };
+
+    $scope.cancelar_timeout = () => {
+        if( $scope.timeout_handler != null){
+            $timeout.cancel($scope.timeout_handler);
+            $scope.timeout_handler = null;
+        }        
+    };
+
+    $scope.tick_letra = () => {
+        $scope.timeout_handler = null;
+        if($scope.indice_letra >= $scope.letra.length){
+            return;
+        }
+
+        $scope.texto_resaltado=$sce.trustAsHtml( $scope.letra[$scope.indice_letra].texto_resaltado.replaceAll("\n","<br>") );
+        $scope.texto_pendiente=$sce.trustAsHtml( $scope.letra[$scope.indice_letra].texto_pendiente.replaceAll("\n","<br>") );
+
+        $scope.indice_letra ++;
+        if($scope.indice_letra < $scope.letra.length){
+            let milisegundos = Math.round($scope.letra[$scope.indice_letra].previous_seconds * 1000);
+            if(milisegundos == 0){
+                milisegundos ++;
+            }
+            $scope.timeout_handler = $timeout( $scope.tick_letra, milisegundos);
+            console.log("tick programado en " + milisegundos + " ms");
+        }
+    };
+
+    $scope.iniciar_letra = () => {
+        $scope.cancelar_timeout();
+        
+        $scope.texto_resaltado=$sce.trustAsHtml( $scope.cancion_actual.label );
+        $scope.texto_pendiente=$sce.trustAsHtml( "" );
+
+        $scope.indice_letra = 0;
+        if($scope.indice_letra < $scope.letra.length){
+            let milisegundos = Math.round($scope.letra[$scope.indice_letra].previous_seconds * 1000);
+            if(milisegundos == 0){
+                milisegundos ++;
+            }
+            $scope.timeout_handler = $timeout( $scope.tick_letra, milisegundos);
+            console.log("Primer tick programado en " + milisegundos + " ms");
+        }
+    };
+
+    $scope.inicializar();
+
+});
+</script>
+</body>
+</html>
