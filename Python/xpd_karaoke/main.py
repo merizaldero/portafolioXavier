@@ -1,5 +1,5 @@
-#qpy:webapp:Kanji Trainer II
-#qpy://127.0.0.1:8080/ktrainer/
+#qpy:webapp:XPD KARAOKE
+#qpy://127.0.0.1:8080/xpd_karaoke/
 """
 This is a sample for qpython webapp
 """
