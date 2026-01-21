@@ -46,32 +46,43 @@
 </div>
 
     <div class="d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
-        <a class="btn btn-secondary" href="/xpd_health/sujetos">
+        <a class="btn btn-secondary btn-sm" href="/xpd_health/sujetos">
             Volver
         </a>
-        <a class="btn btn-primary" href="/xpd_health/sujetos/{{objeto['id']}}/editar">
+        <a class="btn btn-primary btn-sm" href="/xpd_health/sujetos/{{objeto['id']}}/editar">
             Editar
         </a>
-    </div>
-
-    <div>
-        <img id="img_resumen" src="/static/img/cargando.png">
     </div>
 
     <ul class="mt-3 nav nav-tabs nav-justified">
 
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#divLecturaGlucosas">LecturaGlucosas ({{len(lecturaglucosas)}})</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#divGrafica">Resumen</a>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link " data-bs-toggle="tab" href="#divDosisInsulinas">DosisInsulinas ({{len(dosisinsulinas)}})</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#divLecturaGlucosas">Lecturas Glucosa ({{len(lecturaglucosas)}})</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link " data-bs-toggle="tab" href="#divDosisInsulinas">Dosis Insulina ({{len(dosisinsulinas)}})</a>
         </li>
 
     </ul>
+
     <div class="tab-content">    
 
-        <div class="tab-pane container active" id="divLecturaGlucosas">
+        <div class="tab-pane container active" id="divGrafica">
+            <img id="img_resumen" src="/static/img/cargando.png" class="img-fluid">
+            
+            <div class="d-flex flex-row justify-content-around border-top border-bottom pt-1 pb-1">
+                <a class="btn btn-primary btn-sm" href="/xpd_health/sujetos/{{objeto['id']}}/nuevolecturaglucosa">Registrar Glucosa</a>
+                <a class="btn btn-primary btn-sm" href="/xpd_health/sujetos/{{objeto['id']}}/nuevodosisinsulina">Registrar Insulina</a>
+            </div>
+
+        </div>
+
+        <div class="tab-pane container" id="divLecturaGlucosas">
             <table class="mt-2 table table-striped small">
                 <thead>
                     <tr class="small">
