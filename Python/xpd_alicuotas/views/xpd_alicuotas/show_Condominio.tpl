@@ -34,6 +34,9 @@
         <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/editar">
             Editar
         </a>
+        <a class="btn btn-primary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/alicuotamasiva">
+            Crear Alicuotas
+        </a>
 % if len(departamentos) + len(transaccions) + len(egresos) == 0:
         <a class="btn btn-secondary" href="/xpd_alicuotas/condominios/{{objeto['id']}}/eliminar" onclick="return confirm('Desea proceder con eliminación?');">
             Eliminar
@@ -253,14 +256,18 @@
         </div>
     </div>    
 <script lang="javascript">
+    function refrescar_alicuotas(){
+        const img_alicuotas = document.getElementById("img_alicuotas");
+        img_alicuotas.src = "/static/graficas/alicuotas_{{objeto['id']}}.png?" + Date.now()
+    }
+
     const btn_refrescar_alicuotas = document.getElementById("btn_refrescar_alicuotas");
     
     btn_refrescar_alicuotas.addEventListener("click", async (event) => {
-        const img_alicuotas = document.getElementById("img_alicuotas");
         respuesta = await fetch("/xpd_alicuotas/condominios/{{objeto['id']}}/graficar");
-        img_alicuotas.src = "/static/graficas/alicuotas_{{objeto['id']}}.png?" + Date.now()
-
+        refrescar_alicuotas();
     });
+    refrescar_alicuotas();
 </script>
 
 % include('xpd_alicuotas/pie.tpl', usuario = usuario)

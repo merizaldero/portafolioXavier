@@ -1112,6 +1112,10 @@ def servir_page_insertar_alicuota(id_departamento):
         abort( 403, "Acceso no autorizado" )
 
     alicuota = Alicuotas.nuevoDiccionario()
+    hoy = datetime.date.today()
+    alicuota['anio'] = str(hoy.year)
+    alicuota['mes'] = str(hoy.month)
+
     if request.method == "GET":        
         return template("xpd_alicuotas/editar_Alicuota", objeto = alicuota, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/departamentos/" + str(id_departamento), fecha_iso_to_js = fecha_iso_to_js)
     # A partir de este punto se asume POST
@@ -1172,6 +1176,121 @@ def servir_page_insertar_alicuota(id_departamento):
     return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href ="/xpd_alicuotas/alicuotas/" + str(alicuota['id']) )
 
 CONFIG['rutas'].append({'ruta':'/departamentos/<id_departamento>/nuevoalicuota', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_alicuota })
+
+def servir_page_insertar_alicuota_masiva(id_condominio):
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )    
+
+    conexion = orm.Conexion(PATH_BDD)
+    objeto, id_user_owner = condominio_getowner(conexion, id_condominio)
+    if objeto is None:
+        conexion.close()
+        abort( 404, "El recurso solicitado no existe" )    
+    if usuario['id'] != id_user_owner:
+        conexion.close()
+        abort( 403, "Acceso no autorizado") 
+    
+    departamentos = Departamentos.getNamedQuery( conexion, "findByCondominio", {'id_condominio':objeto['id']} )
+    conexion.close()
+
+    hoy = datetime.date.today()
+    objeto['anio_alicuota'] = str(hoy.year)
+    objeto['mes_alicuota'] = str(hoy.month)
+    objeto['monto_alicuota'] = str(0.0)
+    objeto["observaciones_alicuota"] = ""
+    for departamento in departamentos:
+        departamento['seleccionado'] = True
+
+    if request.method == "GET":        
+        return template("xpd_alicuotas/editar_AlicuotaMasiva", objeto = objeto, departamentos = departamentos, usuario = usuario, lvl = "", mensaje = "", ruta_cancelar = "/xpd_alicuotas/condominios/"+ str(id_condominio), fecha_iso_to_js = fecha_iso_to_js)
+    # Se asumen POST en este punto
+    mensajes_error = []
+    objeto["anio_alicuota"] = request.forms.get( "anio_alicuota", "").strip()
+    if len(objeto["anio_alicuota"]) == 0:
+        mensajes_error.append("anio es requerido")
+    try:
+        objeto["anio_alicuota"] = int( objeto["anio_alicuota"] )
+    except:
+        mensajes_error.append("El valor de anio no es válido")
+
+    objeto["mes_alicuota"] = request.forms.get( "mes_alicuota", "").strip()
+    if len(objeto["mes_alicuota"]) == 0:
+        mensajes_error.append("mes es requerido")
+    try:
+        objeto["mes_alicuota"] = int( objeto["mes_alicuota"] )
+    except:
+        mensajes_error.append("El valor de mes no es válido")
+
+    objeto["monto_alicuota"] = request.forms.get( "monto_alicuota", "").strip()
+    if len(objeto["monto_alicuota"]) == 0:
+        mensajes_error.append("monto es requerido")
+    try:
+        objeto["monto_alicuota"] = float( objeto["monto_alicuota"] )
+    except:
+        mensajes_error.append("El valor de monto no es válido")
+
+    objeto["observaciones_alicuota"] = request.forms.get( "observaciones_alicuota", "").strip()
+        
+    if len(objeto["observaciones_alicuota"]) == 0:
+        mensajes_error.append("observaciones es requerido")
+
+    if len(objeto["observaciones_alicuota"]) > 256:
+        mensajes_error.append("El tamaño de observaciones excede el permitido")
+
+    ids_departamento = request.forms.getlist( "ids_departamento")
+    print(f"Departamentos seleccionados: {ids_departamento}")
+
+    try:
+        ids_departamento = [ int(x) for x in ids_departamento if x != '' ]
+    except:
+        mensajes_error.append("La selección de Departamentos no es válida")
+
+    if len(ids_departamento) == 0:
+        mensajes_error.append("Debe seleccionar al menos un departamento")
+    
+    ids_departamento_validos = [ x['id'] for x in departamentos ]
+    ids_departamento_no_validos = [ x for x in ids_departamento if x not in ids_departamento_validos ]
+
+    if len(ids_departamento_no_validos) > 0:
+        mensajes_error.append("La selección de Departamentos no es válida")
+
+    for departamento in departamentos:
+        departamento['seleccionado'] = True if departamento['id'] in ids_departamento else False
+
+    if len(mensajes_error) > 0:
+        return template("xpd_alicuotas/editar_AlicuotaMasiva", objeto = objeto, departamentos = departamentos, usuario = usuario, lvl = "danger", mensaje = " / ".join(mensajes_error) , ruta_cancelar = "/xpd_alicuotas/condominios/"+ str(id_condominio), fecha_iso_to_js = fecha_iso_to_js)
+
+    con = orm.Conexion(PATH_BDD)
+
+    try:
+        for departamento in departamentos:
+            if departamento['seleccionado'] == True:
+
+                alicuota = Alicuotas.nuevoDiccionario()
+                alicuota['id_departamento'] = departamento['id']
+                alicuota['anio'] = objeto['anio_alicuota']
+                alicuota['mes'] = objeto['mes_alicuota']
+                alicuota['monto'] = objeto['monto_alicuota']
+                alicuota['observaciones'] = objeto["observaciones_alicuota"]
+                alicuota["monto_pendiente"] = alicuota['monto']
+                alicuota["pagado"] = False
+                
+                departamento['saldo'] -= alicuota['monto_pendiente']
+
+                Alicuotas.insertar(con, alicuota)
+
+        Departamentos.actualizar(con, departamento)
+        con.commit()
+    except:
+        con.rollback()
+        return template("xpd_alicuotas/editar_AlicuotaMasiva", objeto = objeto, departamentos = departamentos, usuario = usuario, lvl = "danger", mensaje = "Se ha producido un error al registrar las Alicuotas" , ruta_cancelar = "/xpd_alicuotas/condominios/"+ str(id_condominio), fecha_iso_to_js = fecha_iso_to_js)
+    finally:
+        con.close()
+
+    return template("xpd_usr/mensaje", lvl = "success", mensaje = "Operación realizada Exitosamente.", href = "/xpd_alicuotas/condominios/"+ str(id_condominio) )
+
+CONFIG['rutas'].append({'ruta':'/condominios/<id_condominio>/alicuotamasiva', 'metodos':['GET','POST'], 'funcion': servir_page_insertar_alicuota_masiva })
 
 def servir_page_eliminar_alicuota(id):
     usuario = xpd_usr.getCurrentUser(request)
