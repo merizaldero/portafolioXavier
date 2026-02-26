@@ -313,22 +313,9 @@ def servir_page_get_sujeto_lista():
     
 CONFIG['rutas'].append({'ruta':'/sujetos', 'metodos':['GET'], 'funcion': servir_page_get_sujeto_lista })
 
-def servir_img_get_sujeto_byid(id_sujeto):
-
-    usuario = xpd_usr.getCurrentUser(request)
-    if usuario is None:
-        abort( 401, "Acceso no autorizado" )    
-
+def generar_imagen_sujeto(id_sujeto):
     conexion = orm.Conexion(PATH_BDD)
 
-    objeto, id_user_owner = sujeto_getowner(conexion, id_sujeto)
-    if objeto is None:
-        conexion.close()
-        abort( 404, "El recurso solicitado no existe" )    
-    if usuario['id'] != id_user_owner:
-        conexion.close()
-        abort( 403, "Acceso no autorizado") 
-    
     lecturaglucosas = LecturaGlucosas.getNamedQuery( conexion, "findBySujeto", {'id_sujeto':objeto['id']} )
     dosisinsulinas = DosisInsulinas.getNamedQuery( conexion, "findBySujeto", {'id_sujeto':objeto['id']} )
 
@@ -374,6 +361,27 @@ def servir_img_get_sujeto_byid(id_sujeto):
 
     path_salida = dirname(abspath(__file__)) + f"/static/img/resumen_{id_sujeto}.png"
     plt.savefig(path_salida)
+
+    return path_salida
+
+def servir_img_get_sujeto_byid(id_sujeto):
+
+    usuario = xpd_usr.getCurrentUser(request)
+    if usuario is None:
+        abort( 401, "Acceso no autorizado" )    
+
+    conexion = orm.Conexion(PATH_BDD)
+
+    objeto, id_user_owner = sujeto_getowner(conexion, id_sujeto)
+
+    conexion.close()
+
+    if objeto is None:
+        abort( 404, "El recurso solicitado no existe" )    
+    if usuario['id'] != id_user_owner:
+        abort( 403, "Acceso no autorizado") 
+
+    path_salida = generar_imagen_sujeto(id_sujeto)
 
     return static_file( basename(path_salida), root = dirname(path_salida) )
     
