@@ -2,11 +2,14 @@ import tkinter as tk
 from tkinter import messagebox
 import xpd_health
 import xpd_orm as orm
-from xpd_tk import FormularioEdicionTki, VisorListadoTki
+from xpd_tk import FormularioEdicionTki, VisorListadoTki, VisorImagenTki
 import datetime
+from os.path import join, dirname
+import sys
 
 FORMULARIOS = {
     "sujeto_show_form" : None,
+    "sujeto_show_grafico" : None,
     "glucosa_edit_form" : None,
     "insulina_edit_form" : None,
 }
@@ -21,6 +24,10 @@ def show_sujeto(id_sujeto):
     sujeto = sujeto[0]
     FORMULARIOS["sujeto_show_form"].setData(sujeto)
     FORMULARIOS["sujeto_show_form"].mostrar()
+    path_imagen = xpd_health.generar_imagen_sujeto(id_sujeto)
+    print("imagen generada")
+    FORMULARIOS["sujeto_show_grafico"].setPath(path_imagen)
+    FORMULARIOS["sujeto_show_grafico"].mostrar()
 
 
 def show_ingresar_glucosa( sujeto ):
@@ -31,7 +38,11 @@ def show_ingresar_glucosa( sujeto ):
     nuevo_glucosa["observacion"] = ""
     FORMULARIOS["glucosa_edit_form"].setData(nuevo_glucosa)
     FORMULARIOS["sujeto_show_form"].esconder()
+    FORMULARIOS["sujeto_show_grafico"].esconder()
     FORMULARIOS["glucosa_edit_form"].mostrar()
+
+def salir_app(sujeto):
+    sys.exit(0)
 
 def guardar_glucosa(lecturaGlucosa):
     try:
@@ -49,6 +60,7 @@ def show_ingresar_dosis_insulina( sujeto ):
     nuevo_insulina["observacion"] = "()h"
     FORMULARIOS["insulina_edit_form"].setData(nuevo_insulina)
     FORMULARIOS["sujeto_show_form"].esconder()
+    FORMULARIOS["sujeto_show_grafico"].esconder()
     FORMULARIOS["insulina_edit_form"].mostrar()
 
 
@@ -73,7 +85,7 @@ SUJETO_SHOW_CAMPOS = [
         "editable": False ,
         "nullable": False ,
         "valor_defecto": "Nombre Aqui",
-        "tamano": 64 ,
+        "tamano": 24 ,
         "precision" : 0 
     }
 ]
@@ -89,6 +101,11 @@ SUJETO_SHOW_COMANDOS = [
         "color_fondo" : "PRIMARY",
         "callback": show_ingresar_dosis_insulina
     },
+    { 
+        "etiqueta" : "Salir",
+        "color_fondo" : "DANGER",
+        "callback": salir_app
+    },
 ]
 
 GLUCOSA_EDIT_CAMPOS = [
@@ -99,7 +116,7 @@ GLUCOSA_EDIT_CAMPOS = [
         "editable": True ,
         "nullable": False ,
         "valor_defecto": datetime.datetime.now().isoformat(),
-        "tamano": 32 ,
+        "tamano": 25 ,
         "precision" : 0 
     },
     {
@@ -119,7 +136,7 @@ GLUCOSA_EDIT_CAMPOS = [
         "editable": True ,
         "nullable": True ,
         "valor_defecto": "",
-        "tamano": 64 ,
+        "tamano": 25 ,
         "precision" : 0 
     },
 ]
@@ -145,7 +162,7 @@ INSULINA_EDIT_CAMPOS = [
         "editable": True ,
         "nullable": False ,
         "valor_defecto": datetime.datetime.now().isoformat(),
-        "tamano": 32 ,
+        "tamano": 25 ,
         "precision" : 0 
     },
     {
@@ -165,7 +182,7 @@ INSULINA_EDIT_CAMPOS = [
         "editable": True ,
         "nullable": True ,
         "valor_defecto": "",
-        "tamano": 64 ,
+        "tamano": 25 ,
         "precision" : 0 
     },
 
@@ -186,7 +203,9 @@ INSULINA_EDIT_COMANDOS = [
 if __name__ == "__main__":
     ventana = tk.Tk()    
     FORMULARIOS['sujeto_show_form'] = FormularioEdicionTki(ventana, SUJETO_SHOW_CAMPOS, SUJETO_SHOW_COMANDOS)
+    FORMULARIOS['sujeto_show_grafico'] = VisorImagenTki(ventana, join( dirname(__file__) , "static", "img", "resumen_1.png") )
     FORMULARIOS["glucosa_edit_form"] = FormularioEdicionTki(ventana, GLUCOSA_EDIT_CAMPOS, GLUCOSA_EDIT_COMANDOS)
     FORMULARIOS["insulina_edit_form"] = FormularioEdicionTki(ventana, INSULINA_EDIT_CAMPOS, INSULINA_EDIT_COMANDOS)
     show_sujeto(1)
     ventana.mainloop()
+    print("Termina mainloop")

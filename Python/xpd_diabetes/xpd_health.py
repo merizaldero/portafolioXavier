@@ -316,6 +316,7 @@ CONFIG['rutas'].append({'ruta':'/sujetos', 'metodos':['GET'], 'funcion': servir_
 def generar_imagen_sujeto(id_sujeto):
     conexion = orm.Conexion(PATH_BDD)
 
+    objeto = Sujetos.getNamedQuery(conexion, "findById", {"id":id_sujeto})[0]
     lecturaglucosas = LecturaGlucosas.getNamedQuery( conexion, "findBySujeto", {'id_sujeto':objeto['id']} )
     dosisinsulinas = DosisInsulinas.getNamedQuery( conexion, "findBySujeto", {'id_sujeto':objeto['id']} )
 
@@ -352,9 +353,27 @@ def generar_imagen_sujeto(id_sujeto):
     ax.plot( ejex, [ objeto['umbral_minimo'] for x in lecturaglucosas] )
     ax.plot( ejex, [ objeto['umbral_maximo'] for x in lecturaglucosas] )
 
+    for indice, lecturaglucosa in enumerate(lecturaglucosas):
+        plt.text(
+            ejex[indice],
+            lecturaglucosa['valor'] + 1,
+            str(lecturaglucosa['valor']),
+            fontsize = 10,
+            ha = 'center'
+        )
+
     ejex1 = [ x['fecha_hora'] - fecha_inicio for x in dosisinsulinas]
     ejex1 = [ x.total_seconds() for x in ejex1 ]
     ax.scatter( ejex1, [ objeto['umbral_minimo'] for x in ejex1], color = 'green', s = [ x ['unidades_aplicadas'] *2 for x in dosisinsulinas ] )
+
+    for indice, dosisinsulina in enumerate(dosisinsulinas):
+        plt.text(
+            ejex1[indice] ,
+            objeto['umbral_minimo'] + 1,
+            str(dosisinsulina['observacion']),
+            fontsize = 15,
+            ha = 'center'
+        )
 
     plt.xticks(xticks_rango, xticks)
     ax.grid()

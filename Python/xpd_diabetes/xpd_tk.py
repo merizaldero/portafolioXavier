@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import datetime
 import copy
+from PIL import Image, ImageTk, UnidentifiedImageError
+import os
 
 class FormularioEdicionTki:
     def __init__(self, parent_control, lista_campos, lista_comandos=[]):
@@ -138,6 +140,7 @@ class FormularioEdicionTki:
                     ctrl.delete("1.0", tk.END)
                     ctrl.insert("1.0", str(valor))
 
+
 class VisorListadoTki:
     def __init__(self, parent_control, lista_campos, lista_comandos=[]):
         self.parent = parent_control
@@ -272,3 +275,92 @@ class VisorListadoTki:
     def esconder(self):
         """Oculta el componente completo."""
         self.container.pack_forget()
+
+class VisorImagenTki:
+    def __init__(self, parent_control, path_imagen):
+        self.parent = parent_control
+        self.__path_imagen = path_imagen
+        self.__imagen_tk = None
+        self.__ancho_parent = 0
+        
+        # Label configurado para no forzar dimensiones (propagate False en el padre es ideal)
+        self.label_imagen = tk.Label(self.parent, bg="#f0f0f0")
+        
+        # Escuchar cambios de tamaño del padre para re-ajustar la imagen internamente
+        self.parent.bind("<Configure>", self.__al_redimensionar)
+
+    def __cargar_y_escalar(self):
+        """Carga y escala la imagen basándose estrictamente en el ancho actual del padre."""
+        self.label_imagen.config(image="", text="")
+
+        if not self.__path_imagen or not os.path.exists(self.__path_imagen):
+            self.__mostrar_error("Archivo no encontrado")
+            return
+
+        try:
+            # Obtenemos el ancho actual del padre sin forzar cambios
+            ancho_parent = self.parent.winfo_width()
+            
+            # Si el ancho es muy pequeño (inicialización), evitamos procesar
+            if ancho_parent <= 1  :
+                return
+            
+            self.__ancho_parent = ancho_parent
+
+            img_original = Image.open(self.__path_imagen)
+            ancho_orig, alto_orig = img_original.size
+
+            # Cálculo de proporción para el alto basado en el ancho actual del padre
+            ratio = (ancho_parent-30) / float(ancho_orig)
+            alto_proporcional = int(float(alto_orig) * ratio)
+
+            print("Cargando y escalando {0}x{1}".format(ancho_parent -30, alto_proporcional))
+
+            # Redimensionamiento de alta calidad
+            img_redimensionada = img_original.resize(
+                (ancho_parent -30, alto_proporcional), 
+                Image.Resampling.LANCZOS
+            )
+            
+            self.__imagen_tk = ImageTk.PhotoImage(img_redimensionada)
+            self.label_imagen.config(image=self.__imagen_tk, text="")
+            
+        except UnidentifiedImageError:
+            self.__mostrar_error("Formato no soportado")
+        except (IOError, SyntaxError):
+            self.__mostrar_error("Imagen corrupta")
+        except Exception as e:
+            self.__mostrar_error(f"Error: {str(e)}")
+
+    def __mostrar_error(self, mensaje):
+        self.__imagen_tk = None
+        self.label_imagen.config(
+            image="", 
+            text=f"⚠ {mensaje}",
+            fg="red",
+            font=("Arial", 9)
+        )
+
+    def __al_redimensionar(self, event):
+        """Se ejecuta cuando el padre cambia de tamaño por causas externas."""
+        print ("redimensionado desde el padre")
+        if self.label_imagen.winfo_ismapped():
+            # Solo redimensionamos la imagen, el Label ya está 'pack'eado con fill='x'
+            self.__cargar_y_escalar()
+
+    def setPath(self, path_imagen):
+        self.__path_imagen = path_imagen
+        if self.label_imagen.winfo_ismapped():
+            self.__cargar_y_escalar()
+
+    def recargarImagen(self):
+        self.__cargar_y_escalar()
+
+    def mostrar(self):
+        """Muestra el label sin usar 'expand=True' para no empujar las paredes del padre."""
+        # fill="x" hace que el label sea tan ancho como el padre, pero no lo estira
+        self.label_imagen.pack(fill="both", side="top", pady=5)
+        self.__cargar_y_escalar()
+
+    def esconder(self):
+        self.label_imagen.pack_forget()

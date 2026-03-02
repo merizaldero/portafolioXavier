@@ -1,5 +1,5 @@
 #qpy:webapp:Asistente
-#qpy://127.0.0.1:8080/
+#qpy://127.0.0.1:8080/static/miku_optimizada.html
 """
 This is a sample for qpython webapp
 """
@@ -7,16 +7,29 @@ import socket
 from bottle import Bottle, ServerAdapter
 from bottle import run, debug, route, error, static_file, template, request, redirect, TEMPLATE_PATH
 
+from BottleSessions import BottleSessions
+
 from os.path import abspath, dirname, join
 from os import listdir
 import eliza
+
+import xpd_usr
+import xpd_asistente
 
 PUEDO_LOCUTAR = False
 try:
     import androidhelper
     PUEDO_LOCUTAR = True
-except:
-    print("locución deshabilitada")
+except Exception as ex:
+    print("locución deshabilitada: " + repr(ex))
+
+PUEDO_GTTS = False
+try:
+    import xpd_tts
+    PUEDO_GTTS = True
+    print("GTTS SOPORTADO!!")
+except Exception as ex:
+    print("gtts deshabilitado: " + repr(ex))
 
 direccion_ip = socket.gethostbyname(socket.gethostname()) # "127.0.0.1"
 
@@ -82,13 +95,21 @@ def servir_hablar():
     texto = request.forms.get("texto", "")
     if PUEDO_LOCUTAR:
         droid.ttsSpeak(texto)
+    elif PUEDO_GTTS:
+        return xpd_tts.locutar(texto)
+        #return "/static/locucion.mp3"
     return "OK"
 
 ######### WEBAPP ROUTERS WRITE YOUR CODE BELOW###############
 
 @app.route('/')
 def home():
-    redirect('/static/webgl_loader_mmd_pose.html')
+    redirect("/static/miku_optimizada.html")
+    # usuario = xpd_usr.getCurrentUser(request)
+    # if usuario is None:
+    #     redirect('/login')
+    # redirect('/xpd_asistente/main')
+    # return server_static("modelador.html")
 
 
 ######### WEBAPP ROUTERS ###############
@@ -96,6 +117,9 @@ def home():
 # app.route('/', method='GET')(home)
 # app.route('/__exit', method=['GET','HEAD'])(__exit)
 # app.route('/assets/<filepath:path>', method='GET')(server_static)
+xpd_usr.rutearModulo(app, '/security')
+xpd_asistente.rutearModulo(app, '/xpd_asistente')
+
 
 try:
 
@@ -108,8 +132,8 @@ try:
         #'host': direccion_ip,
         #'password': None
     }
-
-    server = MyWSGIRefServer(host='0.0.0.0', port=puerto)
+    BottleSessions(app, session_backing = backing_params, session_secure = False, session_expire = 600 )
+    server = MyWSGIRefServer(host='127.0.0.1', port=puerto)
     app.run(server=server,reloader=False)
 except Exception as ex:
     errs = "Exception: %s" % repr(ex)

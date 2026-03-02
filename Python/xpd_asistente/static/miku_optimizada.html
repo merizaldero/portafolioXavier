@@ -73,6 +73,36 @@
 				<div class="text-center border-top border-bottom" data-bs-toggle="collapse" data-bs-target="#divLayers">&equiv;Accesorios&equiv;</div>
 				<div id="divLayers" class="border-top collapse">
 				</div>
+				<div class="text-center border-top border-bottom" data-bs-toggle="collapse" data-bs-target="#divMaterials">&equiv;Colores&equiv;</div>
+				<div id="divMaterials" class="border-top collapse">
+				No me cargu&eacute; bien :(
+				</div>
+				<div class="text-center border-top border-bottom" data-bs-toggle="collapse" data-bs-target="#divSaveLoad">&equiv;Apariencia General&equiv;</div>
+				<div id="divSaveLoad" class="border-top collapse">
+					<div class="row">
+						<span class="col-1">
+							&equiv;
+						</span>
+						<span class="col-11">
+							Guardar Como
+						</span>
+					</div>
+					<div class="input-group">
+						<input id="txtGuardarApariencia" type="text" maxlength="30" class="form-control">
+						<button id="btnResetTxtApariencia" class="btn btn-primary">x</button>
+						<button id="btnGuardarApariencia" class="btn btn-primary">Guardar</button>
+					</div>
+					<div class="row border-top">
+						<span class="col-1">
+							&equiv;
+						</span>
+						<span class="col-11">
+							Cargar Apariencias
+						</span>
+					</div>
+					<div id="divApariencias" class="list-group">
+					</div>
+				</div>
 				<div class="border-top">
 				  <a href="/static/webgl_loader_mmd_pose.html">Ver otra Miku</a>
 				</div>
@@ -125,9 +155,28 @@
 			let defaultAction = null;
 			let visibilidad;
 			let modalProgreso, divProgreso;
+			let materials;
+			let apariencias;
 			
 			let bufferMensaje, procesadorMensaje;
-
+   const material_list = [
+     "CyanPelo",
+	 "gris",
+	 "Celeste",
+	 "Bota Negra",
+	 "MarcoLentes",
+	 "Blanco Uniforme",
+	 "Amarillo Uniforme",
+	 "Verde Uniforme",
+	 "Naranja Interestella",
+	 "Blanco Interestella",
+	 "Color Blusa",
+	 "Color Terno",
+	 "ColorOjos",
+	 "Negro",
+	 "Blanco",
+	 "Piel"
+   ];
 			//const vpds = [];
 			const traducciones = {
 				"真面目" : "cejas seria",
@@ -157,6 +206,109 @@
 				"えー" : "Boca D:",
 				"にやり" : "Boca sonrisa"
 			};
+			
+/**
+ * Reproduce un archivo MP3 desde una URL.
+ * @param {string} url - La dirección del archivo .mp3
+ */
+function reproducirMP3(url) {
+    // 1. Creamos la instancia del objeto Audio
+    const audio = new Audio(url);
+
+    // 2. Intentamos reproducir
+    audio.play()
+        .then(() => {
+            console.log("Reproduciendo: " + url);
+        })
+        .catch(error => {
+            // Los navegadores modernos bloquean el audio si el usuario 
+            // no ha interactuado con la página primero (clic, tap, etc.)
+            console.error("Error al reproducir el audio: ", error);
+            alert("Haz clic en la página primero para permitir la reproducción.");
+        });
+
+    // Opcional: Retornamos el objeto por si quieres pausarlo luego
+    return audio;
+}
+
+// Ejemplo de uso:
+// reproducirMP3("https://tusitio.com/audio.mp3");
+
+			
+			function get_mesh_color(material_name){
+			    for(let indice_mesh = 0; indice_mesh < skin_meshes.length; indice_mesh++){
+			        const skin_mesh = skin_meshes[indice_mesh];
+			        
+			        if(!("material" in skin_mesh) || skin_mesh.material == null){
+			          //alert(skin_mesh.name + " no tiene Materials!!");
+			          continue;
+			        }
+
+			        let material;
+					if(skin_mesh.material instanceof Array){
+						material = skin_mesh.material.find(item => item.name == material_name);
+					}else if (skin_mesh.material.name == material_name){
+						material = skin_mesh.material;
+					}
+			        
+			        if(material){
+			            // TODO: convertir material.color a hexadecimal Rgb
+			            //alert("debo descifrar color");
+			            let rojo = Math.ceil( material.color.r * 255, 0 ).toString(16);
+						if(rojo.length == 1){
+							rojo = "0" + rojo;
+						}
+			            let verde = Math.ceil( material.color.g * 255, 0 ).toString(16);
+			            if(verde.length == 1){
+							verde = "0" + verde;
+						}						
+						let azul = Math.ceil( material.color.b * 255, 0 ).toString(16);
+						if(azul.length == 1){
+							azul = "0" + azul;
+						}
+			            return `#${rojo}${verde}${azul}`;
+			        }
+			    }
+			    return "#000000";
+			}
+			
+			function set_mesh_color(material_name, value){
+			    if(value.length<7){
+			        return;
+			    }
+			    const rojo = parseInt(value.substring(1,3), 16) / 255.0;
+			    const verde = parseInt(value.substring(3,5), 16) / 255.0;
+			    const azul = parseInt(value.substring(5,7), 16) / 255.0;
+			    skin_meshes.forEach(skin_mesh => {
+
+					if(!("material" in skin_mesh) || skin_mesh.material == null){
+			          alert(skin_mesh.name + " no tiene Materials!!");
+			          return;
+			        }
+
+					if(skin_mesh.material instanceof Array){
+						skin_mesh.material.filter(item => item.name == material_name).forEach(item =>{
+							item.color.r = rojo;
+							item.color.g = verde;
+							item.color.b = azul;
+							if("specular" in item){
+							    item.specular.r = (1 - rojo)/16;
+							    item.specular.g = (1 - verde)/16;
+							    item.specular.b = (1 - azul)/16;
+							}
+						});
+					}else if(skin_mesh.material.name == material_name){
+						skin_mesh.material.color.r = rojo;
+						skin_mesh.material.color.g = verde;
+						skin_mesh.material.color.b = azul;
+						if("specular" in skin_mesh.material){
+							    skin_mesh.material.specular.r = (1 - rojo)/16;
+							    skin_mesh.material.specular.g = (1 - verde)/16;
+							    skin_mesh.material.specular.b = (1 - azul)/16;
+							}
+					}
+			    });
+			}
 
 			async function dormir(milisegundos){
 				function dormir1(milis){
@@ -205,11 +357,11 @@
 					{x:0,y:1.35,z:1.3},
 					{x:0,y:1.35,z:2},
 					{x:0,y:1.35,z:2},
-					{x:0,y:1.35,z:1.3},
-					{x:0,y:1,z:2},
 					{x:0,y:1.35,z:1.5},
-					{x:0,y:1,z:2},
-					{x:0,y:1.35,z:1.3},
+					{x:0,y:1.35,z:1.5},
+					{x:0,y:1.35,z:1.5},
+					{x:0,y:1.35,z:1.5},
+					{x:0,y:1.35,z:1.5},
 					{x:0,y:1,z:2},
 					{x:0,y:1.35,z:1.3},
 					{x:0,y:1.35,z:1.4}
@@ -481,8 +633,9 @@
 
 					function initMorphs() {
 					
-					 const divMorphs = document.getElementById("divMorphs");
-
+					 	const divMorphs = document.getElementById("divMorphs");
+						divMorphs.innerHTML = "";
+						
 						for ( const key in dictionary ) {
 
 							// morphs.add( controls, key, 0.0, 1.0, 0.01 ).onChange( onChangeMorph );
@@ -521,6 +674,8 @@
 					
 					function initLayers(){
 					    const divLayers = document.getElementById("divLayers");
+					    divLayers.innerHTML = "";
+						//localStorage.removeItem("Miku.Visibilidad");
 						if (localStorage.getItem("Miku.Visibilidad") != null){
 							visibilidad = JSON.parse(localStorage.getItem("Miku.Visibilidad"));
 						}else{
@@ -692,16 +847,210 @@
 						if(chkLocucion.checked){
 						    const formData = new FormData();
 					    	formData.append("texto",mensaje);
-					    	fetch("/hablar", {method:"POST", body:formData });
+					    	fetch("/hablar", {method:"POST", body:formData })
+					    	.then(result => {
+					    	    if(result.ok){
+					    	        result.text().then( result_text => {
+					    	            if( result_text != "OK"){
+					    	                
+					    	                reproducirMP3( result_text + "?" + Date.now() );
+					    	            }
+					    	        });
+					    	    }
+					    	});
 						}
 						
 					}
+					
+					function initMaterials(){
+						const divMaterials = document.getElementById("divMaterials");
+					 	divMaterials.innerHTML = "";
+						//localStorage.removeItem("Miku.Materials");
+						if (localStorage.getItem("Miku.Materials") != null){
+							materials = JSON.parse(localStorage.getItem("Miku.Materials"));
+						}else{
+							materials = [];
+						}
+						material_list.forEach(material_name => {
+							let material = materials.find(item => item.nombre == material_name);
+							if(!material){
+								material = {nombre:material_name, color: get_mesh_color(material_name) };
+								materials.push(material);
+							}
+							material.default_color = get_mesh_color(material_name);
+							set_mesh_color(material_name, material.color);
+
+							// alert("1 procesando " + material_name);
+							const row = document.createElement("div");
+							row.classList.add("row");
+							const label = document.createElement("label");
+							label.classList.add("col", "form-label");
+							label.innerText = material_name;
+						  	const span = document.createElement("span");
+						  	span.classList.add("col");
+						  	const color_picker = document.createElement("input");
+						  	// alert("2 procesando " + material_name);
+						  	color_picker.classList.add( "form-control","xpd-material-picker");
+							color_picker.type="color";
+							color_picker.dataset.material_name = material_name;
+							// alert("3 procesando " + material_name);
+							color_picker.value = material.color;
+
+							const span_default = document.createElement("span");
+							span_default.classList.add("col");
+							const btn_default = document.createElement("button");
+							btn_default.classList.add("btn","btn-secondary");
+							btn_default.dataset.material_name = material_name;
+							btn_default.innerText = "Restaurar";							
+
+							//alert("4 procesando " + material_name);
+							span.appendChild(color_picker);
+							span_default.appendChild(btn_default);
+							row.appendChild(label);
+							row.appendChild(span);
+							row.appendChild(span_default);
+							divMaterials.appendChild(row);
+							color_picker.addEventListener("change", onChangeMaterialText);
+							btn_default.addEventListener("click", onClickMaterialButton);
+						});
+						localStorage.setItem("Miku.Materials", JSON.stringify(materials));
+						//alert("Materials Cargado");
+					}
+					
+					function onChangeMaterialText(event){
+					    const color_picker = event.target;
+					    const material_name = color_picker.dataset.material_name;
+					    const valor = color_picker.value;
+					    set_mesh_color(material_name, valor);
+						const material = materials.find(item=> item.nombre == material_name);
+					    material.color = valor;
+					    localStorage.setItem("Miku.Materials", JSON.stringify(materials));
+					}
+
+					function onClickMaterialButton(event){
+						const btn_default = event.target;
+					    const material_name = btn_default.dataset.material_name;
+						const material = materials.find(item=> item.nombre == material_name);
+						material.color = material.default_color;
+						const color_pickers = document.getElementsByClassName("xpd-material-picker");
+						for(let indice = 0; indice < color_pickers.length; indice++){
+							const color_picker = color_pickers[indice];
+							if(color_picker.dataset.material_name == material_name){
+								color_picker.value = material.color;
+								break;
+							}
+						}
+						set_mesh_color(material_name, material.color);
+					}
+
+					function initLoadApariencias(){
+						const divApariencias = document.getElementById("divApariencias");
+						divApariencias.innerHTML = "";
+						//localStorage.removeItem("Miku.Apariencias");
+						if (localStorage.getItem("Miku.Apariencias") != null){
+							apariencias = JSON.parse(localStorage.getItem("Miku.Apariencias"));
+						}else{
+							apariencias = [];
+						}
+
+						apariencias.forEach(apariencia => {
+							const list_item = document.createElement("div");
+							list_item.classList.add("list-group-item");
+							const flex_row = document.createElement("div");
+							flex_row.classList.add("d-flex", "flex-row", "justify-content-between");
+							const enlace = document.createElement("a");
+							enlace.href = "#";
+							enlace.innerText = apariencia.nombre;
+							enlace.classList.add("text-decoration-none");
+							enlace.dataset.apariencia = apariencia.nombre;
+							const btn_eliminar = document.createElement("a");
+							btn_eliminar.innerText = "x";
+							btn_eliminar.dataset.apariencia = apariencia.nombre;
+							enlace.classList.add("text-decoration-none");
+							list_item.appendChild(flex_row);
+							flex_row.appendChild(enlace);
+							flex_row.appendChild(btn_eliminar);
+							divApariencias.appendChild(list_item);
+							enlace.addEventListener("click", OnCargarApariencia);
+							btn_eliminar.addEventListener("click", OnEliminarApariencia);
+						});
+
+						localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
+					}
+
+					function initGuardarApariencias(){
+						const btnGuardarApariencia = document.getElementById("btnGuardarApariencia");
+						const btnResetTxtApariencia = document.getElementById("btnResetTxtApariencia");
+						btnGuardarApariencia.addEventListener("click", OnGuardarApariencia);
+						btnResetTxtApariencia.addEventListener("click", OnResetTxtApariencia);
+					}
+
+					function OnResetTxtApariencia(){
+						const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
+						txtGuardarApariencia.value = "";
+					}
+
+					function OnGuardarApariencia(){
+						const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
+						const nombre = txtGuardarApariencia.value;
+						let apariencia = apariencias.find( item => item.nombre == nombre);
+						if(apariencia == null){
+							apariencia = {"nombre": nombre};
+							apariencias.push(apariencia);
+						}else if ( ! confirm("Desea reemplazar la Apariencia "+ nombre +"?") ){
+							mostrarToast("Se cancela guardado de apariencia.");
+							return;
+						}
+						apariencia.layers = {...visibilidad};
+						apariencia.materials = [...materials];
+						apariencias.sort( (a,b) => (a.nombre >= b.nombre) ? 1 : -1 ); 
+						localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
+						initLoadApariencias();
+						mostrarToast("Se ha guardado la apariencia " + nombre + ".");
+					}
+
+					function OnCargarApariencia(event){
+						const enlace = event.target;
+						const nombre = enlace.dataset.apariencia;
+						const apariencia = apariencias.find(item => item.nombre == nombre);
+						if(apariencia == null){
+							mostrarToast("No se ha encontrado apariencia " + nombre + ".");
+							return;
+						}
+						localStorage.setItem("Miku.Visibilidad", JSON.stringify(apariencia.layers));
+						localStorage.setItem("Miku.Materials", JSON.stringify(apariencia.materials));
+						initLayers();
+						initMaterials();
+						const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
+						txtGuardarApariencia.value = nombre;
+						//divOpciones.classList.remove("show");
+					}
+
+					function OnEliminarApariencia(event){
+						const enlace = event.target;
+						const nombre = event.dataset.apariencia;
+						const apariencia = apariencias.find(item => item.nombre == nombre);
+						if(apariencia == null){
+							mostrarToast("No se ha encontrado apariencia " + nombre + ".");
+							return;
+						}
+						const indice = apariencias.indexOf(apariencia);
+						apariencias.pop(indice);
+						localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
+						initLoadApariencias();
+						mostrarToast("Se ha eliminado la apariencia " + nombre + ".");
+					}
+
+
 
 					initControls();
 					initKeys();
 					initPoses();
 					initMorphs();
 					initLayers();
+					initMaterials();
+					initLoadApariencias();
+					initGuardarApariencias();
 
 					onChangeMorph();
 					onChangePose();
