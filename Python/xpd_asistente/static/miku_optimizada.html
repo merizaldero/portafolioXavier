@@ -148,7 +148,9 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camera, scene, renderer, effect;
+			let camara_default, scene, renderer, effect;
+			let camaras = {};
+			let camara_actual;
 			let mesh, helper, morphing_mesh, skin_meshes, skeletonHelper;
 			let animationGroup, animationMixer;
 			let currentAction = null;
@@ -157,6 +159,7 @@
 			let modalProgreso, divProgreso;
 			let materials;
 			let apariencias;
+			let orbit_controls;
 			
 			let bufferMensaje, procesadorMensaje;
    const material_list = [
@@ -354,7 +357,7 @@ function reproducirMP3(url) {
 			function init() {
 				
 				const posicionesCamara = [
-					{x:0,y:1.35,z:1.3},
+					{x:3,y:0.85,z:0},
 					{x:0,y:1.35,z:2},
 					{x:0,y:1.35,z:2},
 					{x:0,y:1.35,z:1.5},
@@ -371,15 +374,98 @@ function reproducirMP3(url) {
 				// document.body.appendChild( container );
 				document.getElementById("divContenedor").appendChild(container);
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camara_default = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );				
+				camara_default.position.set(posicionesCamara[0].x, posicionesCamara[0].y, posicionesCamara[0].z);
+				camara_default.lookAt(0, posicionesCamara[0].y, 0);				
+				camara_default.name = "Camara Default";
+				camara_default.updateProjectionMatrix();
+				
 
+				camara_actual = camara_default.clone();
+				camara_actual.name = "Camara Actual";
+				
+				
+
+				console.log("camaras inicializadas");
+				
+				function setCamaraActual(nuevaCamara){	
+					/*
+					camara_actual.position.set( nuevaCamara.position.x, nuevaCamara.position.y, nuevaCamara.position.x );
+					camara_actual.lookAt(0 , nuevaCamara.position.y, 0 );
+					camara_actual.updateProjectionMatrix();
+*/
+					if(orbit_controls){
+						/*
+						if(! orbit_controls.position){
+								orbit_controls.position = nuevaCamara.position.clone();
+						}else{
+							orbit_controls.position.set( 
+								nuevaCamara.position.x, 
+								nuevaCamara.position.y, 
+								nuevaCamara.position.z 
+							);
+						}					
+						if(orbit_controls.target){
+							orbit_controls.target.set(
+								0, 
+								nuevaCamara.position.y, 
+								0
+							);
+						}
+						
+						orbit_controls.update();
+						*/
+					}						
+						
+					
+				}				
+				
 				function ajustarCamara(indice){
+					
+					if(isNaN(indice)){
+						if( indice in camaras){
+							setCamaraActual( camaras[indice]);
+						}else{
+							setCamaraActual( camara_default);
+						}
+						return;	
+					}
+
+					setCamaraActual( camara_default);
+
 					if( indice >= posicionesCamara.length){
 						indice = posicionesCamara.length -1;
 					}
-					camera.position.x = posicionesCamara[indice].x;
-					camera.position.y = posicionesCamara[indice].y;
-					camera.position.z = posicionesCamara[indice].z;
+
+					camara_default.position.set(posicionesCamara[indice].x, posicionesCamara[indice].y, posicionesCamara[indice].z);
+					camara_default.lookAt( 0 , posicionesCamara[indice].y , 0 );
+					camara_default.updateProjectionMatrix();
+
+					if(orbit_controls){
+						/*
+						const word_direction = nuevaCamara.getWorldDirection(camara_default.position);
+						if(! orbit_controls.position){
+							orbit_controls.position = camara_default.position.clone();
+						}else{
+							orbit_controls.position.set( 
+								camara_default.position.x, 
+								camara_default.position.y, 
+								camara_default.position.z 
+							);
+						}					
+						if(orbit_controls.target){
+							orbit_controls.target.set(
+								nuevaCamara.position.x + word_direction.x, 
+								nuevaCamara.position.y + word_direction.y, 
+								nuevaCamara.position.z + word_direction.z
+							);
+						}			
+						*/			
+						//orbit_controls.update();
+					}else{
+					}
+					
+					
 				}
 				//camera.position.z = 25;
 				ajustarCamara(0);
@@ -392,6 +478,9 @@ function reproducirMP3(url) {
 
 				const ambient = new THREE.AmbientLight( 0xaaaaaa, 3 );
 				scene.add( ambient );
+
+				const axesHelper = new THREE.AxesHelper(5);
+				scene.add(axesHelper);
 
 				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
@@ -411,11 +500,9 @@ function reproducirMP3(url) {
 				const cube = new THREE.Mesh( geometry, material );
 				scene.add( cube );
 				*/
-				/*
-				const orbitControls = new OrbitControls( camera, renderer.domElement );
-				orbitControls.minDistance = 5;
-				orbitControls.maxDistance = 15;
-				*/
+				
+				orbit_controls = new OrbitControls( camara_actual, renderer.domElement );
+				
 				effect = new OutlineEffect( renderer );
 
 				// model
@@ -448,9 +535,23 @@ function reproducirMP3(url) {
 				}
 
 				function cargarAnimacion(vpd, nombre_animacion) {
+					
+					// busca si la animacion actual tiene una camara
+					const camara_animacion = vpd.children.find(item => item.type == "PerspectiveCamera");
+					if(camara_animacion){
+						console.log("Se ha detectado la camara " + camara_animacion.name);
+						console.log(`Posicion x:${camara_animacion.position.x}, y:${camara_animacion.position.y}, z:${camara_animacion.position.z}`);						
+						const w_vector = camara_animacion.getWorldDirection(camara_animacion.position);
+						console.log(`Viendo hacia x:${w_vector.x}, y:${w_vector.y}, z:${w_vector.z}`);						
+						camaras[nombre_animacion] = camara_animacion;
+					}
 
 					if('animations' in vpd && vpd.animations.length > 0){
 						const animation_clip = vpd.animations.find(item=>{
+							if(vpd.animations.length == 1){
+								item.name = nombre_animacion;
+								return true;
+							}
 							const partes_nombre = item.name.split("|");
 							const nombre = partes_nombre[1];
 							return nombre == nombre_animacion;
@@ -485,7 +586,7 @@ function reproducirMP3(url) {
 								resolve(this.accion);
 							}else{
 								modalProgreso.show();
-								fbxLoader.load(this.path, async (object)=>{
+								fbxLoader.load(this.path + "?" + Date.now() , async (object)=>{
 									this.accion = cargarAnimacion(object, this.label);
 									resolve(this.accion);
 								}, onProgress, null );
@@ -494,8 +595,8 @@ function reproducirMP3(url) {
 					}
 				}
 
-				const modelFile = 'models/fbx/miku_mesh.fbx';
-
+				const modelFile = 'models/fbx/miku_mesh.fbx?'+ (Date.now());
+				console.log("Cargando modelo desde " + modelFile);
 				const bvhFiles = [
 					new AnimacionFBX('Pose01','models/fbx/pose01.fbx'),
 					new AnimacionFBX('Pose02','models/fbx/pose02.fbx'),
@@ -532,6 +633,7 @@ function reproducirMP3(url) {
 					scene.add( skeletonHelper );
 
 					initGui();
+					console.log("GUI inicializada");
 					/*
 					cargarAnimacion(mesh);
 
@@ -771,8 +873,9 @@ function reproducirMP3(url) {
 							currentAction = await bvhFiles[ index ].getAccion();
 							if(currentAction != null){
 								currentAction.play();
+								ajustarCamara(currentAction.name);
 							}							
-							ajustarCamara(index + 1);
+							
 							if(chkPoseTemporal.checked){
 							    setTimeout(()=>{
 							        selPoses.value=-1;
@@ -826,40 +929,35 @@ function reproducirMP3(url) {
 						      throw {message:"Error " + respuesta.status};
 						    }
 						    const respuesta_json = await respuesta.json();
-						    mostrarToast( respuesta_json.texto);
+						    await mostrarToast( respuesta_json.texto);
 						  }catch(ex){
-						    mostrarToast(ex.message);
+						    await mostrarToast(ex.message);
 						  }
 						  
 						}else{
-						  mostrarToast(texto);
+						  await mostrarToast(texto);
 						}
 						txtMensaje.value = "";
 					});
 
-					function mostrarToast(mensaje){
+					async function mostrarToast(mensaje){
 						const toastMensaje = document.getElementById("toastMensaje");						
 						const toastBody = toastMensaje.getElementsByClassName("toast-body")[0];
 						toastBody.innerText = mensaje;
 						const tostada = new bootstrap.Toast(toastMensaje);
 						tostada.show();
-						bufferMensaje = mensaje.toLowerCase();
 						if(chkLocucion.checked){
 						    const formData = new FormData();
 					    	formData.append("texto",mensaje);
-					    	fetch("/hablar", {method:"POST", body:formData })
-					    	.then(result => {
-					    	    if(result.ok){
-					    	        result.text().then( result_text => {
-					    	            if( result_text != "OK"){
-					    	                
-					    	                reproducirMP3( result_text + "?" + Date.now() );
-					    	            }
-					    	        });
-					    	    }
-					    	});
+					    	const resultado_hablar = await fetch("/hablar", {method:"POST", body:formData });
+							if(resultado_hablar.ok){
+								const result_text = await resultado_hablar.text();
+								if( result_text != "OK"){
+									reproducirMP3( result_text + "?" + Date.now() );
+								}
+							}
 						}
-						
+						bufferMensaje = mensaje.toLowerCase();
 					}
 					
 					function initMaterials(){
@@ -1064,8 +1162,8 @@ function reproducirMP3(url) {
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				camara_actual.aspect = window.innerWidth / window.innerHeight;
+				camara_actual.updateProjectionMatrix();
 
 				effect.setSize( window.innerWidth, window.innerHeight );
 
@@ -1077,9 +1175,9 @@ function reproducirMP3(url) {
 				if(procesadorMensaje){
 					procesadorMensaje();
 				}
-				effect.render( scene, camera );
+				effect.render( scene, camara_actual );
 
-				await dormir(1000);
+				await dormir(2000);
 
 			}
 
