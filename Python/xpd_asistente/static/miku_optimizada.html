@@ -22,6 +22,9 @@
 		</div>
 	</div>
 	<div class="border rounded m-4 p-2" style="background-color: rgba(200, 255, 200, 0.75);">
+	    <div class="text-center border-top border-bottom" data-bs-toggle="collapse" data-bs-target="#divHistoricoChat">&equiv;Historial Chat&equiv;</div>
+	    <div id="divHistoricoChat" class="overflow-auto border-top border-bottom" style="max-height:200px;">
+	    </div>
 		<div class="row m-3">
 			<input id="txtMensaje" maxlength="64" class="col col-lg-11 form-control">
 			<button id="btnMensaje" class="col-2 col-lg-1 btn btn-primary">&gt;</button>
@@ -136,80 +139,194 @@
 
 		<script type="module">
 
-			import * as THREE from 'three';
+	import * as THREE from 'three';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+	import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
-			//import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
-            import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-			import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
-			//import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+	import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+	//import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+	import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+	import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
+	//import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let camara_default, scene, renderer, effect;
-			let camaras = {};
-			let camara_actual;
-			let mesh, helper, morphing_mesh, skin_meshes, skeletonHelper;
-			let animationGroup, animationMixer;
-			let currentAction = null;
-			let defaultAction = null;
-			let visibilidad;
-			let modalProgreso, divProgreso;
-			let materials;
-			let apariencias;
-			let orbit_controls;
-			
-			let bufferMensaje, procesadorMensaje;
-   const material_list = [
-     "CyanPelo",
-	 "gris",
-	 "Celeste",
-	 "Bota Negra",
-	 "MarcoLentes",
-	 "Blanco Uniforme",
-	 "Amarillo Uniforme",
-	 "Verde Uniforme",
-	 "Naranja Interestella",
-	 "Blanco Interestella",
-	 "Color Blusa",
-	 "Color Terno",
-	 "ColorOjos",
-	 "Negro",
-	 "Blanco",
-	 "Piel"
-   ];
-			//const vpds = [];
-			const traducciones = {
-				"真面目" : "cejas seria",
-				"困る" : "cejas preocupada",
-				"にこり" : "cejas sonrisa",
-				"怒り" : "cejas enojada",
-				"上" : "cejas arriba",
-				"下" : "cejas abajo",
-				"まばたき" : "ojos parpadear",
-				"笑い" : "ojos risa",
-				"ウィンク" : "guiño izq",
-				"ウィンク２" : "guiño 2 izq",
-				"ウィンク右" : "guiño der",
-				"ｳｨﾝｸ２右" : "guiño 2 der",
-				"はぅ" : "ojos >_<",
-				"なごみ" : "ojos -_-",
-				"びっくり" : "ojos sorpresa",
-				"じと目" : "ojos sueño",
-				"なぬ！" : "ojos queee?",
-				"瞳小" : "ojos pupilas pequeñas",
-				"あ" : "Boca A",
-				"い" : "Boca I",
-				"う" : "Boca U",
-				"お" : "Boca O",
-				"はんっ！" : "Boca humm!",
-				"ぺろっ" : "Boca pero ...",
-				"えー" : "Boca D:",
-				"にやり" : "Boca sonrisa"
-			};
-			
+	let container;
+	let camara_default, scene, renderer, effect;
+	let camaras = {};
+	let camara_actual;
+	let mesh, helper, morphing_mesh, skin_meshes, skeletonHelper;
+	let animationGroup, animationMixer;
+	let currentAction = null;
+	let defaultAction = null;
+	let visibilidad;
+	let modalProgreso, divProgreso;
+	let materials;
+	let apariencias;
+	let orbit_controls;
+	let axesHelper;
+	let ambient, directionalLight;
+	let clavesControl, controlesGestos;
+	
+	let bufferMensaje;
+
+	const material_list = [
+		"CyanPelo",
+		"gris",
+		"Celeste",
+		"Bota Negra",
+		"MarcoLentes",
+		"Blanco Uniforme",
+		"Amarillo Uniforme",
+		"Verde Uniforme",
+		"Naranja Interestella",
+		"Blanco Interestella",
+		"Color Blusa",
+		"Color Terno",
+		"ColorOjos",
+		"Negro",
+		"Blanco",
+		"Piel"
+    ];
+
+	//const vpds = [];
+	const traducciones = {
+		"真面目" : "cejas seria",
+		"困る" : "cejas preocupada",
+		"にこり" : "cejas sonrisa",
+		"怒り" : "cejas enojada",
+		"上" : "cejas arriba",
+		"下" : "cejas abajo",
+		"まばたき" : "ojos parpadear",
+		"笑い" : "ojos risa",
+		"ウィンク" : "guiño izq",
+		"ウィンク２" : "guiño 2 izq",
+		"ウィンク右" : "guiño der",
+		"ｳｨﾝｸ２右" : "guiño 2 der",
+		"はぅ" : "ojos >_<",
+		"なごみ" : "ojos -_-",
+		"びっくり" : "ojos sorpresa",
+		"じと目" : "ojos sueño",
+		"なぬ！" : "ojos queee?",
+		"瞳小" : "ojos pupilas pequeñas",
+		"あ" : "Boca A",
+		"い" : "Boca I",
+		"う" : "Boca U",
+		"お" : "Boca O",
+		"はんっ！" : "Boca humm!",
+		"ぺろっ" : "Boca pero ...",
+		"えー" : "Boca D:",
+		"にやり" : "Boca sonrisa"
+	};
+
+	const morphs_by_pattern = [
+		{patron:":d",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmileOpen2_max":1.0}},
+		{patron:":p",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmileOpen2_max":0.7, "Expressions_mouthSmile_max":0.5, "Expressions_tongueHoriz_max":0.4, "Expressions_tongueOut_max":1.0, "Expressions_tongueVert_min":1.0}},				
+		{patron:":o",morphs:{"Expressions_browOutVertL_max":1.0, "Expressions_browOutVertR_max":1.0, "Expressions_eyesSmile_max":1.0, "Expressions_mouthOpenLarge_max":1.0}},
+		{patron:":)",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_max":1.0}},
+		{patron:":-)",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_max":1.0}},
+		{patron:";)",morphs:{"Expressions_eyeClosedR_max":0.4, "Expressions_eyesSmile_max":0.5, "Expressions_mouthSmileL_max":1.0, "Expressions_mouthSmileOpen_max":0.5}},
+		{patron:";-)",morphs:{"Expressions_eyeClosedR_max":0.4, "Expressions_eyesSmile_max":0.5, "Expressions_mouthSmileL_max":1.0, "Expressions_mouthSmileOpen_max":0.5}},
+		{patron:":(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
+		{patron:":-(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
+		{patron:":'(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
+		{patron:"uwu",morphs:{"Expressions_browsMidVert_max":1.0,"Expressions_eyesSmile_max":0.6, "Expressions_mouthOpenTeethClosed_min":1.0, "Expressions_mouthSmile_max":1.0}},
+		{patron:"xd",morphs:{"Expressions_browOutVertL_max":1.0, "Expressions_browOutVertR_max":1.0, "Expressions_eyesSmile_max":1.0, "Expressions_mouthSmileOpen2_max":1.0}},
+		{patron:"a",morphs:{"Expressions_mouthOpen_max":0.9, "Expressions_mouthSmile_max":1.0}},
+		{patron:"á",morphs:{"Expressions_mouthOpen_max":0.9, "Expressions_mouthSmile_max":1.0}},
+		{patron:"e",morphs:{"Expressions_mouthOpenO_max":0.5, "Expressions_mouthSmile_max":0.9}},
+		{patron:"é",morphs:{"Expressions_mouthOpenO_max":0.5, "Expressions_mouthSmile_max":0.9}},
+		{patron:"i",morphs:{"Expressions_mouthSmileOpen_max":0.3}},
+		{patron:"í",morphs:{"Expressions_mouthSmileOpen_max":0.3}},
+		{patron:"o",morphs:{"Expressions_mouthOpenO_max":0.5}},
+		{patron:"ó",morphs:{"Expressions_mouthOpenO_max":0.5}},
+		{patron:"u",morphs:{"Expressions_mouthOpenO_max":0.1,"Expressions_mouthOpenO_min":1.0}},
+		{patron:"ú",morphs:{"Expressions_mouthOpenO_max":0.1,"Expressions_mouthOpenO_min":1.0}},
+		{patron:".",morphs:{"Expressions_mouthSmile_max":1.0}}
+	];
+
+	const posicionesCamara = [
+		{x:3,y:0.85,z:0},
+		{x:0,y:1.35,z:2},
+		{x:0,y:1.35,z:2},
+		{x:0,y:1.35,z:1.5},
+		{x:0,y:1.35,z:1.5},
+		{x:0,y:1.35,z:1.5},
+		{x:0,y:1.35,z:1.5},
+		{x:0,y:1.35,z:1.5},
+		{x:0,y:1,z:2},
+		{x:0,y:1.35,z:1.3},
+		{x:0,y:1.35,z:1.4}
+	];
+
+	const fbxLoader = new FBXLoader();
+	const bvhLoader = new BVHLoader();
+
+class AnimacionFBX{
+	constructor(label,path){
+		this.label = label;
+		this.path = path;
+		this.accion = null;
+	}
+	getAccion(){
+		return new Promise((resolve, reject)=>{
+			if(this.accion != null){
+				resolve(this.accion);
+			}else{
+				modalProgreso.show();
+				fbxLoader.load(this.path + "?" + Date.now() , async (object)=>{
+					this.accion = cargarAnimacion(object, this.label);
+					resolve(this.accion);
+				}, onProgress, null );
+			}
+		});
+	}
+}
+
+	const bvhFiles = [
+		new AnimacionFBX('Pose01','models/fbx/pose01.fbx'),
+		new AnimacionFBX('Pose02','models/fbx/pose02.fbx'),
+		new AnimacionFBX('Pose03','models/fbx/pose03.fbx'),
+		new AnimacionFBX('Pose04','models/fbx/pose04.fbx'),
+		new AnimacionFBX('Pose05','models/fbx/pose05.fbx'),
+		new AnimacionFBX('Pose06','models/fbx/pose06.fbx'),
+		new AnimacionFBX('Pose07','models/fbx/pose07.fbx'),
+		new AnimacionFBX('Pose08','models/fbx/pose08.fbx'),
+		new AnimacionFBX('Pose09','models/fbx/pose09.fbx'),
+		new AnimacionFBX('Pose11','models/fbx/pose11.fbx')
+	];
+
+function agregarMensaje(parent, titulo, mensaje, clasesCard = [], clasesHeader = [ "small"], clasesBody = [ "p-1","mb-1", "border", "rounded-bottom", "rounded-start"], styleCard = null, styleHeader = null, styleBody = "background-color:rgba(255,255,255,0.75)" ){
+    // alert(mensaje);
+    const divCard = document.createElement("div");
+    const divHeader = document.createElement("div");
+    divHeader.innerText = titulo;
+    const divBody = document.createElement("div");
+    if(styleCard != null){
+        divCard.style = styleCard;
+    }
+    if(styleHeader != null){
+        divHeader.style = styleHeader;
+    }
+    if(styleBody != null){
+        divBody.style = styleBody;
+    }
+    divBody.innerText = mensaje;
+    clasesCard.forEach( clase => {
+        divCard.classList.add(clase);
+    });
+    clasesHeader.forEach( clase => {
+        divHeader.classList.add(clase);
+    });
+    clasesBody.forEach( clase => {
+        divBody.classList.add(clase);
+    });
+    divCard.appendChild(divHeader);
+    divCard.appendChild(divBody);
+    parent.appendChild(divCard);
+    return divCard;
+}
+
 /**
  * Reproduce un archivo MP3 desde una URL.
  * @param {string} url - La dirección del archivo .mp3
@@ -233,953 +350,811 @@ function reproducirMP3(url) {
     // Opcional: Retornamos el objeto por si quieres pausarlo luego
     return audio;
 }
+		
+function get_mesh_color(material_name){
+	for(let indice_mesh = 0; indice_mesh < skin_meshes.length; indice_mesh++){
+		const skin_mesh = skin_meshes[indice_mesh];
+		
+		if(!("material" in skin_mesh) || skin_mesh.material == null){
+			//alert(skin_mesh.name + " no tiene Materials!!");
+			continue;
+		}
 
-// Ejemplo de uso:
-// reproducirMP3("https://tusitio.com/audio.mp3");
-
+		let material;
+		if(skin_mesh.material instanceof Array){
+			material = skin_mesh.material.find(item => item.name == material_name);
+		}else if (skin_mesh.material.name == material_name){
+			material = skin_mesh.material;
+		}
+		
+		if(material){
+			// TODO: convertir material.color a hexadecimal Rgb
+			//alert("debo descifrar color");
+			let rojo = Math.ceil( material.color.r * 255, 0 ).toString(16);
+			if(rojo.length == 1){
+				rojo = "0" + rojo;
+			}
+			let verde = Math.ceil( material.color.g * 255, 0 ).toString(16);
+			if(verde.length == 1){
+				verde = "0" + verde;
+			}						
+			let azul = Math.ceil( material.color.b * 255, 0 ).toString(16);
+			if(azul.length == 1){
+				azul = "0" + azul;
+			}
+			return `#${rojo}${verde}${azul}`;
+		}
+	}
+	return "#000000";
+}
 			
-			function get_mesh_color(material_name){
-			    for(let indice_mesh = 0; indice_mesh < skin_meshes.length; indice_mesh++){
-			        const skin_mesh = skin_meshes[indice_mesh];
-			        
-			        if(!("material" in skin_mesh) || skin_mesh.material == null){
-			          //alert(skin_mesh.name + " no tiene Materials!!");
-			          continue;
-			        }
+function set_mesh_color(material_name, value){
+	if(value.length<7){
+		return;
+	}
+	const rojo = parseInt(value.substring(1,3), 16) / 255.0;
+	const verde = parseInt(value.substring(3,5), 16) / 255.0;
+	const azul = parseInt(value.substring(5,7), 16) / 255.0;
+	skin_meshes.forEach(skin_mesh => {
 
-			        let material;
-					if(skin_mesh.material instanceof Array){
-						material = skin_mesh.material.find(item => item.name == material_name);
-					}else if (skin_mesh.material.name == material_name){
-						material = skin_mesh.material;
-					}
-			        
-			        if(material){
-			            // TODO: convertir material.color a hexadecimal Rgb
-			            //alert("debo descifrar color");
-			            let rojo = Math.ceil( material.color.r * 255, 0 ).toString(16);
-						if(rojo.length == 1){
-							rojo = "0" + rojo;
-						}
-			            let verde = Math.ceil( material.color.g * 255, 0 ).toString(16);
-			            if(verde.length == 1){
-							verde = "0" + verde;
-						}						
-						let azul = Math.ceil( material.color.b * 255, 0 ).toString(16);
-						if(azul.length == 1){
-							azul = "0" + azul;
-						}
-			            return `#${rojo}${verde}${azul}`;
-			        }
-			    }
-			    return "#000000";
+		if(!("material" in skin_mesh) || skin_mesh.material == null){
+			alert(skin_mesh.name + " no tiene Materials!!");
+			return;
+		}
+
+		if(skin_mesh.material instanceof Array){
+			skin_mesh.material.filter(item => item.name == material_name).forEach(item =>{
+				item.color.r = rojo;
+				item.color.g = verde;
+				item.color.b = azul;
+				if("specular" in item){
+					item.specular.r = (1 - rojo)/16;
+					item.specular.g = (1 - verde)/16;
+					item.specular.b = (1 - azul)/16;
+				}
+			});
+		}else if(skin_mesh.material.name == material_name){
+			skin_mesh.material.color.r = rojo;
+			skin_mesh.material.color.g = verde;
+			skin_mesh.material.color.b = azul;
+			if("specular" in skin_mesh.material){
+					skin_mesh.material.specular.r = (1 - rojo)/16;
+					skin_mesh.material.specular.g = (1 - verde)/16;
+					skin_mesh.material.specular.b = (1 - azul)/16;
+				}
+		}
+	});
+}
+
+async function dormir(milisegundos){
+	function dormir1(milis){
+		return new Promise(resolve => setTimeout(resolve, milis) );
+	}
+	await dormir1(milisegundos);
+}
+
+function setCamaraActual(nuevaCamara){	
+}
+
+function ajustarCamara(indice){	
+	if(isNaN(indice)){
+		if( indice in camaras){
+			setCamaraActual( camaras[indice]);
+		}else{
+			setCamaraActual( camara_default);
+		}
+		return;	
+	}
+
+	setCamaraActual( camara_default);
+
+	if( indice >= posicionesCamara.length){
+		indice = posicionesCamara.length -1;
+	}
+
+	camara_default.position.set(posicionesCamara[indice].x, posicionesCamara[indice].y, posicionesCamara[indice].z);
+	camara_default.lookAt( 0 , posicionesCamara[indice].y , 0 );
+	camara_default.updateProjectionMatrix();
+
+	if(orbit_controls){
+		/*
+		const word_direction = nuevaCamara.getWorldDirection(camara_default.position);
+		if(! orbit_controls.position){
+			orbit_controls.position = camara_default.position.clone();
+		}else{
+			orbit_controls.position.set( 
+				camara_default.position.x, 
+				camara_default.position.y, 
+				camara_default.position.z 
+			);
+		}					
+		if(orbit_controls.target){
+			orbit_controls.target.set(
+				nuevaCamara.position.x + word_direction.x, 
+				nuevaCamara.position.y + word_direction.y, 
+				nuevaCamara.position.z + word_direction.z
+			);
+		}			
+		*/			
+		//orbit_controls.update();
+	}else{
+	}
+}
+
+function onProgress( xhr ) {
+
+	if ( xhr.lengthComputable ) {
+
+		const percentComplete = Math.floor(xhr.loaded / xhr.total * 100);
+		console.log( Math.round( percentComplete, 2 ) + '% downloaded ' + xhr.loaded + "/" + xhr.total);
+		divProgreso.style.width = "" + percentComplete + "%";
+		divProgreso.style.minWidth = "" + percentComplete + "%";
+		divProgreso.innerText = "" + percentComplete + " %";
+		if(xhr.loaded >= xhr.total){
+			setTimeout(()=>{
+				modalProgreso.hide();
+			},1000);
+		}
+	}
+
+}
+
+function getBaseName( s ) {
+
+	return s.slice( s.lastIndexOf( '/' ) + 1 );
+
+}
+
+function cargarAnimacion(vpd, nombre_animacion) {
+	// busca si la animacion actual tiene una camara
+	const camara_animacion = vpd.children.find(item => item.type == "PerspectiveCamera");
+	if(camara_animacion){
+		console.log("Se ha detectado la camara " + camara_animacion.name);
+		console.log(`Posicion x:${camara_animacion.position.x}, y:${camara_animacion.position.y}, z:${camara_animacion.position.z}`);						
+		const w_vector = camara_animacion.getWorldDirection(camara_animacion.position);
+		console.log(`Viendo hacia x:${w_vector.x}, y:${w_vector.y}, z:${w_vector.z}`);						
+		camaras[nombre_animacion] = camara_animacion;
+	}
+
+	if('animations' in vpd && vpd.animations.length > 0){
+		const animation_clip = vpd.animations.find(item=>{
+			if(vpd.animations.length == 1){
+				item.name = nombre_animacion;
+				return true;
 			}
-			
-			function set_mesh_color(material_name, value){
-			    if(value.length<7){
-			        return;
-			    }
-			    const rojo = parseInt(value.substring(1,3), 16) / 255.0;
-			    const verde = parseInt(value.substring(3,5), 16) / 255.0;
-			    const azul = parseInt(value.substring(5,7), 16) / 255.0;
-			    skin_meshes.forEach(skin_mesh => {
-
-					if(!("material" in skin_mesh) || skin_mesh.material == null){
-			          alert(skin_mesh.name + " no tiene Materials!!");
-			          return;
-			        }
-
-					if(skin_mesh.material instanceof Array){
-						skin_mesh.material.filter(item => item.name == material_name).forEach(item =>{
-							item.color.r = rojo;
-							item.color.g = verde;
-							item.color.b = azul;
-							if("specular" in item){
-							    item.specular.r = (1 - rojo)/16;
-							    item.specular.g = (1 - verde)/16;
-							    item.specular.b = (1 - azul)/16;
-							}
-						});
-					}else if(skin_mesh.material.name == material_name){
-						skin_mesh.material.color.r = rojo;
-						skin_mesh.material.color.g = verde;
-						skin_mesh.material.color.b = azul;
-						if("specular" in skin_mesh.material){
-							    skin_mesh.material.specular.r = (1 - rojo)/16;
-							    skin_mesh.material.specular.g = (1 - verde)/16;
-							    skin_mesh.material.specular.b = (1 - azul)/16;
-							}
-					}
-			    });
-			}
-
-			async function dormir(milisegundos){
-				function dormir1(milis){
-					return new Promise(resolve => setTimeout(resolve, milis) );
-				}
-				await dormir1(milisegundos);
-			}
-
-			const morphs_by_pattern = [
-				{patron:":d",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmileOpen2_max":1.0}},
-				{patron:":p",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmileOpen2_max":0.7, "Expressions_mouthSmile_max":0.5, "Expressions_tongueHoriz_max":0.4, "Expressions_tongueOut_max":1.0, "Expressions_tongueVert_min":1.0}},				
-				{patron:":o",morphs:{"Expressions_browOutVertL_max":1.0, "Expressions_browOutVertR_max":1.0, "Expressions_eyesSmile_max":1.0, "Expressions_mouthOpenLarge_max":1.0}},
-				{patron:":)",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_max":1.0}},
-				{patron:":-)",morphs:{"Expressions_cheekSneerL_max":0.8, "Expressions_cheekSneerR_max":0.8, "Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_max":1.0}},
-				{patron:";)",morphs:{"Expressions_eyeClosedR_max":0.4, "Expressions_eyesSmile_max":0.5, "Expressions_mouthSmileL_max":1.0, "Expressions_mouthSmileOpen_max":0.5}},
-				{patron:";-)",morphs:{"Expressions_eyeClosedR_max":0.4, "Expressions_eyesSmile_max":0.5, "Expressions_mouthSmileL_max":1.0, "Expressions_mouthSmileOpen_max":0.5}},
-				{patron:":(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
-				{patron:":-(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
-				{patron:":'(",morphs:{"Expressions_eyesSmile_max":0.2, "Expressions_mouthSmile_min":1}},
-				{patron:"uwu",morphs:{"Expressions_browsMidVert_max":1.0,"Expressions_eyesSmile_max":0.6, "Expressions_mouthOpenTeethClosed_min":1.0, "Expressions_mouthSmile_max":1.0}},
-				{patron:"xd",morphs:{"Expressions_browOutVertL_max":1.0, "Expressions_browOutVertR_max":1.0, "Expressions_eyesSmile_max":1.0, "Expressions_mouthSmileOpen2_max":1.0}},
-				{patron:"a",morphs:{"Expressions_mouthOpen_max":0.9, "Expressions_mouthSmile_max":1.0}},
-				{patron:"á",morphs:{"Expressions_mouthOpen_max":0.9, "Expressions_mouthSmile_max":1.0}},
-				{patron:"e",morphs:{"Expressions_mouthOpenO_max":0.5, "Expressions_mouthSmile_max":0.9}},
-				{patron:"é",morphs:{"Expressions_mouthOpenO_max":0.5, "Expressions_mouthSmile_max":0.9}},
-				{patron:"i",morphs:{"Expressions_mouthSmileOpen_max":0.3}},
-				{patron:"í",morphs:{"Expressions_mouthSmileOpen_max":0.3}},
-				{patron:"o",morphs:{"Expressions_mouthOpenO_max":0.5}},
-				{patron:"ó",morphs:{"Expressions_mouthOpenO_max":0.5}},
-				{patron:"u",morphs:{"Expressions_mouthOpenO_max":0.1,"Expressions_mouthOpenO_min":1.0}},
-				{patron:"ú",morphs:{"Expressions_mouthOpenO_max":0.1,"Expressions_mouthOpenO_min":1.0}},
-				{patron:".",morphs:{"Expressions_mouthSmile_max":1.0}}
-			];
-
-			Ammo().then( function ( AmmoLib ) {
-
-				Ammo = AmmoLib;
-
-				init();
-
-			} );
-
-			function init() {
-				
-				const posicionesCamara = [
-					{x:3,y:0.85,z:0},
-					{x:0,y:1.35,z:2},
-					{x:0,y:1.35,z:2},
-					{x:0,y:1.35,z:1.5},
-					{x:0,y:1.35,z:1.5},
-					{x:0,y:1.35,z:1.5},
-					{x:0,y:1.35,z:1.5},
-					{x:0,y:1.35,z:1.5},
-					{x:0,y:1,z:2},
-					{x:0,y:1.35,z:1.3},
-					{x:0,y:1.35,z:1.4}
-				];
-
-				const container = document.createElement( 'div' );
-				// document.body.appendChild( container );
-				document.getElementById("divContenedor").appendChild(container);
-
-				camara_default = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );				
-				camara_default.position.set(posicionesCamara[0].x, posicionesCamara[0].y, posicionesCamara[0].z);
-				camara_default.lookAt(0, posicionesCamara[0].y, 0);				
-				camara_default.name = "Camara Default";
-				camara_default.updateProjectionMatrix();
-				
-
-				camara_actual = camara_default.clone();
-				camara_actual.name = "Camara Actual";
-				
-				
-
-				console.log("camaras inicializadas");
-				
-				function setCamaraActual(nuevaCamara){	
-					/*
-					camara_actual.position.set( nuevaCamara.position.x, nuevaCamara.position.y, nuevaCamara.position.x );
-					camara_actual.lookAt(0 , nuevaCamara.position.y, 0 );
-					camara_actual.updateProjectionMatrix();
-*/
-					if(orbit_controls){
-						/*
-						if(! orbit_controls.position){
-								orbit_controls.position = nuevaCamara.position.clone();
-						}else{
-							orbit_controls.position.set( 
-								nuevaCamara.position.x, 
-								nuevaCamara.position.y, 
-								nuevaCamara.position.z 
-							);
-						}					
-						if(orbit_controls.target){
-							orbit_controls.target.set(
-								0, 
-								nuevaCamara.position.y, 
-								0
-							);
-						}
-						
-						orbit_controls.update();
-						*/
-					}						
-						
-					
-				}				
-				
-				function ajustarCamara(indice){
-					
-					if(isNaN(indice)){
-						if( indice in camaras){
-							setCamaraActual( camaras[indice]);
-						}else{
-							setCamaraActual( camara_default);
-						}
-						return;	
-					}
-
-					setCamaraActual( camara_default);
-
-					if( indice >= posicionesCamara.length){
-						indice = posicionesCamara.length -1;
-					}
-
-					camara_default.position.set(posicionesCamara[indice].x, posicionesCamara[indice].y, posicionesCamara[indice].z);
-					camara_default.lookAt( 0 , posicionesCamara[indice].y , 0 );
-					camara_default.updateProjectionMatrix();
-
-					if(orbit_controls){
-						/*
-						const word_direction = nuevaCamara.getWorldDirection(camara_default.position);
-						if(! orbit_controls.position){
-							orbit_controls.position = camara_default.position.clone();
-						}else{
-							orbit_controls.position.set( 
-								camara_default.position.x, 
-								camara_default.position.y, 
-								camara_default.position.z 
-							);
-						}					
-						if(orbit_controls.target){
-							orbit_controls.target.set(
-								nuevaCamara.position.x + word_direction.x, 
-								nuevaCamara.position.y + word_direction.y, 
-								nuevaCamara.position.z + word_direction.z
-							);
-						}			
-						*/			
-						//orbit_controls.update();
-					}else{
-					}
-					
-					
-				}
-				//camera.position.z = 25;
-				ajustarCamara(0);
-
-				// scene
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				//scene.background = new THREE.Color( 0x000000 );
-
-				const ambient = new THREE.AmbientLight( 0xaaaaaa, 3 );
-				scene.add( ambient );
-
-				const axesHelper = new THREE.AxesHelper(5);
-				scene.add(axesHelper);
-
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
-				directionalLight.position.set( - 1, 1, 1 ).normalize();
-				scene.add( directionalLight );
-
-				//
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				container.appendChild( renderer.domElement );
-
-				/*
-				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-				const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-				const cube = new THREE.Mesh( geometry, material );
-				scene.add( cube );
-				*/
-				
-				orbit_controls = new OrbitControls( camara_actual, renderer.domElement );
-				
-				effect = new OutlineEffect( renderer );
-
-				// model
-				modalProgreso = new bootstrap.Modal(document.getElementById("modalProgreso"),{keyboard:false});
-				divProgreso = document.getElementById("divProgreso");
-				modalProgreso.show();
-
-				function onProgress( xhr ) {
-
-					if ( xhr.lengthComputable ) {
-
-						const percentComplete = Math.floor(xhr.loaded / xhr.total * 100);
-						console.log( Math.round( percentComplete, 2 ) + '% downloaded ' + xhr.loaded + "/" + xhr.total);
-						divProgreso.style.width = "" + percentComplete + "%";
-						divProgreso.style.minWidth = "" + percentComplete + "%";
-						divProgreso.innerText = "" + percentComplete + " %";
-						if(xhr.loaded >= xhr.total){
-							setTimeout(()=>{
-								modalProgreso.hide();
-							},1000);
-						}
-					}
-
-				}
-
-				function getBaseName( s ) {
-
-					return s.slice( s.lastIndexOf( '/' ) + 1 );
-
-				}
-
-				function cargarAnimacion(vpd, nombre_animacion) {
-					
-					// busca si la animacion actual tiene una camara
-					const camara_animacion = vpd.children.find(item => item.type == "PerspectiveCamera");
-					if(camara_animacion){
-						console.log("Se ha detectado la camara " + camara_animacion.name);
-						console.log(`Posicion x:${camara_animacion.position.x}, y:${camara_animacion.position.y}, z:${camara_animacion.position.z}`);						
-						const w_vector = camara_animacion.getWorldDirection(camara_animacion.position);
-						console.log(`Viendo hacia x:${w_vector.x}, y:${w_vector.y}, z:${w_vector.z}`);						
-						camaras[nombre_animacion] = camara_animacion;
-					}
-
-					if('animations' in vpd && vpd.animations.length > 0){
-						const animation_clip = vpd.animations.find(item=>{
-							if(vpd.animations.length == 1){
-								item.name = nombre_animacion;
-								return true;
-							}
-							const partes_nombre = item.name.split("|");
-							const nombre = partes_nombre[1];
-							return nombre == nombre_animacion;
-						});
-						if(animation_clip){
-							const partes_nombre = animation_clip.name.split("|");
-							const nombre = partes_nombre[1];
-							const accion = animationMixer.clipAction(animation_clip);
-							accion.name = nombre_animacion ;
-							return accion;
-						};
-					} else if('clip' in vpd){
-						const nombre = nombre_animacion.toLowerCase();
-						//vpd.clip.tracks = vpd.clip.tracks.filter(item=>item.name.indexOf("root.") != 0);
-						//vpd.clip.tracks = vpd.clip.tracks.filter(item=>item.name.indexOf(".quaternion") >= 0);
-						const accion = animationMixer.clipAction(vpd.clip);
-						accion.name = nombre ;
-						return accion;
-					}
-					return null;
-				}
-
-				class AnimacionFBX{
-					constructor(label,path){
-						this.label = label;
-						this.path = path;
-						this.accion = null;
-					}
-					getAccion(){
-						return new Promise((resolve, reject)=>{
-							if(this.accion != null){
-								resolve(this.accion);
-							}else{
-								modalProgreso.show();
-								fbxLoader.load(this.path + "?" + Date.now() , async (object)=>{
-									this.accion = cargarAnimacion(object, this.label);
-									resolve(this.accion);
-								}, onProgress, null );
-							}
-						});
-					}
-				}
-
-				const modelFile = 'models/fbx/miku_mesh.fbx?'+ (Date.now());
-				console.log("Cargando modelo desde " + modelFile);
-				const bvhFiles = [
-					new AnimacionFBX('Pose01','models/fbx/pose01.fbx'),
-					new AnimacionFBX('Pose02','models/fbx/pose02.fbx'),
-					new AnimacionFBX('Pose03','models/fbx/pose03.fbx'),
-					new AnimacionFBX('Pose04','models/fbx/pose04.fbx'),
-					new AnimacionFBX('Pose05','models/fbx/pose05.fbx'),
-					new AnimacionFBX('Pose06','models/fbx/pose06.fbx'),
-					new AnimacionFBX('Pose07','models/fbx/pose07.fbx'),
-					new AnimacionFBX('Pose08','models/fbx/pose08.fbx'),
-					new AnimacionFBX('Pose09','models/fbx/pose09.fbx'),
-					new AnimacionFBX('Pose11','models/fbx/pose11.fbx')
-				];
-
-				const fbxLoader = new FBXLoader();
-				const bvhLoader = new BVHLoader();
-
-				fbxLoader.load( modelFile, async ( object ) => {
-
-					mesh = object;					
-					animationGroup = object.children.find(item=> item.name =="asis__armature");
-					// animationGroup.rotation.x = 0;
-
-					morphing_mesh = object.children.find(item=> item.name =="asis__body")
-					//mesh.position.y = - 10;
-					
-					skin_meshes = object.children.filter(item => item.type=="SkinnedMesh");
-										
-					skeletonHelper = new THREE.SkeletonHelper(animationGroup);
-					skeletonHelper.visible = false;
-
-					animationMixer = new THREE.AnimationMixer(animationGroup.children.find(item=>item.type=="Bone"));
-
-					scene.add( mesh );
-					scene.add( skeletonHelper );
-
-					initGui();
-					console.log("GUI inicializada");
-					/*
-					cargarAnimacion(mesh);
-
-					let bvhIndex = 0;
-
-					async function cargarBvh(){
-						const bvhFile = bvhFiles[ bvhIndex ];
-						await bvhLoader.load(bvhFile, async bvh=>{
-							cargarAnimacion(bvh, getBaseName(bvhFile));
-						});
-						bvhIndex ++;
-						if ( bvhIndex < bvhFiles.length ) {
-							cargarBvh();
-						} else {
-							initGui();
-						}
-					}
-
-					cargarBvh();
-					*/
-				}, onProgress, null );
-
-				
-
-				window.addEventListener( 'resize', onWindowResize );
-
-				function initGui() {
-
-					const dictionary = {};
-					
-					if(morphing_mesh){
-						const dictionary_raw = morphing_mesh.morphTargetDictionary;
-						Object.keys(dictionary_raw).forEach(item=>{
-							let clave = item;
-							if( Object.keys(traducciones).indexOf(item) >= 0 ){
-								clave = traducciones[item];
-							}
-							dictionary[clave] = dictionary_raw[item];
-						})
-					}
-					
-					
-					const controls = {};
-					const keys = [];
-
-					function initControls() {
-
-						for ( const key in dictionary ) {
-
-							controls[ key ] = 0.0;
-
-						}
-
-						controls.pose = - 1;
-
-						for ( let i = 0; i < bvhFiles.length; i ++ ) {
-
-							controls[ bvhFiles[ i ].label ] = false;
-
-						}
-
-					}
-
-					function initKeys() {
-						//console.log("========\nLISTA DE CLAVES\n==========");
-						for ( const key in dictionary ) {
-							//console.log(`"${key}" : "",`);
-							keys.push( key );
-
-						}
-
-					}
-
-					function initPoses() {
-
-						const files = { default: - 1 };
-
-						for ( let i = 0; i < bvhFiles.length; i ++ ) {							
-							files[ bvhFiles[i].label ] = i;
-						}
-     
-						// poses.add( controls, 'pose', files ).onChange( onChangePose );
-						
-						const selPoses = document.getElementById("selPoses");
-						
-						Object.keys(files).forEach(file=>{
-						    const opcion = document.createElement("option");
-						    opcion.value = files[file];
-						    opcion.innerText = file;
-						    selPoses.appendChild(opcion);
-						    if(file=="default"){
-						        opcion.selected = true;
-						    }
-						});
-						
-						selPoses.addEventListener("change", onChangePose);
-						
-					}
-
-					function initMorphs() {
-					
-					 	const divMorphs = document.getElementById("divMorphs");
-						divMorphs.innerHTML = "";
-						
-						for ( const key in dictionary ) {
-
-							// morphs.add( controls, key, 0.0, 1.0, 0.01 ).onChange( onChangeMorph );
-							const indice = dictionary[key];
-							const divRow = document.createElement("div");
-							divRow.classList.add("row","mt-1");
-							const label = document.createElement("label");
-							label.classList.add("col");
-							label.innerText = key.replaceAll("_", " ");
-							const slider = document.createElement("input");
-							slider.classList.add("col","form-range");
-							slider.type="range";
-							slider.min = 0.0;
-							slider.max = 1.0;
-							slider.step = 0.1;
-							slider.value = 0.0;
-							slider.id = `sldMorph${indice}`;
-							slider.dataset.textoid = `txtMorph${indice}`;
-							slider.dataset.morph_key = key;
-							const texto = document.createElement("input");
-							texto.value=0;
-							texto.classList.add("col","form-control","ml-2");
-							texto.id = `txtMorph${indice}`;
-							texto.dataset.sliderid = `sldMorph${indice}`;
-							texto.dataset.indice = indice;
-							texto.disabled = true;
-							divRow.appendChild(label);
-							divRow.appendChild(slider);
-							divRow.appendChild(texto);
-							divMorphs.appendChild(divRow);
-							slider.addEventListener('change', onChangeMorphSlider);
+			const partes_nombre = item.name.split("|");
+			const nombre = partes_nombre[1];
+			return nombre == nombre_animacion;
+		});
+		if(animation_clip){
+			const partes_nombre = animation_clip.name.split("|");
+			const nombre = partes_nombre[1];
+			const accion = animationMixer.clipAction(animation_clip);
+			accion.name = nombre_animacion ;
+			return accion;
+		};
+	} else if('clip' in vpd){
+		const nombre = nombre_animacion.toLowerCase();
+		//vpd.clip.tracks = vpd.clip.tracks.filter(item=>item.name.indexOf("root.") != 0);
+		//vpd.clip.tracks = vpd.clip.tracks.filter(item=>item.name.indexOf(".quaternion") >= 0);
+		const accion = animationMixer.clipAction(vpd.clip);
+		accion.name = nombre ;
+		return accion;
+	}
+	return null;
+}
+
+function init() {
+
+	container = document.createElement( 'div' );
+	// document.body.appendChild( container );
+	document.getElementById("divContenedor").appendChild(container);
+
+	camara_default = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );				
+	camara_default.position.set(posicionesCamara[0].x, posicionesCamara[0].y, posicionesCamara[0].z);
+	camara_default.lookAt(0, posicionesCamara[0].y, 0);				
+	camara_default.name = "Camara Default";
+	camara_default.updateProjectionMatrix();
+	
+
+	camara_actual = camara_default.clone();
+	camara_actual.name = "Camara Actual";
+
+	console.log("camaras inicializadas");
+
+	//camera.position.z = 25;
+	ajustarCamara(0);
+
+	// scene
+	scene = new THREE.Scene();
+	scene.background = new THREE.Color( 0xffffff );
+	//scene.background = new THREE.Color( 0x000000 );
+
+	ambient = new THREE.AmbientLight( 0xaaaaaa, 3 );
+	scene.add( ambient );
+
+	//axesHelper = new THREE.AxesHelper(5);
+	//scene.add(axesHelper);
+
+	directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+	directionalLight.position.set( 1, 1, 1 ).normalize();
+	scene.add( directionalLight );
+
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setAnimationLoop( animate );
+	container.appendChild( renderer.domElement );
+
+	orbit_controls = new OrbitControls( camara_actual, renderer.domElement );
+	
+	effect = new OutlineEffect( renderer );
+
+	// model
+	modalProgreso = new bootstrap.Modal(document.getElementById("modalProgreso"),{keyboard:false});
+	divProgreso = document.getElementById("divProgreso");
+	modalProgreso.show();
+
+	const modelFile = 'models/fbx/miku_mesh.fbx?'+ (Date.now());
+	console.log("Cargando modelo desde " + modelFile);
+	
+
+	fbxLoader.load( modelFile, async ( object ) => {
+
+		mesh = object;					
+		animationGroup = object.children.find(item=> item.name =="asis__armature");
+
+		morphing_mesh = object.children.find(item=> item.name =="asis__body")
+		
+		skin_meshes = object.children.filter(item => item.type=="SkinnedMesh");
 							
-						}
+		skeletonHelper = new THREE.SkeletonHelper(animationGroup);
+		skeletonHelper.visible = false;
 
-					}
-					
-					function initLayers(){
-					    const divLayers = document.getElementById("divLayers");
-					    divLayers.innerHTML = "";
-						//localStorage.removeItem("Miku.Visibilidad");
-						if (localStorage.getItem("Miku.Visibilidad") != null){
-							visibilidad = JSON.parse(localStorage.getItem("Miku.Visibilidad"));
-						}else{
-							visibilidad = {};
-						}
-					    skin_meshes.forEach(anim_mesh => {
-					        const row = document.createElement("div");
-					        row.classList.add("row");
-					        const check = document.createElement("input");
-					        check.type = "checkbox";
-					        check.classList.add( "form-check", "form-switch", "col-1");
-					        check.dataset.mesh_id = anim_mesh.name;
-					        row.appendChild(check);
-					        const label = document.createElement("label");
-					        label.innerText = anim_mesh.name;
-					        label.classList.add("form-label", "col");
-					        row.appendChild(label);
-					        divLayers.appendChild(row);
-					        check.addEventListener('click', onChangeCheckLayer);							
-							
-					        check.checked = anim_mesh.name == morphing_mesh.name || anim_mesh.name in visibilidad && visibilidad[anim_mesh.name] || !(anim_mesh.name in visibilidad) && anim_mesh.name.indexOf("Miku.") == 0 ;
-							visibilidad[anim_mesh.name] = check.checked;
-							anim_mesh.visible = check.checked;
-					    });	
+		animationMixer = new THREE.AnimationMixer(animationGroup.children.find(item=>item.type=="Bone"));
 
-						localStorage.setItem("Miku.Visibilidad", JSON.stringify(visibilidad));
-					}
-					
-					function onChangeCheckLayer(event){
-					    const check = event.target;
-					    const anim_mesh = skin_meshes.find(item => item.name == check.dataset.mesh_id);
-					    if(anim_mesh){
-					        //alert("mostrar/ocultar " + check.dataset.mesh_id);
-					        anim_mesh.visible = check.checked;
-							visibilidad[anim_mesh.name] = check.checked;
-							localStorage.setItem("Miku.Visibilidad", JSON.stringify(visibilidad));
-					    }else{
-					        alert("no encontré " + check.dataset.mesh_id);
-					    }
-					}
-					
-					function onChangeMorphSlider(event){
-					  const slider = event.target;
-					  const texto = document.getElementById(slider.dataset.textoid);
-					  texto.value = slider.value;
-					  controls[slider.dataset.morph_key] = parseFloat(slider.value);
-					  onChangeMorph();
-					}
+		scene.add( mesh );
+		scene.add( skeletonHelper );
 
-					function onChangeMorph() {
+		initGui();
+		console.log("GUI inicializada");
+		
+	}, onProgress, null );
 
-						for ( let i = 0; i < keys.length; i ++ ) {
+	window.addEventListener( 'resize', onWindowResize );
 
-							const key = keys[ i ];
-							const value = controls[ key ];
-							if(morphing_mesh){
-								morphing_mesh.morphTargetInfluences[ i ] = value;
-							}
-							
+	
 
-						}
+}
 
-					}
+function initGui() {
 
-					async function onChangePose() {
-					 
-						const selPoses = document.getElementById("selPoses");
-						//const index = parseInt( controls.pose );
-						const chkPoseTemporal = document.getElementById("chkPoseTemporal");
-						const divOpciones = document.getElementById("divOpciones");
-						const index = parseInt(selPoses.value);
-
-						if(currentAction != null){
-							currentAction.stop();
-							//animationMixer.update(1);
-						}
-
-						if ( index === - 1 ) {
-
-							//mesh.pose();
-							/*		
-							if(defaultAction !=null){
-								currentAction = defaultAction;
-								currentAction.play();
-							}
-							*/					
-							currentAction = null;
-							ajustarCamara(0);
-
-						} else {
-							
-							//helper.pose( mesh, vpds[ index ] );
-							currentAction = await bvhFiles[ index ].getAccion();
-							if(currentAction != null){
-								currentAction.play();
-								ajustarCamara(currentAction.name);
-							}							
-							
-							if(chkPoseTemporal.checked){
-							    setTimeout(()=>{
-							        selPoses.value=-1;
-							        onChangePose();
-							    },5000);
-							}
-						}
-						animationMixer.update(1);
-						
-    					divOpciones.classList.remove("show");
-					}
-
-					procesadorMensaje = ()=>{
-						if( !bufferMensaje || bufferMensaje.length == 0 ){
-							return;
-						}
-						const gesto = morphs_by_pattern.find(item=>{
-							return bufferMensaje.indexOf(item.patron) == 0;
-						});
-						for(const clave in controls){
-							if(gesto && clave in gesto.morphs){
-								controls[clave] = gesto.morphs[clave];
-							}else{
-								controls[clave] = 0.0;
-							}
-						}
-						onChangeMorph();
-						if(gesto){
-							bufferMensaje = bufferMensaje.substring(gesto.patron.length);
-						}else{
-							bufferMensaje = bufferMensaje.substring(1);
-						}
-					};
-
-					const txtMensaje = document.getElementById("txtMensaje");
-					const btnMensaje = document.getElementById("btnMensaje");
-					const chkModoConversacion = document.getElementById("chkModoConversacion");
-					const chkLocucion = document.getElementById("chkLocucion");
-
-					btnMensaje.addEventListener("click",async ()=>{
-						const texto = txtMensaje.value;
-						if(texto.trim().length == 0){
-							return;
-						}
-						if(chkModoConversacion.checked){
-						  const formData = new FormData();
-						  formData.append("texto",texto);
-						  try{
-						    const respuesta = await fetch("/eliza", {method:"POST", body: formData});
-						    if(respuesta.status != 200){
-						      throw {message:"Error " + respuesta.status};
-						    }
-						    const respuesta_json = await respuesta.json();
-						    await mostrarToast( respuesta_json.texto);
-						  }catch(ex){
-						    await mostrarToast(ex.message);
-						  }
-						  
-						}else{
-						  await mostrarToast(texto);
-						}
-						txtMensaje.value = "";
-					});
-
-					async function mostrarToast(mensaje){
-						const toastMensaje = document.getElementById("toastMensaje");						
-						const toastBody = toastMensaje.getElementsByClassName("toast-body")[0];
-						toastBody.innerText = mensaje;
-						const tostada = new bootstrap.Toast(toastMensaje);
-						tostada.show();
-						if(chkLocucion.checked){
-						    const formData = new FormData();
-					    	formData.append("texto",mensaje);
-					    	const resultado_hablar = await fetch("/hablar", {method:"POST", body:formData });
-							if(resultado_hablar.ok){
-								const result_text = await resultado_hablar.text();
-								if( result_text != "OK"){
-									reproducirMP3( result_text + "?" + Date.now() );
-								}
-							}
-						}
-						bufferMensaje = mensaje.toLowerCase();
-					}
-					
-					function initMaterials(){
-						const divMaterials = document.getElementById("divMaterials");
-					 	divMaterials.innerHTML = "";
-						//localStorage.removeItem("Miku.Materials");
-						if (localStorage.getItem("Miku.Materials") != null){
-							materials = JSON.parse(localStorage.getItem("Miku.Materials"));
-						}else{
-							materials = [];
-						}
-						material_list.forEach(material_name => {
-							let material = materials.find(item => item.nombre == material_name);
-							if(!material){
-								material = {nombre:material_name, color: get_mesh_color(material_name) };
-								materials.push(material);
-							}
-							material.default_color = get_mesh_color(material_name);
-							set_mesh_color(material_name, material.color);
-
-							// alert("1 procesando " + material_name);
-							const row = document.createElement("div");
-							row.classList.add("row");
-							const label = document.createElement("label");
-							label.classList.add("col", "form-label");
-							label.innerText = material_name;
-						  	const span = document.createElement("span");
-						  	span.classList.add("col");
-						  	const color_picker = document.createElement("input");
-						  	// alert("2 procesando " + material_name);
-						  	color_picker.classList.add( "form-control","xpd-material-picker");
-							color_picker.type="color";
-							color_picker.dataset.material_name = material_name;
-							// alert("3 procesando " + material_name);
-							color_picker.value = material.color;
-
-							const span_default = document.createElement("span");
-							span_default.classList.add("col");
-							const btn_default = document.createElement("button");
-							btn_default.classList.add("btn","btn-secondary");
-							btn_default.dataset.material_name = material_name;
-							btn_default.innerText = "Restaurar";							
-
-							//alert("4 procesando " + material_name);
-							span.appendChild(color_picker);
-							span_default.appendChild(btn_default);
-							row.appendChild(label);
-							row.appendChild(span);
-							row.appendChild(span_default);
-							divMaterials.appendChild(row);
-							color_picker.addEventListener("change", onChangeMaterialText);
-							btn_default.addEventListener("click", onClickMaterialButton);
-						});
-						localStorage.setItem("Miku.Materials", JSON.stringify(materials));
-						//alert("Materials Cargado");
-					}
-					
-					function onChangeMaterialText(event){
-					    const color_picker = event.target;
-					    const material_name = color_picker.dataset.material_name;
-					    const valor = color_picker.value;
-					    set_mesh_color(material_name, valor);
-						const material = materials.find(item=> item.nombre == material_name);
-					    material.color = valor;
-					    localStorage.setItem("Miku.Materials", JSON.stringify(materials));
-					}
-
-					function onClickMaterialButton(event){
-						const btn_default = event.target;
-					    const material_name = btn_default.dataset.material_name;
-						const material = materials.find(item=> item.nombre == material_name);
-						material.color = material.default_color;
-						const color_pickers = document.getElementsByClassName("xpd-material-picker");
-						for(let indice = 0; indice < color_pickers.length; indice++){
-							const color_picker = color_pickers[indice];
-							if(color_picker.dataset.material_name == material_name){
-								color_picker.value = material.color;
-								break;
-							}
-						}
-						set_mesh_color(material_name, material.color);
-					}
-
-					function initLoadApariencias(){
-						const divApariencias = document.getElementById("divApariencias");
-						divApariencias.innerHTML = "";
-						//localStorage.removeItem("Miku.Apariencias");
-						if (localStorage.getItem("Miku.Apariencias") != null){
-							apariencias = JSON.parse(localStorage.getItem("Miku.Apariencias"));
-						}else{
-							apariencias = [];
-						}
-
-						apariencias.forEach(apariencia => {
-							const list_item = document.createElement("div");
-							list_item.classList.add("list-group-item");
-							const flex_row = document.createElement("div");
-							flex_row.classList.add("d-flex", "flex-row", "justify-content-between");
-							const enlace = document.createElement("a");
-							enlace.href = "#";
-							enlace.innerText = apariencia.nombre;
-							enlace.classList.add("text-decoration-none");
-							enlace.dataset.apariencia = apariencia.nombre;
-							const btn_eliminar = document.createElement("a");
-							btn_eliminar.innerText = "x";
-							btn_eliminar.dataset.apariencia = apariencia.nombre;
-							enlace.classList.add("text-decoration-none");
-							list_item.appendChild(flex_row);
-							flex_row.appendChild(enlace);
-							flex_row.appendChild(btn_eliminar);
-							divApariencias.appendChild(list_item);
-							enlace.addEventListener("click", OnCargarApariencia);
-							btn_eliminar.addEventListener("click", OnEliminarApariencia);
-						});
-
-						localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
-					}
-
-					function initGuardarApariencias(){
-						const btnGuardarApariencia = document.getElementById("btnGuardarApariencia");
-						const btnResetTxtApariencia = document.getElementById("btnResetTxtApariencia");
-						btnGuardarApariencia.addEventListener("click", OnGuardarApariencia);
-						btnResetTxtApariencia.addEventListener("click", OnResetTxtApariencia);
-					}
-
-					function OnResetTxtApariencia(){
-						const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
-						txtGuardarApariencia.value = "";
-					}
-
-					function OnGuardarApariencia(){
-						const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
-						const nombre = txtGuardarApariencia.value;
-						let apariencia = apariencias.find( item => item.nombre == nombre);
-						if(apariencia == null){
-							apariencia = {"nombre": nombre};
-							apariencias.push(apariencia);
-						}else if ( ! confirm("Desea reemplazar la Apariencia "+ nombre +"?") ){
-							mostrarToast("Se cancela guardado de apariencia.");
-							return;
-						}
-						apariencia.layers = {...visibilidad};
-						apariencia.materials = [...materials];
-						apariencias.sort( (a,b) => (a.nombre >= b.nombre) ? 1 : -1 ); 
-						localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
-						initLoadApariencias();
-						mostrarToast("Se ha guardado la apariencia " + nombre + ".");
-					}
-
-					function OnCargarApariencia(event){
-						const enlace = event.target;
-						const nombre = enlace.dataset.apariencia;
-						const apariencia = apariencias.find(item => item.nombre == nombre);
-						if(apariencia == null){
-							mostrarToast("No se ha encontrado apariencia " + nombre + ".");
-							return;
-						}
-						localStorage.setItem("Miku.Visibilidad", JSON.stringify(apariencia.layers));
-						localStorage.setItem("Miku.Materials", JSON.stringify(apariencia.materials));
-						initLayers();
-						initMaterials();
-						const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
-						txtGuardarApariencia.value = nombre;
-						//divOpciones.classList.remove("show");
-					}
-
-					function OnEliminarApariencia(event){
-						const enlace = event.target;
-						const nombre = event.dataset.apariencia;
-						const apariencia = apariencias.find(item => item.nombre == nombre);
-						if(apariencia == null){
-							mostrarToast("No se ha encontrado apariencia " + nombre + ".");
-							return;
-						}
-						const indice = apariencias.indexOf(apariencia);
-						apariencias.pop(indice);
-						localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
-						initLoadApariencias();
-						mostrarToast("Se ha eliminado la apariencia " + nombre + ".");
-					}
-
-
-
-					initControls();
-					initKeys();
-					initPoses();
-					initMorphs();
-					initLayers();
-					initMaterials();
-					initLoadApariencias();
-					initGuardarApariencias();
-
-					onChangeMorph();
-					onChangePose();
-
-					//poses.open();
-					//morphs.open();
-
+		const dictionary = {};
+		
+		if(morphing_mesh){
+			const dictionary_raw = morphing_mesh.morphTargetDictionary;
+			Object.keys(dictionary_raw).forEach(item=>{
+				let clave = item;
+				if( Object.keys(traducciones).indexOf(item) >= 0 ){
+					clave = traducciones[item];
 				}
+				dictionary[clave] = dictionary_raw[item];
+			})
+		}
+		
+		
+		
+		clavesControl = [];
 
+		const txtMensaje = document.getElementById("txtMensaje");
+		const btnMensaje = document.getElementById("btnMensaje");
+		const chkModoConversacion = document.getElementById("chkModoConversacion");
+		const chkLocucion = document.getElementById("chkLocucion");
+
+		btnMensaje.addEventListener("click",async ()=>{
+			const texto = txtMensaje.value;
+			if(texto.trim().length == 0){
+				return;
 			}
-
-			function onWindowResize() {
-
-				camara_actual.aspect = window.innerWidth / window.innerHeight;
-				camara_actual.updateProjectionMatrix();
-
-				effect.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			//
-
-			async function animate() {
-				if(procesadorMensaje){
-					procesadorMensaje();
+			if(chkModoConversacion.checked){
+				const divHistoricoChat = document.getElementById("divHistoricoChat");
+				agregarMensaje(divHistoricoChat, "Yo:", texto );
+				const formData = new FormData();
+				formData.append("texto",texto);
+				try{
+				const respuesta = await fetch("/eliza", {method:"POST", body: formData});
+				if(respuesta.status != 200){
+					throw {message:"Error " + respuesta.status};
 				}
-				effect.render( scene, camara_actual );
-
-				await dormir(2000);
-
+				const respuesta_json = await respuesta.json();
+				agregarMensaje(divHistoricoChat, "Miku", respuesta_json.texto);
+					await mostrarToast( respuesta_json.texto);
+				}catch(ex){
+				await mostrarToast(ex.message);
+				}
+				
+			}else{
+				await mostrarToast(texto);
 			}
+			txtMensaje.value = "";
+		});
+
+		initControls(dictionary);
+		initKeys(dictionary);
+		initPoses();
+		initMorphs(dictionary);
+		initLayers();
+		initMaterials();
+		initLoadApariencias();
+		initGuardarApariencias();
+
+		onChangeMorph();
+		onChangePose();
+
+		//poses.open();
+		//morphs.open();
+
+	}
+
+function initControls(dictionary) {
+	controlesGestos = {};
+	for ( const key in dictionary ) {
+
+		controlesGestos[ key ] = 0.0;
+
+	}
+
+	controlesGestos.pose = - 1;
+
+	for ( let i = 0; i < bvhFiles.length; i ++ ) {
+
+		controlesGestos[ bvhFiles[ i ].label ] = false;
+
+	}
+
+}
+
+function initKeys(dictionary) {
+	//console.log("========\nLISTA DE CLAVES\n==========");
+	clavesControl = [];
+	for ( const key in dictionary ) {
+		//console.log(`"${key}" : "",`);
+		clavesControl.push( key );
+
+	}
+
+}
+
+function initPoses() {
+
+	const files = { default: - 1 };
+
+	for ( let i = 0; i < bvhFiles.length; i ++ ) {							
+		files[ bvhFiles[i].label ] = i;
+	}
+
+	// poses.add( controls, 'pose', files ).onChange( onChangePose );
+	
+	const selPoses = document.getElementById("selPoses");
+	
+	Object.keys(files).forEach(file=>{
+		const opcion = document.createElement("option");
+		opcion.value = files[file];
+		opcion.innerText = file;
+		selPoses.appendChild(opcion);
+		if(file=="default"){
+			opcion.selected = true;
+		}
+	});
+	
+	selPoses.addEventListener("change", onChangePose);
+	
+}
+
+function initMorphs(dictionary) {
+		
+	const divMorphs = document.getElementById("divMorphs");
+	divMorphs.innerHTML = "";
+	
+	for ( const key in dictionary ) {
+
+		// morphs.add( controls, key, 0.0, 1.0, 0.01 ).onChange( onChangeMorph );
+		const indice = dictionary[key];
+		const divRow = document.createElement("div");
+		divRow.classList.add("row","mt-1");
+		const label = document.createElement("label");
+		label.classList.add("col");
+		label.innerText = key.replaceAll("_", " ");
+		const slider = document.createElement("input");
+		slider.classList.add("col","form-range");
+		slider.type="range";
+		slider.min = 0.0;
+		slider.max = 1.0;
+		slider.step = 0.1;
+		slider.value = 0.0;
+		slider.id = `sldMorph${indice}`;
+		slider.dataset.textoid = `txtMorph${indice}`;
+		slider.dataset.morph_key = key;
+		const texto = document.createElement("input");
+		texto.value=0;
+		texto.classList.add("col","form-control","ml-2");
+		texto.id = `txtMorph${indice}`;
+		texto.dataset.sliderid = `sldMorph${indice}`;
+		texto.dataset.indice = indice;
+		texto.disabled = true;
+		divRow.appendChild(label);
+		divRow.appendChild(slider);
+		divRow.appendChild(texto);
+		divMorphs.appendChild(divRow);
+		slider.addEventListener('change', onChangeMorphSlider);
+		
+	}
+
+}
+
+function onChangeCheckLayer(event){
+	const check = event.target;
+	const anim_mesh = skin_meshes.find(item => item.name == check.dataset.mesh_id);
+	if(anim_mesh){
+		//alert("mostrar/ocultar " + check.dataset.mesh_id);
+		anim_mesh.visible = check.checked;
+		visibilidad[anim_mesh.name] = check.checked;
+		localStorage.setItem("Miku.Visibilidad", JSON.stringify(visibilidad));
+	}else{
+		alert("no encontré " + check.dataset.mesh_id);
+	}
+}
+
+function onChangeMorphSlider(event){
+	const slider = event.target;
+	const texto = document.getElementById(slider.dataset.textoid);
+	texto.value = slider.value;
+	controlesGestos[slider.dataset.morph_key] = parseFloat(slider.value);
+	onChangeMorph();
+}
+
+function onChangeMorph() {
+
+	for ( let i = 0; i < clavesControl.length; i ++ ) {
+
+		const key = clavesControl[ i ];
+		const value = controlesGestos[ key ];
+		if(morphing_mesh){
+			morphing_mesh.morphTargetInfluences[ i ] = value;
+		}
+		
+
+	}
+
+}
+
+async function onChangePose() {
+
+	const selPoses = document.getElementById("selPoses");
+	//const index = parseInt( controls.pose );
+	const chkPoseTemporal = document.getElementById("chkPoseTemporal");
+	const divOpciones = document.getElementById("divOpciones");
+	const index = parseInt(selPoses.value);
+
+	if(currentAction != null){
+		currentAction.stop();
+		//animationMixer.update(1);
+	}
+
+	if ( index === - 1 ) {
+
+		//mesh.pose();
+		/*		
+		if(defaultAction !=null){
+			currentAction = defaultAction;
+			currentAction.play();
+		}
+		*/					
+		currentAction = null;
+		ajustarCamara(0);
+
+	} else {
+		
+		//helper.pose( mesh, vpds[ index ] );
+		currentAction = await bvhFiles[ index ].getAccion();
+		if(currentAction != null){
+			currentAction.play();
+			ajustarCamara(currentAction.name);
+		}							
+		
+		if(chkPoseTemporal.checked){
+			setTimeout(()=>{
+				selPoses.value=-1;
+				onChangePose();
+			},5000);
+		}
+	}
+	animationMixer.update(1);
+
+	divOpciones.classList.remove("show");
+	}
+
+function procesadorMensaje(){
+	if( !bufferMensaje || bufferMensaje.length == 0 ){
+		return;
+	}
+	const gesto = morphs_by_pattern.find(item=>{
+		return bufferMensaje.indexOf(item.patron) == 0;
+	});
+	for(const clave in controlesGestos){
+		if(gesto && clave in gesto.morphs){
+			controlesGestos[clave] = gesto.morphs[clave];
+		}else{
+			controlesGestos[clave] = 0.0;
+		}
+	}
+	onChangeMorph();
+	if(gesto){
+		bufferMensaje = bufferMensaje.substring(gesto.patron.length);
+	}else{
+		bufferMensaje = bufferMensaje.substring(1);
+	}
+}
+
+async function mostrarToast(mensaje){
+	/*
+	const toastMensaje = document.getElementById("toastMensaje");						
+	const toastBody = toastMensaje.getElementsByClassName("toast-body")[0];
+	toastBody.innerText = mensaje;
+	const tostada = new bootstrap.Toast(toastMensaje);
+	tostada.show();
+	*/
+	if(chkLocucion.checked){
+		const formData = new FormData();
+		formData.append("texto",mensaje);
+		const resultado_hablar = await fetch("/hablar", {method:"POST", body:formData });
+		if(resultado_hablar.ok){
+			const result_text = await resultado_hablar.text();
+			if( result_text != "OK"){
+				reproducirMP3( result_text + "?" + Date.now() );
+			}
+		}
+	}
+	bufferMensaje = mensaje.toLowerCase();
+}
+
+function initMaterials(){
+	const divMaterials = document.getElementById("divMaterials");
+	divMaterials.innerHTML = "";
+	//localStorage.removeItem("Miku.Materials");
+	if (localStorage.getItem("Miku.Materials") != null){
+		materials = JSON.parse(localStorage.getItem("Miku.Materials"));
+	}else{
+		materials = [];
+	}
+	material_list.forEach(material_name => {
+		let material = materials.find(item => item.nombre == material_name);
+		if(!material){
+			material = {nombre:material_name, color: get_mesh_color(material_name) };
+			materials.push(material);
+		}
+		material.default_color = get_mesh_color(material_name);
+		set_mesh_color(material_name, material.color);
+
+		// alert("1 procesando " + material_name);
+		const row = document.createElement("div");
+		row.classList.add("row");
+		const label = document.createElement("label");
+		label.classList.add("col", "form-label");
+		label.innerText = material_name;
+		const span = document.createElement("span");
+		span.classList.add("col");
+		const color_picker = document.createElement("input");
+		// alert("2 procesando " + material_name);
+		color_picker.classList.add( "form-control","xpd-material-picker");
+		color_picker.type="color";
+		color_picker.dataset.material_name = material_name;
+		// alert("3 procesando " + material_name);
+		color_picker.value = material.color;
+
+		const span_default = document.createElement("span");
+		span_default.classList.add("col");
+		const btn_default = document.createElement("button");
+		btn_default.classList.add("btn","btn-secondary");
+		btn_default.dataset.material_name = material_name;
+		btn_default.innerText = "Restaurar";							
+
+		//alert("4 procesando " + material_name);
+		span.appendChild(color_picker);
+		span_default.appendChild(btn_default);
+		row.appendChild(label);
+		row.appendChild(span);
+		row.appendChild(span_default);
+		divMaterials.appendChild(row);
+		color_picker.addEventListener("change", onChangeMaterialText);
+		btn_default.addEventListener("click", onClickMaterialButton);
+	});
+	localStorage.setItem("Miku.Materials", JSON.stringify(materials));
+	//alert("Materials Cargado");
+}
+
+function onChangeMaterialText(event){
+	const color_picker = event.target;
+	const material_name = color_picker.dataset.material_name;
+	const valor = color_picker.value;
+	set_mesh_color(material_name, valor);
+	const material = materials.find(item=> item.nombre == material_name);
+	material.color = valor;
+	localStorage.setItem("Miku.Materials", JSON.stringify(materials));
+}
+
+function onClickMaterialButton(event){
+	const btn_default = event.target;
+	const material_name = btn_default.dataset.material_name;
+	const material = materials.find(item=> item.nombre == material_name);
+	material.color = material.default_color;
+	const color_pickers = document.getElementsByClassName("xpd-material-picker");
+	for(let indice = 0; indice < color_pickers.length; indice++){
+		const color_picker = color_pickers[indice];
+		if(color_picker.dataset.material_name == material_name){
+			color_picker.value = material.color;
+			break;
+		}
+	}
+	set_mesh_color(material_name, material.color);
+}
+
+function initLoadApariencias(){
+	const divApariencias = document.getElementById("divApariencias");
+	divApariencias.innerHTML = "";
+	//localStorage.removeItem("Miku.Apariencias");
+	if (localStorage.getItem("Miku.Apariencias") != null){
+		apariencias = JSON.parse(localStorage.getItem("Miku.Apariencias"));
+	}else{
+		apariencias = [];
+	}
+
+	apariencias.forEach(apariencia => {
+		const list_item = document.createElement("div");
+		list_item.classList.add("list-group-item");
+		const flex_row = document.createElement("div");
+		flex_row.classList.add("d-flex", "flex-row", "justify-content-between");
+		const enlace = document.createElement("a");
+		enlace.href = "#";
+		enlace.innerText = apariencia.nombre;
+		enlace.classList.add("text-decoration-none");
+		enlace.dataset.apariencia = apariencia.nombre;
+		const btn_eliminar = document.createElement("a");
+		btn_eliminar.innerText = "x";
+		btn_eliminar.dataset.apariencia = apariencia.nombre;
+		enlace.classList.add("text-decoration-none");
+		list_item.appendChild(flex_row);
+		flex_row.appendChild(enlace);
+		flex_row.appendChild(btn_eliminar);
+		divApariencias.appendChild(list_item);
+		enlace.addEventListener("click", OnCargarApariencia);
+		btn_eliminar.addEventListener("click", OnEliminarApariencia);
+	});
+
+	localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
+}
+
+function initLayers(){
+	const divLayers = document.getElementById("divLayers");
+	divLayers.innerHTML = "";
+	//localStorage.removeItem("Miku.Visibilidad");
+	if (localStorage.getItem("Miku.Visibilidad") != null){
+		visibilidad = JSON.parse(localStorage.getItem("Miku.Visibilidad"));
+	}else{
+		visibilidad = {};
+	}
+	skin_meshes.forEach(anim_mesh => {
+		const row = document.createElement("div");
+		row.classList.add("row");
+		const check = document.createElement("input");
+		check.type = "checkbox";
+		check.classList.add( "form-check", "form-switch", "col-1");
+		check.dataset.mesh_id = anim_mesh.name;
+		row.appendChild(check);
+		const label = document.createElement("label");
+		label.innerText = anim_mesh.name;
+		label.classList.add("form-label", "col");
+		row.appendChild(label);
+		divLayers.appendChild(row);
+		check.addEventListener('click', onChangeCheckLayer);							
+		
+		check.checked = anim_mesh.name == morphing_mesh.name || anim_mesh.name in visibilidad && visibilidad[anim_mesh.name] || !(anim_mesh.name in visibilidad) && anim_mesh.name.indexOf("Miku.") == 0 ;
+		visibilidad[anim_mesh.name] = check.checked;
+		anim_mesh.visible = check.checked;
+	});	
+
+	localStorage.setItem("Miku.Visibilidad", JSON.stringify(visibilidad));
+}
+
+function initGuardarApariencias(){
+	const btnGuardarApariencia = document.getElementById("btnGuardarApariencia");
+	const btnResetTxtApariencia = document.getElementById("btnResetTxtApariencia");
+	btnGuardarApariencia.addEventListener("click", OnGuardarApariencia);
+	btnResetTxtApariencia.addEventListener("click", OnResetTxtApariencia);
+}
+
+function OnResetTxtApariencia(){
+	const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
+	txtGuardarApariencia.value = "";
+}
+
+function OnGuardarApariencia(){
+	const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
+	const nombre = txtGuardarApariencia.value;
+	let apariencia = apariencias.find( item => item.nombre == nombre);
+	if(apariencia == null){
+		apariencia = {"nombre": nombre};
+		apariencias.push(apariencia);
+	}else if ( ! confirm("Desea reemplazar la Apariencia "+ nombre +"?") ){
+		mostrarToast("Se cancela guardado de apariencia.");
+		return;
+	}
+	apariencia.layers = {...visibilidad};
+	apariencia.materials = [...materials];
+	apariencias.sort( (a,b) => (a.nombre >= b.nombre) ? 1 : -1 ); 
+	localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
+	initLoadApariencias();
+	mostrarToast("Se ha guardado la apariencia " + nombre + ".");
+}
+
+function OnCargarApariencia(event){
+	const enlace = event.target;
+	const nombre = enlace.dataset.apariencia;
+	const apariencia = apariencias.find(item => item.nombre == nombre);
+	if(apariencia == null){
+		mostrarToast("No se ha encontrado apariencia " + nombre + ".");
+		return;
+	}
+	localStorage.setItem("Miku.Visibilidad", JSON.stringify(apariencia.layers));
+	localStorage.setItem("Miku.Materials", JSON.stringify(apariencia.materials));
+	initLayers();
+	initMaterials();
+	const txtGuardarApariencia = document.getElementById("txtGuardarApariencia");
+	txtGuardarApariencia.value = nombre;
+	//divOpciones.classList.remove("show");
+}
+
+function OnEliminarApariencia(event){
+	const enlace = event.target;
+	const nombre = event.dataset.apariencia;
+	const apariencia = apariencias.find(item => item.nombre == nombre);
+	if(apariencia == null){
+		mostrarToast("No se ha encontrado apariencia " + nombre + ".");
+		return;
+	}
+	const indice = apariencias.indexOf(apariencia);
+	apariencias.pop(indice);
+	localStorage.setItem("Miku.Apariencias", JSON.stringify(apariencias));
+	initLoadApariencias();
+	mostrarToast("Se ha eliminado la apariencia " + nombre + ".");
+}
+
+function onWindowResize() {
+
+	camara_actual.aspect = window.innerWidth / window.innerHeight;
+	camara_actual.updateProjectionMatrix();
+
+	effect.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+async function animate() {
+	if(procesadorMensaje){
+		procesadorMensaje();
+	}
+	effect.render( scene, camara_actual );
+
+	await dormir(2000);
+
+}
+
+Ammo().then( function ( AmmoLib ) {
+
+	Ammo = AmmoLib;
+
+	init();
+
+} );
 
 		</script>
 

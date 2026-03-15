@@ -52,11 +52,11 @@ class eliza:
             messages=[
                 {
                     "role": "system",
-                    "content": "Solo dar respuestas cortas y concisas, maximo 50 palabras."
+                    "content": "Limitar todas las respuestas a una sola frase."
                 },
                 {
                     "role": "user",
-                    "content": str
+                    "content": "Resume en una sola frase, " +str
                 }
             ],
             stream=True

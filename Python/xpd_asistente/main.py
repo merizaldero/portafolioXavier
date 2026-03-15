@@ -93,11 +93,11 @@ if PUEDO_LOCUTAR:
 @app.route('/hablar', method=['POST'])
 def servir_hablar():
     texto = request.forms.get("texto", "")
-    if PUEDO_LOCUTAR:
-        droid.ttsSpeak(texto)
-    elif PUEDO_GTTS:
+    if PUEDO_GTTS:
         return xpd_tts.locutar(texto)
-        #return "/static/locucion.mp3"
+    elif PUEDO_LOCUTAR:
+        droid.ttsSpeak(texto)
+    
     return "OK"
 
 ######### WEBAPP ROUTERS WRITE YOUR CODE BELOW###############
