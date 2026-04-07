@@ -1,0 +1,5 @@
+taichi_ciervo|60
+taichi_oso|140
+taichi_tigre|120
+taichi_mono|120
+taichi_grulla|120

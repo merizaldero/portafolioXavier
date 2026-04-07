@@ -1,0 +1,12 @@
+calentamiento_cuello_1|20
+calentamiento_cuello_2|20
+calentamiento_cuello_3|20
+calentamiento_brazos_1|20
+calentamiento_brazos_2|20
+calentamiento_antebrazos_1|20
+calentamiento_antebrazos_2|20
+calentamiento_munecas_1|10
+calentamiento_munecas_2|10
+calentamiento_cintura_1|40
+calentamiento_cadera_1|40
+calentamiento_cadera_2|40
