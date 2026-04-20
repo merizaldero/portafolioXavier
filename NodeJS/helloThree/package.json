@@ -11,7 +11,7 @@
   "author": "Xavier Merizalde",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "three": "^0.135.0"
   }
 }
