@@ -18,19 +18,24 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'XTT_PLUGIN_VERSION', '0.5' );
+define( 'XTT_PLUGIN_VERSION', '0.6' );
 define( 'XTT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'XTT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'XTT_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 require_once XTT_PLUGIN_DIR . 'includes/xtt-post-type.php';
+require_once XTT_PLUGIN_DIR . 'includes/xtt-taxonomy.php';
 require_once XTT_PLUGIN_DIR . 'includes/xtt-metabox.php';
 require_once XTT_PLUGIN_DIR . 'includes/xtt-ajax.php';
 require_once XTT_PLUGIN_DIR . 'includes/xtt-render.php';
+require_once XTT_PLUGIN_DIR . 'includes/xtt-frontend.php';
+require_once XTT_PLUGIN_DIR . 'includes/xtt-frontend-actions.php';
 
 function xtt_activate_plugin() {
     xtt_register_post_type();
+    xtt_register_taxonomy();
     xtt_register_statuses();
+    xtt_register_rewrite_rules();
     flush_rewrite_rules();
 }
 register_activation_hook( __FILE__, 'xtt_activate_plugin' );
