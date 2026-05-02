@@ -1,0 +1,149 @@
+#xtt-editor-wrapper {
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    background: #fff;
+    margin: 20px 0;
+}
+
+.xtt-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px;
+    background: #f0f0f1;
+    border-bottom: 1px solid #ccd0d4;
+    gap: 8px;
+}
+
+.xtt-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.xtt-toolbar-separator {
+    width: 1px;
+    height: 30px;
+    background: #ddd;
+    margin: 0 8px;
+}
+
+.xtt-tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.xtt-tool-btn:hover {
+    background: #e5e5e5;
+    border-color: #999;
+}
+
+.xtt-tool-btn.xtt-active {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+
+.xtt-tool-btn.xtt-active .dashicons {
+    color: #fff;
+}
+
+.xtt-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #50575e;
+}
+
+#xtt-fill-color,
+#xtt-stroke-color {
+    width: 40px;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 0;
+}
+
+#xtt-stroke-width,
+#xtt-canvas-width,
+#xtt-canvas-height {
+    width: 60px;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 4px;
+}
+
+#xtt-opacity {
+    width: 80px;
+}
+
+#xtt-canvas-container {
+    position: relative;
+    background: #f9f9f9;
+    padding: 20px;
+    min-height: 400px;
+}
+
+#xtt-drawing-area {
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    background: #fff;
+    min-height: 400px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#xtt-drawing-area svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#xtt-preview-section {
+    padding: 20px;
+    border-top: 1px solid #ccd0d4;
+}
+
+#xtt-preview-container {
+    text-align: center;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#xtt-preview-img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#xtt-no-preview {
+    color: #888;
+    font-style: italic;
+}
+
+@media screen and (max-width: 782px) {
+    .xtt-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .xtt-toolbar-separator {
+        width: 100%;
+        height: 1px;
+    }
+}
